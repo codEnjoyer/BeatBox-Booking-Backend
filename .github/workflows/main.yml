@@ -1,0 +1,33 @@
+name: Test CI/CD
+on: 
+  workflow_dispatch:
+  pull_request:
+    types: [opened, reopened]
+  push:
+      branches:
+        - master
+        - dev
+jobs:
+    test:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Get repository code
+              uses: actions/checkout@v4
+            - name: Cache dependencies # Добавляется перед каждой установкой зависимостей, чтобы ускорить установку
+              uses: actions/cache@v4
+              with:
+                path: ~/.npm
+                key: python-dependencies-${{ hashFiles('**/poetry.lock')}}
+            - name: Install python
+              uses: actions/setup-python@v5 
+              with:
+                python-version: '3.12.2' 
+            - name: Poetry Install
+              uses: Gr1N/setup-poetry@v8
+            - run: poetry --version
+            - name: Install dependencies
+              run: poetry install --with dev,test
+            - name: Black configuration
+              run: poetry run black . --check
+            - name: Test app
+              run: poetry run pytest -s -v

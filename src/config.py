@@ -21,7 +21,7 @@ class Settings(BaseSettings):
             password=self.db_pass,
             host=self.db_host,
             port=self.db_port,
-            path=f"{self.db_name}",
+            path=self.db_name,
         )
 
 

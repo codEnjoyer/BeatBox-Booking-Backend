@@ -34,9 +34,6 @@ jobs:
 
     linting:
       runs-on: ubuntu-latest
-      strategy:
-        matrix:
-          linter: [flake8, pylint, mypy]
       steps:
         - name: Get repository code
           uses: actions/checkout@v4

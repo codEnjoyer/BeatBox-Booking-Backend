@@ -31,3 +31,22 @@ jobs:
               run: poetry run black . --check
             - name: Test app
               run: poetry run pytest -s -v
+
+    linting:
+      runs-on: ubuntu-latest
+      strategy:
+        matrix:
+          linter: [flake8, pylint, mypy]
+      steps:
+        - name: Get repository code
+          uses: actions/checkout@v4
+        - name: Cache dependencies # Добавляется перед каждой установкой зависимостей, чтобы ускорить установку
+          uses: actions/cache@v4
+          with:
+            path: ~/.npm
+            key: python-dependencies-${{ hashFiles('**/poetry.lock')}}
+
+        - name: Linters
+          uses: advanced-security/python-lint-code-scanning-action@v1
+          with:
+            linter: ${{ matrix.linter }}

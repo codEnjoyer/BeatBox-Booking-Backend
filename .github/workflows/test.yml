@@ -45,7 +45,18 @@ jobs:
           with:
             path: ~/.npm
             key: python-dependencies-${{ hashFiles('**/poetry.lock')}}
-        - name: Linters
-          uses: advanced-security/python-lint-code-scanning-action@v1
+        - name: Install python
+          uses: actions/setup-python@v5 
           with:
-            linter: ${{ matrix.linter }}
+              python-version: '3.12.2' 
+        - name: Poetry Install
+          uses: Gr1N/setup-poetry@v8
+        - run: poetry --version
+        - name: Install dependencies
+          run: poetry install --with dev,test
+        - name: Linting flake8
+          run: poetry run flake8
+        - name: Linting pylint
+          run: poetry run pylint src
+        - name: Linting mypy
+          run: poetry run mypy src

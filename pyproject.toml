@@ -19,6 +19,8 @@ pydantic = { extras = ["dotenv"], version = "^2.6.4" }
 [tool.poetry.group.dev.dependencies]
 python = "3.12.2"
 black = "^24.3.0"
+flake8 = "^7.0.0"
+mypy = "^1.9.0"
 
 
 [tool.poetry.group.test.dependencies]

@@ -1,4 +1,4 @@
-from sqlalchemy import Integer, String, func
+from sqlalchemy import Integer, String
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import mapped_column, relationship, Mapped
 
@@ -12,8 +12,9 @@ class Studio(Base):
     name: Mapped[str] = mapped_column(String(100))
     address: Mapped[str] = mapped_column(String(200))
     description: Mapped[str] = mapped_column(String(500))
+
     reviews: Mapped[list["Review"]] = relationship(back_populates="studio", lazy="joined")
-    slots: Mapped[list["Slot"]] = relationship(back_populates="studio")
+    rooms: Mapped[list["Room"]] = relationship(back_populates="studio")
 
     @hybrid_property
     def average_grade(self):

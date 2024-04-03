@@ -13,3 +13,9 @@ async def get_users(session: AsyncSession = Depends(get_async_session)):
     result = await session.execute(select(User))
     users = result.scalars().all()
     return users
+
+@app.post("/users")
+async def create_user(user: dict, session: AsyncSession = Depends(get_async_session)):
+    session.add(User(**user))
+    result = await session.commit()
+    return result

@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     db_user: str
 
     @property
-    def database_url(self) -> PostgresDsn:
+    def database_url(self) -> str:
         return PostgresDsn.build(
             scheme="postgresql+asyncpg",
             username=self.db_user,
@@ -22,7 +22,7 @@ class Settings(BaseSettings):
             host=self.db_host,
             port=self.db_port,
             path=self.db_name,
-        )
+        ).__str__()
 
 
 settings = Settings()

@@ -3,7 +3,7 @@ from sqlalchemy import MetaData
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import declarative_base
 
-from .config import settings
+from src.settings import settings
 
 
 metadata = MetaData()
@@ -11,8 +11,7 @@ Base = declarative_base(metadata=metadata)
 
 engine = create_async_engine(
     str(settings.database_url),
-    pool_pre_ping=True,  # Проверять соединение перед выполнением запроса
-    pool_recycle=3600,  # Пересоздавать соединение каждый час
+    pool_recycle=3600,
 )
 async_session_maker = async_sessionmaker(engine, expire_on_commit=False)
 

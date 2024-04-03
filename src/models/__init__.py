@@ -1,4 +1,5 @@
 from .user import User
 from .review import Review
-from .slot import Slot
+from .room import Room
 from .studio import Studio
+from .slot import Slot

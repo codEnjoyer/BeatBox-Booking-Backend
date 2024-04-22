@@ -13,8 +13,8 @@ class Studio(Base):
     address: Mapped[str] = mapped_column(String(200))
     description: Mapped[str] = mapped_column(String(500))
 
-    reviews: Mapped[list["Review"]] = relationship(back_populates="studio", lazy="joined")
-    rooms: Mapped[list["Room"]] = relationship(back_populates="studio")
+    reviews: Mapped[list["Review"]] = relationship(back_populates="studio", lazy="joined", cascade="all, delete-orphan")
+    rooms: Mapped[list["Room"]] = relationship(back_populates="studio", cascade="all, delete-orphan")
 
     @hybrid_property
     def average_grade(self):

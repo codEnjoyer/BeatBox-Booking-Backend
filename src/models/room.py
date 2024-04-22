@@ -14,4 +14,4 @@ class Room(Base):
     studio_id: Mapped[int] = mapped_column(ForeignKey("studios.id"), nullable=False)
     studio: Mapped["Studio"] = relationship(back_populates="rooms", lazy="joined", foreign_keys=[studio_id])
 
-    slots: Mapped[list["Slot"]] = relationship(back_populates="room")
+    slots: Mapped[list["Slot"]] = relationship(back_populates="room", cascade="all, delete-orphan")

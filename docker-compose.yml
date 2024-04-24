@@ -1,0 +1,21 @@
+version: '3'
+
+services:
+  rabbitmq:
+    image: rabbitmq:latest
+    ports:
+      - "15672:15672"  # Порт для веб-интерфейса управления RabbitMQ (необязательно)
+      - "5672:5672"
+    hostname: localhost
+    environment:
+      - RABBITMQ_DEFAULT_USER=user  # Имя пользователя для RabbitMQ (необязательно)
+      - RABBITMQ_DEFAULT_PASS=password # Пароль для RabbitMQ (необязательно)
+
+  backend:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    depends_on:
+      - rabbitmq

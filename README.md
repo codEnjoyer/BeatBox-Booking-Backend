@@ -18,3 +18,10 @@ black --check . --diff
 ```bash
 pytest -v
 ```
+
+## Миграции БД
+```bash
+alembic revision --autogenerate -m "Initial tables"
+alembic upgrade head 
+alembic downgrade -1
+```

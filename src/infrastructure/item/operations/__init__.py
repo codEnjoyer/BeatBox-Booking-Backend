@@ -1,4 +1,4 @@
 from .create import CreateOperation
-from .read import GetOperation
+from .read import GetOneOperation, GetAllOperation
 from .update import UpdateOperation
 from .delete import DeleteOperation

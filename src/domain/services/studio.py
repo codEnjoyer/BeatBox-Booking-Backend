@@ -2,7 +2,7 @@ from sqlalchemy import ColumnElement
 from sqlalchemy.exc import NoResultFound
 
 from src.domain.exceptions.studio import StudioNotFoundException
-from src.domain.repositories.studio import StudioRepository
+from src.domain.models.repositories.studio import StudioRepository
 from src.domain.schemas.studio import StudioCreate, StudioUpdate
 from src.infrastructure.service import Service
 from src.models import Studio

@@ -1,6 +1,6 @@
 from abc import ABC
 
-from src.infrastructure.repository import Repository as RepositoryABC
+from src.infrastructure.item.repository import Repository as RepositoryABC
 
 
 class Service[Repository: RepositoryABC](ABC):

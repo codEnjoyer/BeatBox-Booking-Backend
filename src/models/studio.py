@@ -8,7 +8,7 @@ from src.db import Base
 class Studio(Base):
     __tablename__ = "studios"
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    # id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String(100))
     address: Mapped[str] = mapped_column(String(200))
     description: Mapped[str] = mapped_column(String(500))

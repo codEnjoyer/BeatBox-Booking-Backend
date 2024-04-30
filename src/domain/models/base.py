@@ -1,3 +1,5 @@
+from typing import Any
+
 from sqlalchemy import MetaData
 from sqlalchemy.orm import declarative_base
 
@@ -24,3 +26,8 @@ class BaseModel(Base):
                 columns.append(f"{column}={getattr(self, column)}")
 
         return f"<{self.__class__.__name__} {', '.join(columns)}>"
+
+
+class IDBaseModel(BaseModel):
+    __abstract__ = True
+    id: Any

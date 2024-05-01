@@ -18,7 +18,7 @@ pydantic = { extras = ["dotenv"], version = "^2.6.4" }
 pydantic-settings = "^2.2.1"
 fastapi-jsonrpc = "^3.1.1"
 pytest-dotenv = "^0.5.2"
-pytest-asyncio = "^0.23.6"
+pytest-asyncio = "0.21.2"
 asgi-lifespan = "^2.1.0"
 
 [tool.poetry.group.dev.dependencies]

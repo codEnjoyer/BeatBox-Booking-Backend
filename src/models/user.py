@@ -13,5 +13,7 @@ class User(Base):
     hashed_password: Mapped[str] = mapped_column(String(200))
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
 
-    reviews: Mapped[list["Review"]] = relationship(back_populates="author", cascade="all, delete-orphan")
+    reviews: Mapped[list["Review"]] = relationship(
+        back_populates="author", cascade="all, delete-orphan"
+    )
     reserved_slots: Mapped[list["Slot"]] = relationship(back_populates="booked_by")

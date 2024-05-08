@@ -12,6 +12,7 @@ class User(Base):
     email: Mapped[str] = mapped_column(String(100), unique=True)
     hashed_password: Mapped[str] = mapped_column(String(200))
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    is_superuser: Mapped[bool] = mapped_column(Boolean, default=False)
 
     reviews: Mapped[list["Review"]] = relationship(
         back_populates="author", cascade="all, delete-orphan"

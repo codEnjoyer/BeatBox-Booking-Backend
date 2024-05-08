@@ -2,7 +2,7 @@ import pytest
 from fastapi import status
 from httpx import AsyncClient
 
-from src.schemas.user import UserCreateSchema
+from src.domain.schemas.user import UserCreateSchema
 
 
 @pytest.mark.usefixtures("clear_database")

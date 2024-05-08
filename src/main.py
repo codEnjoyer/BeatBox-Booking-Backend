@@ -1,15 +1,17 @@
 from contextlib import asynccontextmanager
+from src.api import *
+from fastapi import FastAPI, APIRouter
 
-from fastapi import FastAPI
 
-# Настройки для JWT-токенов
-SECRET = "my_super_secret_key"
-TOKEN_URL = "/auth/login"
+def include_routers(app_: FastAPI, *routers: APIRouter) -> None:
+    for routers in routers:
+        app_.include_router(routers)
+
 
 @asynccontextmanager
 async def lifespan(fastapi_app: FastAPI):
     """Запускаем код до и после запуска приложения"""
-    # Тут можно выполнить код до запуска приложения: различные include_router, и другие доп. настройки/проверки
+    include_routers(fastapi_app, auth_router, user_router)
     yield  # Возвращаем работу приложению
     # Тут можно выполнить код после завершения приложения
 

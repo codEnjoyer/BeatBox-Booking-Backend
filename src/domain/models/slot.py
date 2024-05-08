@@ -3,10 +3,10 @@ from datetime import datetime
 from sqlalchemy import Integer, DateTime, ForeignKey
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 
-from src.db import Base
+from src.domain.models.base import BaseModel
 
 
-class Slot(Base):
+class Slot(BaseModel):
     __tablename__ = "slots"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     start_time: Mapped[datetime] = mapped_column(DateTime)

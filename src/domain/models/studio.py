@@ -1,14 +1,14 @@
-from sqlalchemy import Integer, String
+from sqlalchemy import String, Integer
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import mapped_column, relationship, Mapped
 
-from src.db import Base
+from src.domain.models.base import BaseModel
 
 
-class Studio(Base):
+class Studio(BaseModel):
     __tablename__ = "studios"
 
-    # id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String(100))
     address: Mapped[str] = mapped_column(String(200))
     description: Mapped[str] = mapped_column(String(500))

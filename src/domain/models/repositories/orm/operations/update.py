@@ -2,8 +2,8 @@ from abc import ABC
 
 from sqlalchemy import ColumnElement, update
 
-from src.db import async_session_maker
 from src.domain.models.base import BaseModel
+from src.domain.db import async_session_maker
 from src.domain.schemas.base import BaseSchema
 from src.infrastructure.item.operations.update import UpdateOperation
 

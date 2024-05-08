@@ -2,8 +2,8 @@ from abc import ABC
 
 from sqlalchemy import ColumnElement, delete
 
-from src.db import async_session_maker
 from src.domain.models.base import BaseModel
+from src.domain.db import async_session_maker
 from src.infrastructure.item.operations.delete import DeleteOperation
 
 

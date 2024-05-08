@@ -6,7 +6,7 @@ from sqlalchemy import NullPool
 from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession, create_async_engine
 
 from src.main import app
-from src.db import Base, get_async_session
+from src.domain.db import Base, get_async_session
 from src.settings import settings
 
 engine_test = create_async_engine(str(settings.database_url), poolclass=NullPool)

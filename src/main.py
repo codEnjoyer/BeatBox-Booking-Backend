@@ -1,21 +1,19 @@
-from fastapi import FastAPI, Depends
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
-
-from src.db import get_async_session
-from src.models.user import User
-
-app = FastAPI(title="BeatBox Booking Backend", version="0.0.1")
+from contextlib import asynccontextmanager
+from src.api import *
+from fastapi import FastAPI, APIRouter
 
 
-@app.get("/users")
-async def get_users(session: AsyncSession = Depends(get_async_session)):
-    result = await session.execute(select(User))
-    users = result.scalars().all()
-    return users
+def include_routers(app_: FastAPI, *routers: APIRouter) -> None:
+    for routers in routers:
+        app_.include_router(routers)
 
-@app.post("/users")
-async def create_user(user: dict, session: AsyncSession = Depends(get_async_session)):
-    session.add(User(**user))
-    result = await session.commit()
-    return result
+
+@asynccontextmanager
+async def lifespan(fastapi_app: FastAPI):
+    """Запускаем код до и после запуска приложения"""
+    include_routers(fastapi_app, auth_router, user_router)
+    yield  # Возвращаем работу приложению
+    # Тут можно выполнить код после завершения приложения
+
+
+app = FastAPI(title="BeatBox Booking Backend", version="0.0.1", lifespan=lifespan)

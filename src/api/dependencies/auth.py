@@ -9,7 +9,7 @@ from src.domain.db import async_session_maker
 from src.domain.models import User
 from src.settings import settings
 
-manager = LoginManager(settings.secret_auth_token, token_url="/auth/token", use_cookie=False)
+manager = LoginManager(settings.secret_auth_token, token_url="/auth/token")
 
 CurrentUser = Annotated[User, Depends(manager)]
 

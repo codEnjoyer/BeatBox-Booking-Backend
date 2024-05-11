@@ -5,7 +5,7 @@ from sqlalchemy.exc import NoResultFound, IntegrityError
 from starlette import status
 from datetime import timedelta
 
-from src.api.dependencies.auth import get_user_by_name, manager, JsonRpcRequest
+from src.api.dependencies.auth import get_user_by_name, manager
 from src.database.actions import create_user
 from src.domain.dependencies.auth import verify_password
 from src.domain.db import get_async_session
@@ -17,16 +17,9 @@ router = APIRouter(prefix="/auth")
 
 
 @router.post("/login", response_model=Token)
-async def login(request: JsonRpcRequest,
+async def login(user_schema: UserAuthSchema,
                 session: AsyncSession = Depends(get_async_session)) -> Token:
-    method_name = request.method
-    params = request.params
-
-    if method_name != "login":
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Method not found")
-
     try:
-        user_schema = UserAuthSchema(**params)
         user = await get_user_by_name(user_schema.username, session)
         if user is None:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
@@ -42,16 +35,9 @@ async def login(request: JsonRpcRequest,
 
 
 @router.post("/register", response_model=UserReadSchema, status_code=status.HTTP_201_CREATED)
-async def register(request: JsonRpcRequest,
+async def register(user_schema: UserCreateSchema,
                    session: AsyncSession = Depends(get_async_session)) -> UserReadSchema:
-    method_name = request.method
-    params = request.params
-
-    if method_name != "register":
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Method not found")
-
     try:
-        user_schema = UserCreateSchema(**params)
         user = await create_user(user_schema=user_schema, session=session)
         return UserReadSchema(id=user.id, username=user.username, email=user.email,
                               is_active=user.is_active, is_superuser=user.is_superuser)
@@ -61,8 +47,7 @@ async def register(request: JsonRpcRequest,
 
 @router.post('/token')
 async def token_login(data: OAuth2PasswordRequestForm = Depends(), session: AsyncSession = Depends(get_async_session)):
-    params = {'username': data.username, 'password': data.password}
-    return await login(JsonRpcRequest(method="login", params=params, id=1), session)
+    return await login(UserAuthSchema(username=data.username, password=data.password), session)
 
 
 @router.get("/protected")

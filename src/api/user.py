@@ -28,7 +28,7 @@ async def read_user(username: str,
     if user is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
-    if user.username != active_user.username and not active_user.is_admin:
+    if user.username != active_user.username and not active_user.is_superuser:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             detail="You don't have permission to access this user")
 

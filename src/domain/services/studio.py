@@ -1,7 +1,7 @@
 from src.domain.models.repositories.studio import StudioRepository
 from src.domain.services.usecases.studio import DeleteStudioByIdUseCase, CreateStudioUseCase, \
     UpdateStudioByIdUseCase, GetStudioByIdUseCase, GetStudioByNameUseCase, GetAllStudiosUseCase
-from src.models import Studio
+from src.domain.models import Studio
 
 
 class StudioService(CreateStudioUseCase,

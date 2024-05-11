@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, status, HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.api.dependencies.auth import get_user_by_name, CurrentUser
+from src.api.dependencies.auth import get_user_by_name, manager
 from src.domain.db import get_async_session
 from src.domain.schemas.user import UserReadSchema
 from src.domain.models.user import User
@@ -20,7 +20,7 @@ async def get_users(session: AsyncSession = Depends(get_async_session)):
 
 @router.get("/{username}")
 async def read_user(username: str,
-                    active_user: CurrentUser,
+                    active_user: User = Depends(manager),
                     session: AsyncSession = Depends(get_async_session)) \
         -> UserReadSchema:
     user = await get_user_by_name(username, session)

@@ -12,8 +12,6 @@ from src.settings import settings
 
 manager = LoginManager(settings.secret_auth_token, token_url="/auth/token")
 
-CurrentUser = Annotated[User, Depends(manager)]
-
 
 class JsonRpcRequest(BaseModel):
     jsonrpc: str = "2.0"

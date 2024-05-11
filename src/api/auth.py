@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import NoResultFound, IntegrityError
 from starlette import status
@@ -15,13 +16,13 @@ from src.domain.models.user import User
 router = APIRouter(prefix="/auth")
 
 
-@router.post("/token", response_model=Token)
-async def auth_user(request: JsonRpcRequest,
-                    session: AsyncSession = Depends(get_async_session)) -> Token:
+@router.post("/login", response_model=Token)
+async def login(request: JsonRpcRequest,
+                session: AsyncSession = Depends(get_async_session)) -> Token:
     method_name = request.method
     params = request.params
 
-    if method_name != "auth_user":
+    if method_name != "login":
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Method not found")
 
     try:
@@ -56,6 +57,12 @@ async def register(request: JsonRpcRequest,
                               is_active=user.is_active, is_superuser=user.is_superuser)
     except IntegrityError:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="User already exists")
+
+
+@router.post('/token')
+async def token_login(data: OAuth2PasswordRequestForm = Depends(), session: AsyncSession = Depends(get_async_session)):
+    params = {'username': data.username, 'password': data.password}
+    return await login(JsonRpcRequest(method="login", params=params, id=1), session)
 
 
 @router.get("/protected")

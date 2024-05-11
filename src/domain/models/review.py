@@ -1,7 +1,13 @@
+import typing
+
 from sqlalchemy import DateTime, String, Integer, CheckConstraint, ForeignKey, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.domain.models.base import BaseModel
+
+if typing.TYPE_CHECKING:
+    from src.domain.models.user import User
+    from src.domain.models.studio import Studio
 
 
 class Review(BaseModel):

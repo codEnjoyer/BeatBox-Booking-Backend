@@ -1,7 +1,13 @@
+import typing
+
 from sqlalchemy import Integer, String, Boolean, false
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.domain.models.base import BaseModel
+
+if typing.TYPE_CHECKING:
+    from src.domain.models.review import Review
+    from src.domain.models.slot import Slot
 
 
 class User(BaseModel):

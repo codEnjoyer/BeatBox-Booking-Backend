@@ -1,8 +1,14 @@
+import typing
+
 from sqlalchemy import String, Integer
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import mapped_column, relationship, Mapped
 
 from src.domain.models.base import BaseModel
+
+if typing.TYPE_CHECKING:
+    from src.domain.models.review import Review
+    from src.domain.models.room import Room
 
 
 class Studio(BaseModel):

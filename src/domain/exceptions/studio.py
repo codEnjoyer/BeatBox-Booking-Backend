@@ -1,6 +1,7 @@
+from sqlalchemy.exc import NoResultFound
+
 from src.domain.exceptions.base import BBBException
-from src.infrastructure.exceptions import ItemNotFoundException
 
 
-class StudioNotFoundException(BBBException, ItemNotFoundException):
+class StudioNotFoundException(BBBException, NoResultFound):
     ...

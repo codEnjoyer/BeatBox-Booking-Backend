@@ -1,6 +1,3 @@
-from typing import Annotated
-
-from fastapi import Depends
 from fastapi_login import LoginManager
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -10,8 +7,6 @@ from src.domain.models import User
 from src.settings import settings
 
 manager = LoginManager(settings.secret_auth_token, token_url="/auth/token")
-
-CurrentUser = Annotated[User, Depends(manager)]
 
 
 async def get_user_by_name(username: str, session: AsyncSession) -> User | None:

@@ -1,7 +1,13 @@
+import typing
+
 from sqlalchemy import Integer, String, ForeignKey
 from sqlalchemy.orm import mapped_column, relationship, Mapped
 
 from src.domain.models.base import BaseModel
+
+if typing.TYPE_CHECKING:
+    from src.domain.models.studio import Studio
+    from src.domain.models.slot import Slot
 
 
 class Room(BaseModel):

@@ -1,9 +1,14 @@
+import typing
 from datetime import datetime
 
 from sqlalchemy import Integer, DateTime, ForeignKey
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 
 from src.domain.models.base import BaseModel
+
+if typing.TYPE_CHECKING:
+    from src.domain.models.user import User
+    from src.domain.models.room import Room
 
 
 class Slot(BaseModel):

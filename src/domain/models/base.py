@@ -1,5 +1,3 @@
-from typing import Any
-
 from src.domain.db import Base
 
 
@@ -22,8 +20,3 @@ class BaseModel(Base):
                 columns.append(f"{column}={getattr(self, column)}")
 
         return f"<{self.__class__.__name__} {', '.join(columns)}>"
-
-
-class IDBaseModel(BaseModel):
-    __abstract__ = True
-    id: Any

@@ -1,17 +1,17 @@
 from src.domain.schemas.base import BaseSchema
 
 
-class StudioBase(BaseSchema):
+class BaseStudio(BaseSchema):
     ...
 
 
-class StudioRead(StudioBase):
+class StudioRead(BaseStudio):
     ...
 
 
-class StudioCreate(StudioBase):
+class StudioCreate(BaseStudio):
     ...
 
 
-class StudioUpdate(StudioBase):
+class StudioUpdate(BaseStudio):
     ...

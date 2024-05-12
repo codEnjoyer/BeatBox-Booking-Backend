@@ -18,5 +18,4 @@ class UserCreateSchema(UserBaseSchema):
 
 class UserReadSchema(UserBaseSchema):
     id: int
-    is_active: bool
     is_superuser: bool = False

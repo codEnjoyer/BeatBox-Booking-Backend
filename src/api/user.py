@@ -32,5 +32,4 @@ async def read_user(username: str,
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             detail="You don't have permission to access this user")
 
-    return UserReadSchema(id=user.id, username=user.username, email=user.email,
-                          is_active=user.is_active)
+    return UserReadSchema(id=user.id, username=user.username, email=user.email)

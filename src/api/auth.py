@@ -40,7 +40,7 @@ async def register(user_schema: UserCreateSchema,
     try:
         user = await create_user(user_schema=user_schema, session=session)
         return UserReadSchema(id=user.id, username=user.username, email=user.email,
-                              is_active=user.is_active, is_superuser=user.is_superuser)
+                              is_superuser=user.is_superuser)
     except IntegrityError:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="User already exists")
 

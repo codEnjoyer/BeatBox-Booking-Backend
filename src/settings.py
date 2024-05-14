@@ -16,6 +16,10 @@ class Settings(BaseSettings):
 
     secret_auth_token: str
 
+    aws_access_key_id: str
+    aws_secret_access_key: str
+    bucket_name: str
+
     @property
     def database_url(self) -> str:
         host = PostgresDsn.build(

@@ -1,9 +1,8 @@
 import enum
 import typing
 
-from sqlalchemy import ForeignKey, String, Enum
+from sqlalchemy import ForeignKey, Enum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy_utils import ChoiceType
 
 from src.domain.models.base import BaseModel
 

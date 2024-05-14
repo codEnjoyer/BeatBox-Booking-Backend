@@ -27,5 +27,5 @@ async def get_file_url(file_service: FileServiceDep, name: str) -> str:
 
 
 @router.delete("/delete")
-async def get_file_url(file_service: FileServiceDep, name: str) -> str:
+async def delete(file_service: FileServiceDep, name: str) -> str:
     return await file_service.delete_by_name(name=name)

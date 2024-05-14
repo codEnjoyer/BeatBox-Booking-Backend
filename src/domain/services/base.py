@@ -42,11 +42,11 @@ class ModelService[
             raise self._not_found_exception from e
         return model
 
-    # NOTE: По необходимости добавляйте этот метод в конкретный сервис модели, у которой есть name
+    # NOTE: По необходимости добавляйте этот метод в конкретный сервис модели, у которой есть name  # noqa: E501
     # async def get_by_name(self,
     #                       model_name: str) -> Model | None:
     #     try:
-    #         model = await self._repository.get_one(self._model.name == model_name)
+    #         model = await self._repository.get_one(self._model.name == model_name)  # noqa: E501
     #     except NoResultFound as e:
     #         raise self._not_found_exception from e
     #     return model

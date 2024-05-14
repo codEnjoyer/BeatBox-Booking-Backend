@@ -38,7 +38,7 @@ class FileBucketRepository:
 
     async def create(self, upload_file: UploadFile, key: str) -> FileBucketRead:
         if not self.check_file_valid(upload_file):
-            raise HTTPException(status_code=400, detail=f"Недопустимый файла")
+            raise HTTPException(status_code=400, detail="Недопустимый файла")
 
         self.s3.upload_fileobj(
             upload_file.file,

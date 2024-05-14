@@ -1,5 +1,5 @@
 from contextlib import asynccontextmanager
-from src.api import *
+from src.api import *  # noqa: F403
 from fastapi import FastAPI, APIRouter
 
 
@@ -12,7 +12,11 @@ def include_routers(app_: FastAPI, *routers: APIRouter) -> None:
 async def lifespan(fastapi_app: FastAPI):
     """Запускаем код до и после запуска приложения"""
     include_routers(
-        fastapi_app, auth_router, studio_router, user_router, file_router
+        fastapi_app,
+        auth_router,  # noqa: F405
+        studio_router,  # noqa: F405
+        user_router,  # noqa: F405
+        file_router,  # noqa: F405
     )
     yield  # Возвращаем работу приложению
     # Тут можно выполнить код после завершения приложения

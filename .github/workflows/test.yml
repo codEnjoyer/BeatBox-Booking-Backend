@@ -52,7 +52,7 @@ jobs:
         - name: Install dependencies
           run: poetry install --with dev,test
         - name: Linting flake8
-          run: poetry run flake8
+          run: poetry run flake8 src
         - name: Linting pylint
           run: poetry run pylint src
         - name: Linting mypy

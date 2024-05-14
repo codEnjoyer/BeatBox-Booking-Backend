@@ -15,10 +15,15 @@ class Slot(BaseModel):
     __tablename__ = "slots"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    start_time: Mapped[dt.datetime] = mapped_column(DateTime(timezone=True), nullable=False)
-    end_time: Mapped[dt.datetime] = mapped_column(DateTime(timezone=True), nullable=False)
-    is_available: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True,
-                                               server_default=true())
+    start_time: Mapped[dt.datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False
+    )
+    end_time: Mapped[dt.datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False
+    )
+    is_available: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=True, server_default=true()
+    )
 
     room_id: Mapped[int] = mapped_column(ForeignKey("rooms.id"), nullable=False)
 

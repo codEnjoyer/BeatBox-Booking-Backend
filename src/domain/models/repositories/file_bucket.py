@@ -26,11 +26,13 @@ class FileBucketRepository:
     async def get_presigned_url(self, file_name: str) -> FileBucketRead:
         try:
             response = self.s3.generate_presigned_url(
-                'get_object', Params={'Bucket': settings.bucket_name, 'Key': file_name}
+                'get_object',
+                Params={'Bucket': settings.bucket_name, 'Key': file_name},
             )
         except ClientError as e:
             raise HTTPException(
-                status_code=status.HTTP_502_BAD_GATEWAY, detail='Invalid credentials'
+                status_code=status.HTTP_502_BAD_GATEWAY,
+                detail='Invalid credentials',
             ) from e
         return response
 
@@ -39,13 +41,18 @@ class FileBucketRepository:
             raise HTTPException(status_code=400, detail=f"Недопустимый файла")
 
         self.s3.upload_fileobj(
-            upload_file.file, settings.bucket_name, key, Config=self.transfer_config
+            upload_file.file,
+            settings.bucket_name,
+            key,
+            Config=self.transfer_config,
         )
         return await self.get_presigned_url(key)
 
     def check_file_valid(self, file: UploadFile) -> bool:
         image_type = guess(file.file)
-        return file.size <= self.max_image_size and isinstance(image_type, self.valid_image_types)
+        return file.size <= self.max_image_size and isinstance(
+            image_type, self.valid_image_types
+        )
 
     async def delete(self, file_key: str) -> None:
         self.s3.delete_object(Bucket=settings.bucket_name, Key=file_key)

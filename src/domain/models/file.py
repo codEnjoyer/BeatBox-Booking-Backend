@@ -17,7 +17,9 @@ class SupportedFileExtensions(enum.Enum):
 class File(BaseModel):
     __tablename__ = "files"
 
-    name: Mapped[uuid.UUID] = mapped_column(UUID, primary_key=True, default=uuid.uuid4)
+    name: Mapped[uuid.UUID] = mapped_column(
+        UUID, primary_key=True, default=uuid.uuid4
+    )
     extension: Mapped[SupportedFileExtensions] = mapped_column(
         Enum(SupportedFileExtensions), nullable=False
     )

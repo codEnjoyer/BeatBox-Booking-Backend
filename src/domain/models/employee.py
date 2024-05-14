@@ -16,7 +16,9 @@ class Employee(BaseModel):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
 
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
-    studio_id: Mapped[int] = mapped_column(ForeignKey("studios.id"), nullable=False)
+    studio_id: Mapped[int] = mapped_column(
+        ForeignKey("studios.id"), nullable=False
+    )
 
     user: Mapped["User"] = relationship(back_populates="employee")
     studio: Mapped["Studio"] = relationship(back_populates="employees")

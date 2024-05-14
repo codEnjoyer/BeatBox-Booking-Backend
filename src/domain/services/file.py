@@ -18,18 +18,24 @@ class FileService(ModelService[FileRepository, File, FileCreate, FileUpdate]):
         super().__init__(FileRepository(), StudioNotFoundException)
         self.file_bucket_repository = FileBucketRepository()
 
-    async def create(self, upload_file: UploadFile) -> Tuple[File, FileBucketRead]:
+    async def create(
+        self, upload_file: UploadFile
+    ) -> Tuple[File, FileBucketRead]:
         filename = str(uuid.uuid4())
 
         image_type = guess(upload_file.file)
         image_type_str = str(image_type.extension)
         full_name = f"{filename}.{image_type_str}"
 
-        file_bucket_read: FileBucketRead = await self.file_bucket_repository.create(
-            upload_file=upload_file, key=full_name
+        file_bucket_read: FileBucketRead = (
+            await self.file_bucket_repository.create(
+                upload_file=upload_file, key=full_name
+            )
         )
         file: File = await self._repository.create(
-            FileCreate(name=filename, extension=SupportedFileExtensions(image_type_str))
+            FileCreate(
+                name=filename, extension=SupportedFileExtensions(image_type_str)
+            )
         )
         return file, file_bucket_read
 

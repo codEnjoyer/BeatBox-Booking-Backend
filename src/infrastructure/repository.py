@@ -12,29 +12,18 @@ class Repository[Item, CreateSchema, UpdateSchema](ABC):
         self._model = model
 
     @abstractmethod
-    async def create(self,
-                     schema: CreateSchema) -> Item:
-        ...
+    async def create(self, schema: CreateSchema) -> Item: ...
 
     @abstractmethod
-    async def get_all(self,
-                      *where,
-                      offset: int = 0,
-                      limit: int = 100) -> list[Item]:
-        ...
+    async def get_all(
+        self, *where, offset: int = 0, limit: int = 100
+    ) -> list[Item]: ...
 
     @abstractmethod
-    async def get_one(self,
-                      *where) -> Item | None:
-        ...
+    async def get_one(self, *where) -> Item | None: ...
 
     @abstractmethod
-    async def update(self,
-                     schema: UpdateSchema,
-                     *where) -> list[Item]:
-        ...
+    async def update(self, schema: UpdateSchema, *where) -> list[Item]: ...
 
     @abstractmethod
-    async def delete(self,
-                     *where) -> None:
-        ...
+    async def delete(self, *where) -> None: ...

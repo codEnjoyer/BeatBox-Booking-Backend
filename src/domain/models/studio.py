@@ -20,18 +20,25 @@ class Studio(BaseModel):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String(100), nullable=False, index=True)
-    description: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
+    description: Mapped[Optional[str]] = mapped_column(
+        String(500), nullable=True
+    )
 
     address: Mapped[str] = mapped_column(String(200), nullable=False)
     latitude: Mapped[float] = mapped_column(Float(precision=8), nullable=False)
     longitude: Mapped[float] = mapped_column(Float(precision=8), nullable=False)
 
-    opening_at: Mapped[dt.datetime] = mapped_column(DateTime(timezone=True), nullable=False)
-    closing_at: Mapped[dt.datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    opening_at: Mapped[dt.datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False
+    )
+    closing_at: Mapped[dt.datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False
+    )
 
     site_url: Mapped[Optional[furl]] = mapped_column(URLType, nullable=True)
-    contact_phone_number: Mapped[Optional[PhoneNumber]] = mapped_column(PhoneNumberType(region="RU"),
-                                                                        nullable=True)
+    contact_phone_number: Mapped[Optional[PhoneNumber]] = mapped_column(
+        PhoneNumberType(region="RU"), nullable=True
+    )
     tg: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
     vk: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
     whats_app: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
@@ -48,4 +55,6 @@ class Studio(BaseModel):
 
     @hybrid_property
     def average_grade(self):
-        return sum([review.grade for review in self.reviews]) / len(self.reviews)
+        return sum([review.grade for review in self.reviews]) / len(
+            self.reviews
+        )

@@ -7,34 +7,35 @@ from src.domain.schemas.base import BaseSchema
 from src.infrastructure.service import Service
 
 
-class ModelService[Repository: SQLAlchemyRepository,
-                   Model: BaseModel,
-                   CreateSchema: BaseSchema,
-                   UpdateSchema: BaseSchema](Service[Repository]):
+class ModelService[
+    Repository: SQLAlchemyRepository,
+    Model: BaseModel,
+    CreateSchema: BaseSchema,
+    UpdateSchema: BaseSchema,
+](Service[Repository]):
     _not_found_exception: type[NoResultFound]
 
     @property
     def _model(self) -> type[Model]:
         return self._repository.model
 
-    def __init__(self, repository: Repository, not_found_exception: type[NoResultFound]):
+    def __init__(
+        self, repository: Repository, not_found_exception: type[NoResultFound]
+    ):
         super().__init__(repository)
         self._not_found_exception = not_found_exception
 
-    async def create(self,
-                     schema: CreateSchema) -> Model:
+    async def create(self, schema: CreateSchema) -> Model:
         return await self._repository.create(schema)
 
-    async def get_all(self,
-                      *where: ColumnElement[bool],
-                      offset: int = 0,
-                      limit: int = 100) -> list[Model]:
-        return await self._repository.get_all(*where,
-                                              offset=offset,
-                                              limit=limit)
+    async def get_all(
+        self, *where: ColumnElement[bool], offset: int = 0, limit: int = 100
+    ) -> list[Model]:
+        return await self._repository.get_all(
+            *where, offset=offset, limit=limit
+        )
 
-    async def get_by_id(self,
-                        model_id: int) -> Model:
+    async def get_by_id(self, model_id: int) -> Model:
         try:
             model = await self._repository.get_one(self._model.id == model_id)
         except NoResultFound as e:
@@ -50,17 +51,16 @@ class ModelService[Repository: SQLAlchemyRepository,
     #         raise self._not_found_exception from e
     #     return model
 
-    async def update_by_id(self,
-                           schema: UpdateSchema,
-                           model_id: int) -> Model:
+    async def update_by_id(self, schema: UpdateSchema, model_id: int) -> Model:
         try:
-            model = await self._repository.update(schema, self._model.id == model_id)
+            model = await self._repository.update(
+                schema, self._model.id == model_id
+            )
         except NoResultFound as e:
             raise self._not_found_exception from e
         return model
 
-    async def delete_by_id(self,
-                           model_id: int) -> None:
+    async def delete_by_id(self, model_id: int) -> None:
         try:
             await self._repository.delete(self._model.id == model_id)
         except NoResultFound as e:

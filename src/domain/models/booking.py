@@ -22,10 +22,16 @@ class BookingStatus(enum.Enum):
 class Booking(BaseModel):
     __tablename__ = "bookings"
 
-    status: Mapped[BookingStatus] = mapped_column(Enum(BookingStatus), nullable=False)
+    status: Mapped[BookingStatus] = mapped_column(
+        Enum(BookingStatus), nullable=False
+    )
 
-    slot_id: Mapped[int] = mapped_column(ForeignKey("slots.id"), primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), primary_key=True)
+    slot_id: Mapped[int] = mapped_column(
+        ForeignKey("slots.id"), primary_key=True
+    )
+    user_id: Mapped[int] = mapped_column(
+        ForeignKey("users.id"), primary_key=True
+    )
 
     slot: Mapped["Slot"] = relationship(back_populates="booking")
     user: Mapped["User"] = relationship(back_populates="bookings")

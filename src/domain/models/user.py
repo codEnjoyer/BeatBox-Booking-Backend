@@ -21,14 +21,15 @@ class User(BaseModel):
     patronymic: Mapped[Optional[str]] = mapped_column(String, nullable=True)
 
     email: Mapped[str] = mapped_column(String(320), unique=True, nullable=False)
-    phone_number: Mapped[PhoneNumber] = mapped_column(PhoneNumberType(region="RU"), nullable=False)
-    is_superuser: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False,
-                                               server_default=false())
+    phone_number: Mapped[PhoneNumber] = mapped_column(
+        PhoneNumberType(region="RU"), nullable=False
+    )
+    is_superuser: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False, server_default=false()
+    )
     hashed_password: Mapped[str] = mapped_column(String, nullable=False)
 
-    bookings: Mapped[list["Booking"]] = relationship(
-        back_populates="user"
-    )
+    bookings: Mapped[list["Booking"]] = relationship(back_populates="user")
     reviews: Mapped[list["Review"]] = relationship(
         back_populates="author", cascade="all, delete-orphan"
     )

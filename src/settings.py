@@ -5,8 +5,12 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
-    mode: Literal["ANY", "TEST"]  # ANY / TEST. MODE=TEST используется для проверки в тестах.
+    model_config = SettingsConfigDict(
+        env_file=".env", env_file_encoding="utf-8"
+    )
+    mode: Literal[
+        "ANY", "TEST"
+    ]  # ANY / TEST. MODE=TEST используется для проверки в тестах.
 
     db_host: str
     db_port: int

@@ -5,6 +5,7 @@ from fastapi import HTTPException, status, UploadFile
 from filetype.types import image
 from filetype import guess
 
+from src.domain.models.file import SupportedFileExtensions
 from src.domain.schemas.file import FileBucketRead
 from src.settings import settings
 
@@ -36,7 +37,7 @@ class FileBucketRepository:
             ) from e
         return response
 
-    async def create(self, upload_file: UploadFile, key: str) -> FileBucketRead:
+    async def upload(self, upload_file: UploadFile, key: str) -> FileBucketRead:
         if not self.check_file_valid(upload_file):
             raise HTTPException(status_code=400, detail="Недопустимый файла")
 
@@ -50,9 +51,7 @@ class FileBucketRepository:
 
     def check_file_valid(self, file: UploadFile) -> bool:
         image_type = guess(file.file)
-        return file.size <= self.max_image_size and isinstance(
-            image_type, self.valid_image_types
-        )
+        return file.size <= self.max_image_size and image_type.extension in [e.value for e in SupportedFileExtensions]
 
     async def delete(self, file_key: str) -> None:
         self.s3.delete_object(Bucket=settings.bucket_name, Key=file_key)

@@ -28,7 +28,7 @@ class FileService(ModelService[FileRepository, File, FileCreate, FileUpdate]):
         full_name = f"{filename}.{image_type_str}"
 
         file_bucket_read: FileBucketRead = (
-            await self.file_bucket_repository.create(
+            await self.file_bucket_repository.upload(
                 upload_file=upload_file, key=full_name
             )
         )

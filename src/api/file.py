@@ -13,11 +13,11 @@ router = APIRouter(prefix="/file", tags=["File"])
 async def upload_file(
     file_service: FileServiceDep,
     file: UploadFile,
-    user: User = Depends(manager),
+    # user: User = Depends(manager),
 ) -> FileRead:
-    file = await file_service.create(file)
+    orm_file, bucket_file = await file_service.create(file)
     return FileRead(
-        name=file[0].name, extension=file[0].extension, url=file[1].url
+        name=orm_file.name, extension=orm_file.extension, url=bucket_file.url
     )
 
 

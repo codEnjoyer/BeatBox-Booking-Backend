@@ -8,7 +8,7 @@ router = APIRouter(prefix="/studios", tags=["Studio"])
 
 
 @router.get("", response_model=list[StudioRead])
-async def get_all_studios(studio_service: StudioServiceDep,
-                          offset: int = 0,
-                          limit: int = 100) -> list[Studio]:
+async def get_all_studios(
+    studio_service: StudioServiceDep, offset: int = 0, limit: int = 100
+) -> list[Studio]:
     return await studio_service.get_all(offset=offset, limit=limit)

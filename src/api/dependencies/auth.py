@@ -11,9 +11,7 @@ manager = LoginManager(settings.secret_auth_token, token_url="/auth/token")
 
 async def get_user_by_name(username: str, session: AsyncSession) -> User | None:
     stmt = select(User)
-    stmt = stmt.filter_by(
-        username=username
-    )
+    stmt = stmt.filter_by(username=username)
     result = await session.execute(stmt)
     return result.unique().scalar_one()
 

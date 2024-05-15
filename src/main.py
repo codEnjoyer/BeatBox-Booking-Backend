@@ -1,5 +1,5 @@
 from contextlib import asynccontextmanager
-from src.api import *
+from src.api import *  # noqa: F403
 from fastapi import FastAPI, APIRouter
 
 
@@ -11,9 +11,17 @@ def include_routers(app_: FastAPI, *routers: APIRouter) -> None:
 @asynccontextmanager
 async def lifespan(fastapi_app: FastAPI):
     """Запускаем код до и после запуска приложения"""
-    include_routers(fastapi_app, auth_router, studio_router, user_router)
+    include_routers(
+        fastapi_app,
+        auth_router,  # noqa: F405
+        studio_router,  # noqa: F405
+        user_router,  # noqa: F405
+        file_router,  # noqa: F405
+    )
     yield  # Возвращаем работу приложению
     # Тут можно выполнить код после завершения приложения
 
 
-app = FastAPI(title="BeatBox Booking Backend", version="0.0.1", lifespan=lifespan)
+app = FastAPI(
+    title="BeatBox Booking Backend", version="0.0.1", lifespan=lifespan
+)

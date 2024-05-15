@@ -1,26 +1,35 @@
-import typing
+from typing import TYPE_CHECKING, Optional
 
 from sqlalchemy import Integer, String, Boolean, false
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy_utils import PhoneNumber, PhoneNumberType
 
 from src.domain.models.base import BaseModel
 
-if typing.TYPE_CHECKING:
+if TYPE_CHECKING:
+    from src.domain.models.booking import Booking
     from src.domain.models.review import Review
-    from src.domain.models.slot import Slot
 
 
 class User(BaseModel):
     __tablename__ = "users"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-    username: Mapped[str] = mapped_column(String(100), index=True)
-    email: Mapped[str] = mapped_column(String(100), unique=True)
-    hashed_password: Mapped[str] = mapped_column(String(200))
-    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
-    is_superuser: Mapped[bool] = mapped_column(Boolean, default=False, server_default=false())
 
+    name: Mapped[str] = mapped_column(String, nullable=False)
+    surname: Mapped[str] = mapped_column(String, nullable=False)
+    patronymic: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+
+    email: Mapped[str] = mapped_column(String(320), unique=True, nullable=False)
+    phone_number: Mapped[PhoneNumber] = mapped_column(
+        PhoneNumberType(region="RU"), nullable=False
+    )
+    is_superuser: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False, server_default=false()
+    )
+    hashed_password: Mapped[str] = mapped_column(String, nullable=False)
+
+    bookings: Mapped[list["Booking"]] = relationship(back_populates="user")
     reviews: Mapped[list["Review"]] = relationship(
         back_populates="author", cascade="all, delete-orphan"
     )
-    reserved_slots: Mapped[list["Slot"]] = relationship(back_populates="booked_by")

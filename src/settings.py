@@ -8,9 +8,9 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=".env", env_file_encoding="utf-8"
     )
-    mode: Literal[
-        "ANY", "TEST"
-    ]  # ANY / TEST. MODE=TEST используется для проверки в тестах.
+    ENVIRONMENT: Literal[
+        "PROD", "TEST"
+    ]  # PROD / TEST. ENVIRONMENT=TEST используется для проверки в тестах.
 
     db_host: str
     db_port: int
@@ -38,4 +38,3 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
-print(f"Settings Mode: {settings.mode}")

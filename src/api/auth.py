@@ -17,7 +17,7 @@ from src.domain.schemas.user import (
 )
 from src.domain.models.user import User
 
-router = APIRouter(prefix="/auth")
+router = APIRouter(prefix="/auth", tags=["Auth"])
 
 
 @router.post("/login", response_model=Token)

@@ -4,6 +4,5 @@ from .employee import Employee
 from .file import File
 from .review import Review
 from .room import Room, RoomImage
-from .slot import Slot
 from .studio import Studio
 from .user import User

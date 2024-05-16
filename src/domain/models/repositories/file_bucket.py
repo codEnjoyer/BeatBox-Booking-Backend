@@ -51,7 +51,9 @@ class FileBucketRepository:
 
     def check_file_valid(self, file: UploadFile) -> bool:
         image_type = guess(file.file)
-        return file.size <= self.max_image_size and image_type.extension in [e.value for e in SupportedFileExtensions]
+        return file.size <= self.max_image_size and image_type.extension in [
+            e.value for e in SupportedFileExtensions
+        ]
 
     async def delete(self, file_key: str) -> None:
         self.s3.delete_object(Bucket=settings.bucket_name, Key=file_key)

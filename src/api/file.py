@@ -1,8 +1,6 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter
 
-from src.api.dependencies.auth import manager
 from src.api.dependencies.services.file import FileServiceDep
-from src.domain.models import User
 from src.domain.schemas.file import FileRead
 from fastapi import UploadFile
 

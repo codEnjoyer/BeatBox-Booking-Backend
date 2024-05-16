@@ -7,7 +7,7 @@ from src.domain.db import get_async_session
 from src.domain.schemas.user import UserReadSchema
 from src.domain.models.user import User
 
-router = APIRouter(prefix="/user")
+router = APIRouter(prefix="/user",  tags=["User"])
 
 
 # services

@@ -24,8 +24,8 @@ app.dependency_overrides[get_async_session] = override_get_async_session
 
 @pytest.fixture(autouse=True, scope="session")
 async def test_env_file():
-    # Проверка, что .env, используемый в тестах содержит MODE=TEST
-    assert settings.mode == "TEST"
+    # Проверка, что .env, используемый в тестах содержит ENVIRONMENT=TEST
+    assert settings.environment == "TEST"
 
 
 @pytest.fixture(scope="function")

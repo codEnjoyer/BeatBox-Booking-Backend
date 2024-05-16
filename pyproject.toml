@@ -7,7 +7,7 @@ package-mode = false
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "3.12.2"
+python = ">=3.12.2,<3.13"
 fastapi = "^0.110.0"
 uvicorn = "^0.29.0"
 sqlalchemy = "^2.0.28"

@@ -1,0 +1,48 @@
+services:
+
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    container_name: nginx
+    depends_on:
+      - fastapi_app
+    ports:
+      - "80:80"
+    restart: on-failure
+    volumes:
+      - ./static:/home/web/default/static
+  fastapi_app:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    container_name: fastapi_app
+    volumes:
+      - .:/backend-app
+    expose:
+      - 8000
+    depends_on:
+      - db
+    restart: always
+    env_file:
+      - .env
+  db:
+    image: postgres:16.2
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+      POSTGRES_DB: ${DB_NAME}
+    restart: on-failure
+    healthcheck:
+      test: [ "CMD", "pg_isready -U $POSTGRES_USER -d $POSTGRES_DB" ]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    expose:
+      - ${DB_PORT}
+    env_file:
+      - .env
+volumes:
+  postgres_data:

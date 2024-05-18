@@ -25,7 +25,7 @@ class ModelService[
         super().__init__(repository)
         self._not_found_exception = not_found_exception
 
-    async def create(self, schema: CreateSchema) -> Model:
+    async def create(self, schema: CreateSchema, *args, **kwargs) -> Model:
         return await self._repository.create(schema)
 
     async def get_all(

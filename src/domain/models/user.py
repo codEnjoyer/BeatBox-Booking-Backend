@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING
 
 from sqlalchemy import Integer, String, Boolean, false
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy_utils import PhoneNumber, PhoneNumberType
+from sqlalchemy_utils import PhoneNumberType
 
 from src.domain.models.base import BaseModel
 
@@ -18,7 +18,7 @@ class User(BaseModel):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
 
     email: Mapped[str] = mapped_column(String(320), unique=True, nullable=False)
-    phone_number: Mapped[PhoneNumber] = mapped_column(
+    phone_number: Mapped[str] = mapped_column(
         PhoneNumberType(region="RU"), nullable=False
     )
     is_superuser: Mapped[bool] = mapped_column(

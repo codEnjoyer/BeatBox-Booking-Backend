@@ -5,7 +5,7 @@ from sqlalchemy.exc import NoResultFound, IntegrityError
 from starlette import status
 from datetime import timedelta
 
-from src.api.dependencies.auth import get_user_by_name, manager
+from src.api.dependencies.auth import get_user_by_email, manager
 from src.database.actions import create_user
 from src.domain.dependencies.auth import verify_password
 from src.domain.db import get_async_session
@@ -26,7 +26,7 @@ async def login(
     session: AsyncSession = Depends(get_async_session),
 ) -> Token:
     try:
-        user = await get_user_by_name(user_schema.username, session)
+        user = await get_user_by_email(user_schema.email, session)
         if user is None:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
@@ -40,7 +40,7 @@ async def login(
             )
 
         access_token = manager.create_access_token(
-            data=dict(sub=user_schema.username), expires=timedelta(hours=48)
+            data=dict(sub=user_schema.email), expires=timedelta(hours=48)
         )
         return Token(access_token=access_token, token_type='bearer')
     except NoResultFound:
@@ -62,7 +62,6 @@ async def register(
         user = await create_user(user_schema=user_schema, session=session)
         return UserReadSchema(
             id=user.id,
-            username=user.username,
             email=user.email,
             is_superuser=user.is_superuser,
         )
@@ -78,7 +77,7 @@ async def token_login(
     session: AsyncSession = Depends(get_async_session),
 ):
     return await login(
-        UserAuthSchema(username=data.username, password=data.password), session
+        UserAuthSchema(email=data.username, password=data.password), session
     )
 
 

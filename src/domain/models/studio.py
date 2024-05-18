@@ -5,7 +5,7 @@ from furl import furl
 from sqlalchemy import String, Integer, Float, DateTime
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import mapped_column, relationship, Mapped
-from sqlalchemy_utils import URLType, PhoneNumber, PhoneNumberType
+from sqlalchemy_utils import URLType, PhoneNumberType
 
 from src.domain.models.base import BaseModel
 
@@ -36,7 +36,7 @@ class Studio(BaseModel):
     )
 
     site_url: Mapped[Optional[furl]] = mapped_column(URLType, nullable=True)
-    contact_phone_number: Mapped[Optional[PhoneNumber]] = mapped_column(
+    contact_phone_number: Mapped[Optional[str]] = mapped_column(
         PhoneNumberType(region="RU"), nullable=True
     )
     tg: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)

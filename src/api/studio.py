@@ -17,6 +17,14 @@ async def get_all_studios(
     return await studio_service.get_all(offset=offset, limit=limit)
 
 
+@router.get("/{studio_id}", response_model=StudioRead)
+async def get_studio(
+    studio_id: int, studio_service: StudioServiceDep
+) -> StudioRead:
+    studio = await studio_service.get_by_id(model_id=studio_id)
+    return convert_model_to_scheme(studio)
+
+
 @router.post("/create", response_model=StudioRead)
 async def create_studio(
     schema: StudioCreate, studio_service: StudioServiceDep
@@ -25,7 +33,7 @@ async def create_studio(
     return convert_model_to_scheme(studio)
 
 
-@router.patch("{studio_id}/update", response_model=StudioRead)
+@router.patch("/{studio_id}/update", response_model=StudioRead)
 async def update_studio(
     studio_id: int,
     schema: StudioUpdate,
@@ -38,7 +46,7 @@ async def update_studio(
     return convert_model_to_scheme(studio)
 
 
-@router.delete("{studio_id}/delete")
+@router.delete("/{studio_id}/delete")
 async def delete_studio(
     studio_id: int,
     studio_service: StudioServiceDep,

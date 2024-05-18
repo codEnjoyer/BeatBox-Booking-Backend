@@ -38,7 +38,7 @@ class Room(BaseModel):
         back_populates="room", cascade="all, delete-orphan", lazy="selectin"
     )
     images: Mapped[list["File"]] = relationship(
-        secondary="room_images", cascade="all, delete-orphan"
+        secondary="room_images", cascade="all"
     )
     reviews: Mapped[list["Review"]] = relationship(
         back_populates="room", lazy="joined", cascade="all, delete-orphan"

@@ -9,9 +9,16 @@ from src.settings import settings
 manager = LoginManager(settings.secret_auth_token, token_url="/auth/token")
 
 
-async def get_user_by_name(username: str, session: AsyncSession) -> User | None:
+async def get_user_by_email(email: str, session: AsyncSession) -> User | None:
     stmt = select(User)
-    stmt = stmt.filter_by(username=username)
+    stmt = stmt.filter_by(email=email)
+    result = await session.execute(stmt)
+    return result.unique().scalar_one()
+
+
+async def get_user_by_id(user_id: int, session: AsyncSession) -> User | None:
+    stmt = select(User)
+    stmt = stmt.filter_by(id=user_id)
     result = await session.execute(stmt)
     return result.unique().scalar_one()
 
@@ -19,4 +26,4 @@ async def get_user_by_name(username: str, session: AsyncSession) -> User | None:
 @manager.user_loader()
 async def get_user(name: str):
     async with async_session_maker() as db:
-        return await get_user_by_name(name, db)
+        return await get_user_by_email(name, db)

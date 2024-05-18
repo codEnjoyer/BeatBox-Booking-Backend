@@ -43,7 +43,9 @@ class Booking(BaseModel):
     room_id: Mapped[int] = mapped_column(ForeignKey("rooms.id"), nullable=False)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
 
-    room: Mapped["Room"] = relationship(back_populates="slots", lazy="joined")
+    room: Mapped["Room"] = relationship(
+        back_populates="bookings", lazy="joined"
+    )
     user: Mapped["User"] = relationship(
         back_populates="bookings", lazy="joined"
     )

@@ -19,7 +19,7 @@ class FileService(ModelService[FileRepository, File, FileCreate, FileUpdate]):
         self.file_bucket_repository = FileBucketRepository()
 
     async def create(
-        self, upload_file: UploadFile
+        self, upload_file: UploadFile, **kwargs
     ) -> Tuple[File, FileBucketRead]:
         filename = str(uuid.uuid4())
 

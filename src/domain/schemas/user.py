@@ -1,17 +1,16 @@
 from pydantic import BaseModel, constr
 
 
-class UserAuthSchema(BaseModel):
-    username: str
-    password: constr(max_length=200)
-
-
 class UserBaseSchema(BaseModel):
-    username: str
     email: str
 
 
+class UserAuthSchema(UserBaseSchema):
+    password: constr(max_length=200)
+
+
 class UserCreateSchema(UserBaseSchema):
+    phone_number: str
     password: constr(max_length=200)
     is_superuser: bool = False
 

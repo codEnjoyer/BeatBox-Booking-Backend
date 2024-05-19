@@ -1,7 +1,6 @@
 from fastapi import APIRouter, Depends
 
 from src.api.dependencies.services.studio import StudioServiceDep
-from src.domain.models import Studio
 from src.domain.schemas.studio import StudioRead, StudioCreate, StudioUpdate
 from src.api.dependencies.auth import manager
 from src.domain.models.user import User
@@ -13,8 +12,9 @@ router = APIRouter(prefix="/studios", tags=["Studio"])
 @router.get("", response_model=list[StudioRead])
 async def get_all_studios(
     studio_service: StudioServiceDep, offset: int = 0, limit: int = 100
-) -> list[Studio]:
-    return await studio_service.get_all(offset=offset, limit=limit)
+) -> list[StudioRead]:
+    studios = await studio_service.get_all(offset=offset, limit=limit)
+    return [convert_model_to_scheme(studio) for studio in studios]
 
 
 @router.get("/{studio_id}", response_model=StudioRead)

@@ -45,7 +45,7 @@ class FileService(ModelService[FileRepository, File, FileCreate, FileUpdate]):
         await self.file_bucket_repository.delete(file_key=full_name)
         return await self._repository.delete(self._model.name == name)
 
-    async def get_url(self, name: str) -> FileBucketRead:
+    async def get_url(self, name: uuid.UUID) -> FileBucketRead:
         file: File = await self._repository.get_one(self._model.name == name)
         full_name = f"{file.name}.{file.extension}"
         return await self.file_bucket_repository.get_presigned_url(full_name)

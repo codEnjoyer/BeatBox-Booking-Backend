@@ -3,6 +3,7 @@ from .studio import router as studio_router
 from .user import router as user_router
 from .file import router as file_router
 from .review import router as review_router
+from .room import router as room_router
 
 __all__ = [
     "auth_router",
@@ -10,4 +11,5 @@ __all__ = [
     "user_router",
     "file_router",
     "review_router",
+    "room_router",
 ]

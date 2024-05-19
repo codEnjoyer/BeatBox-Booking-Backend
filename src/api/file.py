@@ -1,3 +1,5 @@
+import uuid
+
 from fastapi import APIRouter
 
 from src.api.dependencies.services.file import FileServiceDep
@@ -19,11 +21,11 @@ async def upload_file(
     )
 
 
-@router.get("/get", response_model=FileRead)
-async def get_file_url(file_service: FileServiceDep, name: str) -> str:
+@router.get("/{name}", response_model=FileRead)
+async def get_file_url(file_service: FileServiceDep, name: uuid.UUID) -> str:
     return await file_service.get_url(name=name)
 
 
-@router.delete("/delete")
-async def delete(file_service: FileServiceDep, name: str) -> str:
+@router.delete("/{name}")
+async def delete(file_service: FileServiceDep, name: uuid.UUID) -> str:
     return await file_service.delete_by_name(name=name)

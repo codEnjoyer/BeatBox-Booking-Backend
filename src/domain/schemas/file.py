@@ -1,10 +1,13 @@
 import uuid
 
+from pydantic import HttpUrl
+
 from src.domain.schemas.base import BaseSchema
 from src.domain.models.file import SupportedFileExtensions
 
 
-class BaseFile(BaseSchema): ...
+class BaseFile(BaseSchema):
+    pass
 
 
 class FileCreate(BaseFile):
@@ -12,13 +15,14 @@ class FileCreate(BaseFile):
     extension: SupportedFileExtensions
 
 
-class FileUpdate(BaseFile): ...
+class FileUpdate(BaseFile):
+    pass
 
 
 class FileRead(BaseFile):
     name: str
     extension: str
-    url: str
+    url: HttpUrl
 
 
 class FileModelRead(BaseFile):
@@ -27,4 +31,4 @@ class FileModelRead(BaseFile):
 
 
 class FileBucketRead(BaseFile):
-    url: str
+    url: HttpUrl

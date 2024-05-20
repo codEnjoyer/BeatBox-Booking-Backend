@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends
 from src.api.dependencies.services.studio import StudioServiceDep
 from src.domain.models import Studio
 from src.domain.schemas.studio import StudioRead, StudioCreate, StudioUpdate
-from src.api.dependencies.auth import manager
+from src.domain.services.auth import manager
 from src.domain.models.user import User
 from src.api.dependencies.studio import convert_model_to_scheme
 

@@ -13,6 +13,11 @@ async def upload_file(
     file: UploadFile,
     # user: User = Depends(manager),
 ) -> FileRead:
+    # if not user.is_superuser:
+    #     raise HTTPException(
+    #         status_code=status.HTTP_403_FORBIDDEN,
+    #         detail="The user doesn't have enough privileges",
+    #     )
     orm_file, bucket_file = await file_service.create(file)
     return FileRead(
         name=orm_file.name, extension=orm_file.extension, url=bucket_file.url

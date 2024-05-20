@@ -18,10 +18,10 @@ class StudioService(
 
     async def create(self, schema: StudioCreate, **kwargs) -> Studio:
         if await self._repository.is_studio_exist(
-            self._model.name == schema.name
+                self._model.name == schema.name
         ):
             raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT,
+                status_code=status.HTTP_409_CONFLICT,  ## TODO: remove it form service layer
                 detail="Studio with same name already exists",
             )
 
@@ -30,10 +30,10 @@ class StudioService(
 
     async def delete(self, studio_id: int, user_id: int) -> None:
         if not await self._repository.is_studio_exist(
-            self._model.id == studio_id
+                self._model.id == studio_id
         ):
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
+                status_code=status.HTTP_404_NOT_FOUND,  ## TODO: remove it form service layer
                 detail="Studio with that name not found",
             )
 
@@ -43,12 +43,12 @@ class StudioService(
         return await self._repository.delete(self._model.id == studio.id)
 
     async def update(
-        self, studio_id: int, user_id: int, schema: StudioUpdate
+            self, studio_id: int, user_id: int, schema: StudioUpdate
     ) -> Studio:
         if not await self._repository.is_studio_exist(
-            self._model.id == studio_id
+                self._model.id == studio_id
         ):
-            raise HTTPException(
+            raise HTTPException(  ## TODO: remove it form service layer
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Studio with that name not found",
             )
@@ -68,7 +68,7 @@ class StudioService(
 
         url = furl(schema.site_url)
         if not url.scheme or not url.host:
-            raise HTTPException(
+            raise HTTPException(  ## TODO: remove it form service layer
                 status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid url"
             )
         schema.site_url = url

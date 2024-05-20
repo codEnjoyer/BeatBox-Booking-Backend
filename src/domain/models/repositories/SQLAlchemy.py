@@ -64,12 +64,12 @@ class SQLAlchemyRepository[
                 .returning(self._model)
             )
             result = await session.execute(stmt)
-            instances = result.scalars()
+            instances = result.scalars().first()
             await session.commit()
             return instances
 
     async def delete(self, *where: ColumnElement[bool]) -> None:
-        async with async_session_maker() as session:
+        async with async_session_maker() as session: ## TODO: fix me pls
             stmt = delete(self._model).where(*where)
             await session.execute(stmt)
             await session.commit()

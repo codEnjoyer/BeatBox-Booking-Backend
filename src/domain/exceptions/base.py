@@ -1,1 +1,2 @@
-class BBBException(Exception): ...
+class BBBException(Exception):
+    pass

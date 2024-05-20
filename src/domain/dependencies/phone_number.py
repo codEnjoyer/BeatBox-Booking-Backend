@@ -9,7 +9,7 @@ from starlette import status
 
 
 def validate_number(number: str) -> str:
-    try:
+    try:  ## TODO: replace it to schema validator
         phone_number = parse(number, 'RU')
         if not is_valid_number(phone_number):
             raise HTTPException(

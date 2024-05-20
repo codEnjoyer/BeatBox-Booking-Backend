@@ -1,18 +1,22 @@
+from datetime import datetime
+
+from pydantic import Field
+
 from src.domain.schemas.base import BaseSchema
 
 
 class BaseReview(BaseSchema):
-    grade: int
+    grade: int = Field(ge=1, le=5)
     text: str
 
 
 class ReviewRead(BaseReview):
+    studio_id: int
     author_id: int
-    date: str
+    date: datetime
 
 
 class ReviewCreate(BaseReview):
-    studio_id: int
     room_id: int
 
 

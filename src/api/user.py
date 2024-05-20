@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, status, HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.api.dependencies.auth import get_user_by_id, manager
+from src.domain.services.auth import get_user_by_id, manager
 from src.domain.db import get_async_session
 from src.domain.schemas.user import UserReadSchema
 from src.domain.models.user import User

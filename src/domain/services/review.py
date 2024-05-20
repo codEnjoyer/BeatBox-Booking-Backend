@@ -25,16 +25,9 @@ class ReviewService(
                 status_code=status.HTTP_409_CONFLICT,
                 detail="User already has a review on this studio",
             )
-
-        current_time = datetime.now(timezone.utc).isoformat()
-        review_data = {
-            'date': current_time,
-            'text': schema.text,
-            'grade': schema.grade,
-            'author_id': author_id,
-            'room_id': schema.room_id,
-            'studio_id': studio_id,
-        }
+        review_data = schema.model_dump()
+        review_data["author_id"] = author_id
+        review_data["studio_id"] = studio_id
 
         return await self._repository.create(review_data)
 
@@ -71,6 +64,5 @@ class ReviewService(
                 status.HTTP_404_NOT_FOUND,
                 detail="User does not have review on this studio",
             )
-        return (
-            await self._repository.update(schema, self._model.id == review_id)
-        )[0]
+        scalar = await self._repository.update(schema, self._model.id == review_id)
+        return scalar

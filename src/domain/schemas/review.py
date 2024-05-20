@@ -7,13 +7,15 @@ class BaseReview(BaseSchema):
 
 
 class ReviewRead(BaseReview):
+    id: int
     author_id: int
     date: str
+    studio_id: int
+    room_id: int | None
 
 
 class ReviewCreate(BaseReview):
-    studio_id: int
-    room_id: int
+    room_id: int | None
 
 
 class ReviewUpdate(BaseReview):

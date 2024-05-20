@@ -64,8 +64,8 @@ class SQLAlchemyRepository[
                 .returning(self._model)
             )
             result = await session.execute(stmt)
-            instances = result.scalars()
             await session.commit()
+            instances = result.scalars()
             return instances
 
     async def delete(self, *where: ColumnElement[bool]) -> None:

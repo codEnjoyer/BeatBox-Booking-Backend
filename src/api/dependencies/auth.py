@@ -27,13 +27,13 @@ async def get_user_by_id(user_id: int, session: AsyncSession) -> User | None:
 
 
 @manager.user_loader()
-async def get_user(name: str) -> User:
+async def get_user(email: str) -> User:
     """
     Raises:
         `LoginManager.not_authenticated_exception`: If the user is not found
     """
     async with async_session_maker() as db:
-        return await get_user_by_email(name, db)
+        return await get_user_by_email(email, db)
 
 
 # Для читаемости при прописывании в dependencies эндпоинтов

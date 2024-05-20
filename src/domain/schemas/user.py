@@ -13,6 +13,7 @@ class UserAuthSchema(UserBaseSchema):
 
 # TODO: кажется, стоит переосмыслить схемы. сейчас решил ничего не трогать
 
+
 class UserCreateSchema(UserBaseSchema):
     phone_number: str
     password: constr(max_length=200)

@@ -5,8 +5,8 @@ from src.domain.schemas.user import UserCreateSchema, UserUpdateSchema
 from src.domain.services.base import ModelService
 
 
-class UserService(ModelService[
-                      UserRepository, User, UserCreateSchema,
-                      UserUpdateSchema]):
+class UserService(
+    ModelService[UserRepository, User, UserCreateSchema, UserUpdateSchema]
+):
     def __init__(self):
         super().__init__(UserRepository(), UserNotFoundException)

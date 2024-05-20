@@ -6,7 +6,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.domain.db import async_session_maker
-from src.domain.models import User
+from src.domain.models import User, Employee
 from src.settings import settings
 
 manager = LoginManager(settings.secret_auth_token, token_url="/auth/token")
@@ -36,24 +36,30 @@ async def get_user(name: str) -> User:
         return await get_user_by_email(name, db)
 
 
-CurrentUserDep = Annotated[User, Depends(manager)]
+# Для читаемости при прописывании в dependencies эндпоинтов
+get_current_user = manager
+
+AuthenticatedUser = Annotated[User, Depends(manager)]
 
 
-async def get_current_employee(current_user: CurrentUserDep) -> User:
-    if current_user.employee is None:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
-                            detail="Not an employee")
-    return current_user
+async def get_current_user_employee(user: AuthenticatedUser) -> Employee:
+    employee: Employee | None = user.employee
+    if not employee:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Permission denied"
+        )
+    return employee
 
 
-CurrentEmployeeDep = Annotated[User, Depends(get_current_employee)]
+AuthenticatedEmployee = Annotated[Employee, Depends(get_current_user_employee)]
 
 
-async def get_current_superuser(current_user: CurrentUserDep) -> User:
-    if not current_user.is_superuser:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
-                            detail="Not a superuser")
-    return current_user
+async def get_current_superuser(user: AuthenticatedUser) -> User:
+    if not user.is_superuser:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Permission denied"
+        )
+    return user
 
 
-CurrentSuperuserDep = Annotated[User, Depends(get_current_superuser)]
+AuthenticatedSuperuser = Annotated[User, Depends(get_current_superuser)]

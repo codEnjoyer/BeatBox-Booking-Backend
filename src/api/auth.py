@@ -5,7 +5,11 @@ from sqlalchemy.exc import NoResultFound, IntegrityError
 from starlette import status
 from datetime import timedelta
 
-from src.api.dependencies.auth import get_user_by_email, manager
+from src.api.dependencies.auth import (
+    get_user_by_email,
+    manager,
+    AuthenticatedUser,
+)
 from src.database.actions import create_user
 from src.domain.dependencies.auth import verify_password
 from src.domain.db import get_async_session
@@ -15,7 +19,6 @@ from src.domain.schemas.user import (
     UserReadSchema,
     UserCreateSchema,
 )
-from src.domain.models.user import User
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
@@ -82,5 +85,5 @@ async def token_login(
 
 
 @router.get("/protected")
-def protected_route(user: User = Depends(manager)):
+def protected_route(user: AuthenticatedUser):
     return {"message": "This is a protected route", "user": user}

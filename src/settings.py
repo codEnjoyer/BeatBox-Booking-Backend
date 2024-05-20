@@ -6,7 +6,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file=".env", env_file_encoding="utf-8"
+        env_file=".env", env_file_encoding="utf-8", extra="allow"
     )
     ENVIRONMENT: Literal[
         "PROD", "TEST"
@@ -23,6 +23,9 @@ class Settings(BaseSettings):
     aws_access_key_id: str
     aws_secret_access_key: str
     bucket_name: str
+
+    app_host: str = "localhost"
+    app_port: int = 8000
 
     @property
     def database_url(self) -> str:

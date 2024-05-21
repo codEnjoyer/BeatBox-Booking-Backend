@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends
 
 from src.api.dependencies.auth import get_current_user
 from src.api.dependencies.services.file import FileServiceDep
+from src.domain.models import User
 from src.domain.schemas.file import FileRead
 from fastapi import UploadFile
 
@@ -16,9 +17,10 @@ router = APIRouter(prefix="/file", tags=["File"])
 async def upload_file(
     file: UploadFile, file_service: FileServiceDep
 ) -> FileRead:
-    orm_file, bucket_file = await file_service.create(file)
+    orm_file, file_url = await file_service.create(file)
+
     return FileRead(
-        name=orm_file.name, extension=orm_file.extension, url=bucket_file.url
+        name=str(orm_file.name), extension=str(orm_file.extension), url=file_url
     )
 
 

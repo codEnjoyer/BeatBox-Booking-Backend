@@ -22,6 +22,7 @@ async def lifespan(fastapi_app: FastAPI):
         review_router,  # noqa: F405
         studio_router,  # noqa: F405
         user_router,  # noqa: F405
+        room_router,  # noqa: F405
     )
     yield  # Возвращаем работу приложению
     # Тут можно выполнить код после завершения приложения

@@ -1,5 +1,3 @@
-from datetime import datetime, timezone
-
 from fastapi import HTTPException
 from starlette import status
 from sqlalchemy.exc import NoResultFound
@@ -20,15 +18,13 @@ class ReviewService(
     async def create(self, schema: ReviewCreate, **kwargs) -> Review:
         author_id: int = kwargs.get('author_id')
         studio_id: int = kwargs.get('studio_id')
-        if not self.is_review_already_exist(author_id, studio_id):
+        if await self.is_review_already_exist(author_id, studio_id):
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
-                detail="User already has a review on this studio",
+                detail="User already has a review.py on this studio",
             )
 
-        current_time = datetime.now(timezone.utc).isoformat()
         review_data = {
-            'date': current_time,
             'text': schema.text,
             'grade': schema.grade,
             'author_id': author_id,
@@ -64,13 +60,13 @@ class ReviewService(
         review_id: int,
         schema: ReviewUpdate,
     ) -> Review:
-        if not self.is_review_already_exist(
+        if not await self.is_review_already_exist(
             studio_id=studio_id, author_id=author_id
         ):
             raise HTTPException(
                 status.HTTP_404_NOT_FOUND,
-                detail="User does not have review on this studio",
+                detail="User does not have review.py on this studio",
             )
-        return (
-            await self._repository.update(schema, self._model.id == review_id)
-        )[0]
+        return await self._repository.update_one(
+            schema, self._model.id == review_id
+        )

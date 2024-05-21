@@ -4,6 +4,7 @@ from src.api.dependencies.services.review import ReviewServiceDep
 from src.api.dependencies.auth import manager
 from src.domain.schemas.review import ReviewCreate, ReviewRead, ReviewUpdate
 from src.domain.models.user import User
+from src.api.dependencies.review import convert_model_to_scheme
 
 router = APIRouter(prefix="/studios", tags=["Review"])
 
@@ -18,24 +19,20 @@ async def add_review(
     review = await service.create(
         schema=schema, author_id=user.id, studio_id=studio_id
     )
-    return ReviewRead(
-        author_id=review.author_id,
-        studio_id=review.studio_id,
-        grade=review.grade,
-        text=review.text,
-    )
+    return convert_model_to_scheme(review)
 
 
 @router.get("/{studio_id}/reviews", response_model=list[ReviewRead])
 async def get_reviews(
     studio_id: int, service: ReviewServiceDep, offset: int = 0, limit: int = 100
 ) -> list[ReviewRead]:
-    return await service.get_reviews_by_studio_id(
+    reviews = await service.get_reviews_by_studio_id(
         studio_id=studio_id, offset=offset, limit=limit
     )
+    return [convert_model_to_scheme(review) for review in reviews]
 
 
-@router.patch("/{studio_id}/reviews/{review_id}", response_model=ReviewRead)
+@router.put("/{studio_id}/reviews/{review_id}", response_model=ReviewRead)
 async def patch_review(
     studio_id: int,
     review_id: int,
@@ -49,9 +46,4 @@ async def patch_review(
         review_id=review_id,
         schema=schema,
     )
-    return ReviewRead(
-        author_id=review.author_id,
-        studio_id=review.studio_id,
-        grade=review.grade,
-        text=review.text,
-    )
+    return convert_model_to_scheme(review)

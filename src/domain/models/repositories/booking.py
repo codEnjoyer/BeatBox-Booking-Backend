@@ -1,4 +1,4 @@
-from sqlalchemy import ColumnElement, select
+from sqlalchemy import ColumnElement, select, update
 from sqlalchemy.orm import selectinload
 
 from src.domain.db import async_session_maker
@@ -29,3 +29,23 @@ class BookingRepository(
             if not room:
                 raise BookingNotFoundException
             return room
+
+    async def update_one(
+        self,
+        schema: BookingUpdate | dict[str, ...],
+        *where: ColumnElement[bool],
+    ) -> Booking:
+        schema = (
+            schema.model_dump() if isinstance(schema, BookingUpdate) else schema
+        )
+        async with async_session_maker() as session:
+            stmt = (
+                update(self._model)
+                .where(*where)
+                .values(**schema)
+                .returning(self._model)
+            )
+            result = await session.execute(stmt)
+            instance = result.scalar()
+            await session.commit()
+            return instance

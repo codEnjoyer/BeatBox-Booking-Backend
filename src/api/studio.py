@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 
 from src.api.dependencies.services.employee import EmployeeServiceDep
 from src.api.dependencies.services.studio import StudioServiceDep
-from src.domain.models import Studio, Employee
+from src.domain.models import Employee
 from src.domain.schemas.employee import EmployeeRead
 from src.domain.schemas.studio import StudioRead, StudioCreate, StudioUpdate
 from src.api.dependencies.auth import (

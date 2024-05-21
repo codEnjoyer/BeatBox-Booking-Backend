@@ -1,3 +1,5 @@
+import uuid
+
 from fastapi import APIRouter, Depends
 
 from src.api.dependencies.services.booking import BookingServiceDep
@@ -24,7 +26,6 @@ async def booked_slot(
 
 @router.get("/my", response_model=list[BookingRead])
 async def get_user_slots(
-    studio_id: int,
     service: BookingServiceDep,
     user: User = Depends(manager),
     offset: int = 0,
@@ -38,7 +39,7 @@ async def get_user_slots(
 
 @router.delete("/{slot_id}", response_model=str)
 async def remove_slot(
-    slot_id: int,
+    slot_id: uuid.UUID,
     service: BookingServiceDep,
     user: User = Depends(manager),
 ) -> str:
@@ -48,7 +49,7 @@ async def remove_slot(
 
 @router.put("/{slot_id}", response_model=BookingRead)
 async def patch_slot(
-    slot_id: int,
+    slot_id: uuid.UUID,
     schema: BookingUpdate,
     service: BookingServiceDep,
     user: User = Depends(manager),

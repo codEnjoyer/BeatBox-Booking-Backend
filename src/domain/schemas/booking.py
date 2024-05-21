@@ -1,4 +1,5 @@
 import datetime as dt
+import uuid
 
 from src.domain.schemas.base import BaseSchema
 from src.domain.models.booking import BookingStatus
@@ -14,7 +15,7 @@ class BaseBooking(BaseSchema):
 
 
 class BookingRead(BaseBooking):
-    id: int
+    id: uuid.UUID
     user_id: int
 
 

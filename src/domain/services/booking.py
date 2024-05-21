@@ -1,4 +1,5 @@
 import datetime as dt
+import uuid
 
 from fastapi import HTTPException
 from starlette import status
@@ -20,7 +21,7 @@ class BookingService(
 
     async def create(self, schema: BookingCreate, **kwargs) -> Booking:
         user_id: int = kwargs.get('user_id')
-        studio_id: int = kwargs.get('studio_id')
+        studio_id: int = kwargs.get('user_id')
         if await self.is_slot_already_booked(
             starts_at=schema.starts_at,
             ends_at=schema.ends_at,
@@ -42,7 +43,17 @@ class BookingService(
                 detail="User does not have permission to close the slot",
             )
 
-        return await self._repository.create(schema=schema)
+        booking_data = {
+            "status": schema.status,
+            "name": schema.name,
+            "surname": schema.surname,
+            "starts_at": schema.starts_at,
+            "ends_at": schema.ends_at,
+            "room_id": schema.room_id,
+            "user_id": user_id,
+        }
+
+        return await self._repository.create(booking_data)
 
     async def is_slot_already_booked(
         self, starts_at: dt.datetime, ends_at: dt.datetime, room_id: int
@@ -58,7 +69,9 @@ class BookingService(
             return False
         return True
 
-    async def check_user_permission(self, slot_id: int, user_id: int) -> bool:
+    async def check_user_permission(
+        self, slot_id: uuid.UUID, user_id: int
+    ) -> bool:
         try:
             await self._repository.get_one(
                 self._model.id == slot_id,
@@ -76,10 +89,13 @@ class BookingService(
         )
 
     async def patch_slot(
-        self, slot_id: int, user_id: int, schema: BookingUpdate
+        self, slot_id: uuid.UUID, user_id: int, schema: BookingUpdate
     ) -> Booking:
-        if schema.status.CANCELED and not self.check_user_permission(
-            slot_id=slot_id, user_id=user_id
+        if (
+            schema.status == BookingStatus.CANCELED
+            and not await self.check_user_permission(
+                slot_id=slot_id, user_id=user_id
+            )
         ):
             raise HTTPException(
                 status.HTTP_403_FORBIDDEN,
@@ -91,7 +107,7 @@ class BookingService(
         )
 
         if (
-            schema.status.CLOSED
+            schema.status == BookingStatus.CLOSED
             and not await RoomRepository.check_employee_permissions(
                 user_id=user_id, studio_id=slot.room.studio_id
             )
@@ -101,11 +117,21 @@ class BookingService(
                 detail="User does not have permission to close the slot",
             )
 
+        booking_data = {
+            "status": schema.status,
+            "name": schema.name,
+            "surname": schema.surname,
+            "starts_at": schema.starts_at,
+            "ends_at": schema.ends_at,
+            "room_id": schema.room_id,
+            "user_id": user_id,
+        }
+
         return await self._repository.update_one(
-            schema, self._model.id == slot_id
+            booking_data, self._model.id == slot_id
         )
 
-    async def remove(self, slot_id: int, user_id: int) -> None:
+    async def remove(self, slot_id: uuid.UUID, user_id: int) -> None:
         if not await self.check_user_permission(
             slot_id=slot_id, user_id=user_id
         ):

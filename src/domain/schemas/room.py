@@ -1,7 +1,6 @@
 import uuid
 
 from src.domain.schemas.base import BaseSchema
-from src.domain.schemas.file import FileBucketRead
 
 
 class BaseRoom(BaseSchema):
@@ -10,8 +9,8 @@ class BaseRoom(BaseSchema):
 
 
 class RoomRead(BaseRoom):
-    banner: FileBucketRead | None
-    images: list[FileBucketRead] | None
+    banner: str | None
+    images: list[str] | None
 
 
 class RoomCreate(BaseRoom):

@@ -6,7 +6,6 @@ from filetype.types import image
 from filetype import guess
 
 from src.domain.models.file import SupportedFileExtensions
-from src.domain.schemas.file import FileBucketRead
 from src.settings import settings
 
 
@@ -24,7 +23,7 @@ class FileBucketRepository:
         chunk_size = 1024 * 1024
         self.transfer_config = TransferConfig(multipart_chunksize=chunk_size)
 
-    async def get_presigned_url(self, file_name: str) -> FileBucketRead:
+    async def get_presigned_url(self, file_name: str) -> str:
         try:
             response = self.s3.generate_presigned_url(
                 'get_object',
@@ -37,7 +36,7 @@ class FileBucketRepository:
             ) from e
         return FileBucketRead(url=response)
 
-    async def upload(self, upload_file: UploadFile, key: str) -> FileBucketRead:
+    async def upload(self, upload_file: UploadFile, key: str) -> str:
         if not self.check_file_valid(upload_file):
             raise HTTPException(status_code=400, detail="Недопустимый файла")
 

@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 from sqlalchemy import Integer, String, Boolean, false
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -27,7 +27,9 @@ class User(BaseModel):
     hashed_password: Mapped[str] = mapped_column(String, nullable=False)
 
     bookings: Mapped[list["Booking"]] = relationship(back_populates="user")
-    employee: Mapped["Employee"] = relationship(back_populates="user")
+    employee: Mapped[Optional["Employee"]] = relationship(
+        back_populates="user", lazy="joined"
+    )
     reviews: Mapped[list["Review"]] = relationship(
         back_populates="author", cascade="all, delete-orphan"
     )

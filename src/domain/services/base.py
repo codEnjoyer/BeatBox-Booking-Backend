@@ -58,7 +58,7 @@ class ModelService[
             )
         except NoResultFound as e:
             raise self._not_found_exception from e
-        return model
+        return model.one()
 
     async def delete_by_id(self, model_id: int) -> None:
         try:

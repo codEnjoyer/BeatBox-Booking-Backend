@@ -17,6 +17,7 @@ async def add_review(
     schema: ReviewCreate,
     review_service: ReviewService = Depends(ReviewService),
     studio_service: StudioService = Depends(StudioService),
+    # room_service: RoomService = Depends(RoomService),
     user: User = Depends(manager),
 ) -> ReviewRead:
     try:
@@ -33,7 +34,9 @@ async def add_review(
     #     )
 
     review = await review_service.create(
-        schema=schema, author_id=user.id
+        schema=schema,
+        author_id=user.id,
+        studio_id=studio_id
     )
     return review
 

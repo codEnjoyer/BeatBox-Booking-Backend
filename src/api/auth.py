@@ -1,14 +1,14 @@
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.exc import NoResultFound, IntegrityError
 from starlette import status
 from datetime import timedelta
 
+from src.domain.exceptions.user import UserAlreadyExistsException, UserNotFoundException
 from src.domain.services.auth import get_user_by_email, manager
 from src.database.actions import create_user
 from src.domain.dependencies.auth import verify_password
-from src.domain.db import get_async_session, async_session_maker
+from src.domain.db import get_async_session
 from src.domain.schemas.auth import Token
 from src.domain.schemas.user import (
     UserAuthSchema,
@@ -19,12 +19,6 @@ from src.domain.schemas.user import (
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
 
-@manager.user_loader() # TODO: remove this from here
-async def get_user(email: str):
-    async with async_session_maker() as db:
-        return await get_user_by_email(email, db)
-
-
 @router.post("/login", response_model=Token)
 async def login(
         user_schema: UserAuthSchema,
@@ -32,15 +26,15 @@ async def login(
 ) -> Token:
     try:
         user = await get_user_by_email(user_schema.email, session)
-    except NoResultFound:
+    except UserNotFoundException:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Invalid credentials"
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials"
         )
     else:
         if not verify_password(user_schema.password, user.hashed_password):
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Incorrect password",
+                detail="Invalid credentials",
             )
 
         access_token = manager.create_access_token(
@@ -60,7 +54,7 @@ async def register(
 ) -> UserReadSchema:
     try:
         return await create_user(user_schema=user_schema, session=session)
-    except IntegrityError:
+    except UserAlreadyExistsException:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT, detail="User already exists"
         )

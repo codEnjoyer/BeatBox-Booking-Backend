@@ -5,3 +5,7 @@ from src.domain.exceptions.base import BBBException
 
 class StudioNotFoundException(BBBException, NoResultFound):
     pass
+
+
+class StudioAlreadyExistException(BBBException):
+    pass

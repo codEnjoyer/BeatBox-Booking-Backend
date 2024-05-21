@@ -29,7 +29,7 @@ class StudioRepository(
             studio = await self.get_one_with_session(session, *where)
 
             employees = studio.employees
-            if any(user_id == employee.user_id for employee in employees):
+            if any(user_id == employee.user_id for employee in employees): ## TODO: correct logic of method
                 raise HTTPException(
                     status_code=status.HTTP_403_FORBIDDEN,
                     detail="Invalid permissions",

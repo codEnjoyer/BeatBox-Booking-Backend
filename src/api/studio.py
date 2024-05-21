@@ -1,11 +1,12 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
+from starlette import status
 
 from src.api.dependencies.services.studio import StudioServiceDep
+from src.domain.exceptions.studio import StudioAlreadyExistException, StudioNotFoundException
 from src.domain.models import Studio
 from src.domain.schemas.studio import StudioRead, StudioCreate, StudioUpdate
 from src.domain.services.auth import manager
 from src.domain.models.user import User
-from src.api.dependencies.studio import convert_model_to_scheme
 
 router = APIRouter(prefix="/studios", tags=["Studio"])
 
@@ -22,15 +23,20 @@ async def get_studio(
     studio_id: int, studio_service: StudioServiceDep
 ) -> StudioRead:
     studio = await studio_service.get_by_id(model_id=studio_id)
-    return convert_model_to_scheme(studio)
+    return studio
 
 
 @router.post("/create", response_model=StudioRead)
 async def create_studio(
     schema: StudioCreate, studio_service: StudioServiceDep
 ) -> StudioRead:
-    studio = await studio_service.create(schema=schema)
-    return convert_model_to_scheme(studio)
+    try:
+        return await studio_service.create(schema=schema)
+    except StudioAlreadyExistException:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Studio with same name already exists",
+        )
 
 
 @router.patch("/{studio_id}/update", response_model=StudioRead)
@@ -43,7 +49,7 @@ async def update_studio(
     studio = await studio_service.update(
         studio_id=studio_id, user_id=user.id, schema=schema
     )
-    return convert_model_to_scheme(studio)
+    return studio
 
 
 @router.delete("/{studio_id}/delete")
@@ -52,5 +58,11 @@ async def delete_studio(
     studio_service: StudioServiceDep,
     user: User = Depends(manager),
 ) -> str:
-    await studio_service.delete(studio_id=studio_id, user_id=user.id)
-    return "Success delete studio"
+    try:
+        await studio_service.delete(studio_id=studio_id, user_id=user.id)
+        return "Success delete studio"
+    except StudioNotFoundException:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Studio not found",
+        )

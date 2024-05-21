@@ -5,7 +5,7 @@ from starlette import status
 from sqlalchemy.exc import NoResultFound
 
 from src.domain.models.review import Review
-from src.domain.schemas.review import ReviewCreate, ReviewUpdate
+from src.domain.schemas.review import ReviewCreate, ReviewUpdate, ReviewRead
 from src.domain.exceptions.review import ReviewNotFoundException
 from src.domain.models.repositories.review import ReviewRepository
 from src.domain.services.base import ModelService
@@ -17,7 +17,7 @@ class ReviewService(
     def __init__(self):
         super().__init__(ReviewRepository(), ReviewNotFoundException)
 
-    async def create(self, schema: ReviewCreate, **kwargs) -> Review:
+    async def create(self, schema: ReviewCreate, **kwargs) -> ReviewRead:
         author_id: int = kwargs.get('author_id')
         studio_id: int = kwargs.get('studio_id')
         if not self.is_review_already_exist(author_id, studio_id):
@@ -29,7 +29,8 @@ class ReviewService(
         review_data["author_id"] = author_id
         review_data["studio_id"] = studio_id
 
-        return await self._repository.create(review_data)
+        review = await self._repository.create(review_data)
+        return ReviewRead.model_validate(review)
 
     async def is_review_already_exist(
         self, author_id: int, studio_id: int

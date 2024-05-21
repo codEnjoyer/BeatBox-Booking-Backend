@@ -24,7 +24,3 @@ class FileRead(BaseFile):
 class FileModelRead(BaseFile):
     name: str
     extension: str
-
-
-class FileBucketRead(BaseFile):
-    url: str

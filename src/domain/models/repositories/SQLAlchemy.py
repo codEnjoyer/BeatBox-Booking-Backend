@@ -38,7 +38,9 @@ class SQLAlchemyRepository[
         async with async_session_maker() as session:
             stmt = select(self._model).where(*where).offset(offset).limit(limit)
             result = await session.execute(stmt)
-            instances = result.scalars()
+            instances = result.unique().scalars().all()
+            if not instances:
+                raise NoResultFound
             return instances
 
     async def get_one(self, *where: ColumnElement[bool]) -> Model:

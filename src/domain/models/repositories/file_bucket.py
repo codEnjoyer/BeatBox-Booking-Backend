@@ -34,7 +34,7 @@ class FileBucketRepository:
                 status_code=status.HTTP_502_BAD_GATEWAY,
                 detail='Invalid credentials',
             ) from e
-        return response
+        return FileBucketRead(url=response)
 
     async def upload(self, upload_file: UploadFile, key: str) -> str:
         if not self.check_file_valid(upload_file):

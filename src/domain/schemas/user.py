@@ -1,12 +1,17 @@
-from pydantic import BaseModel, constr
+from pydantic import constr
+
+from src.domain.schemas.base import BaseSchema
 
 
-class UserBaseSchema(BaseModel):
+class UserBaseSchema(BaseSchema):
     email: str
 
 
 class UserAuthSchema(UserBaseSchema):
     password: constr(max_length=200)
+
+
+# TODO: кажется, стоит переосмыслить схемы. сейчас решил ничего не трогать
 
 
 class UserCreateSchema(UserBaseSchema):
@@ -18,3 +23,7 @@ class UserCreateSchema(UserBaseSchema):
 class UserReadSchema(UserBaseSchema):
     id: int
     is_superuser: bool = False
+
+
+class UserUpdateSchema(UserBaseSchema):
+    phone_number: str

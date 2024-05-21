@@ -1,7 +1,7 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter
 
 from src.api.dependencies.services.review import ReviewServiceDep
-from src.api.dependencies.auth import manager
+from src.api.dependencies.auth import AuthenticatedUser
 from src.domain.schemas.review import ReviewCreate, ReviewRead, ReviewUpdate
 from src.domain.models.user import User
 from src.api.dependencies.review import convert_model_to_scheme
@@ -14,7 +14,7 @@ async def add_review(
     studio_id: int,
     schema: ReviewCreate,
     service: ReviewServiceDep,
-    user: User = Depends(manager),
+    user: AuthenticatedUser,
 ) -> ReviewRead:
     review = await service.create(
         schema=schema, author_id=user.id, studio_id=studio_id
@@ -38,7 +38,7 @@ async def patch_review(
     review_id: int,
     schema: ReviewUpdate,
     service: ReviewServiceDep,
-    user: User = Depends(manager),
+    user: AuthenticatedUser,
 ) -> ReviewRead:
     review = await service.patch_review(
         studio_id=studio_id,
@@ -46,4 +46,4 @@ async def patch_review(
         review_id=review_id,
         schema=schema,
     )
-    return convert_model_to_scheme(review)
+    return review

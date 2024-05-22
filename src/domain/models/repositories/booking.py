@@ -25,10 +25,10 @@ class BookingRepository(
                 .limit(1)
             )
             result = await session.execute(stmt)
-            room: Booking | None = result.scalar()
-            if not room:
+            booking: Booking | None = result.scalar()
+            if not booking:
                 raise BookingNotFoundException
-            return room
+            return booking
 
     async def update_one(
         self,

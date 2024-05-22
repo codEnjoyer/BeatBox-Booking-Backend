@@ -1,14 +1,13 @@
 import uuid
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter
 
 from src.api.dependencies.services.booking import BookingServiceDep
-from src.api.dependencies.auth import manager
+from src.api.dependencies.auth import AuthenticatedUser
 from src.domain.schemas.booking import BookingCreate, BookingRead, BookingUpdate
-from src.domain.models.user import User
 from src.api.dependencies.booking import convert_model_to_scheme
 
-router = APIRouter(prefix="/slots", tags=["Slot"])
+router = APIRouter(prefix="/bookings", tags=["Booking"])
 
 
 @router.post("", response_model=BookingRead)
@@ -16,7 +15,7 @@ async def booked_slot(
     studio_id: int,
     schema: BookingCreate,
     service: BookingServiceDep,
-    user: User = Depends(manager),
+    user: AuthenticatedUser,
 ) -> BookingRead:
     review = await service.create(
         schema=schema, user_id=user.id, studio_id=studio_id
@@ -25,36 +24,34 @@ async def booked_slot(
 
 
 @router.get("/my", response_model=list[BookingRead])
-async def get_user_slots(
+async def get_user_bookings(
     service: BookingServiceDep,
-    user: User = Depends(manager),
+    user: AuthenticatedUser,
     offset: int = 0,
     limit: int = 100,
 ) -> list[BookingRead]:
-    slots = await service.get_slots_by_user_id(
+    bookings = await service.get_bookings_by_user_id(
         user_id=user.id, offset=offset, limit=limit
     )
-    return [convert_model_to_scheme(slot) for slot in slots]
+    return [convert_model_to_scheme(booking) for booking in bookings]
 
 
-@router.delete("/{slot_id}", response_model=str)
-async def remove_slot(
-    slot_id: uuid.UUID,
-    service: BookingServiceDep,
-    user: User = Depends(manager),
+@router.delete("/{booking_id}", response_model=str)
+async def remove_booking(
+    booking_id: uuid.UUID, service: BookingServiceDep, user: AuthenticatedUser
 ) -> str:
-    await service.remove(slot_id=slot_id, user_id=user.id)
+    await service.remove(booking_id=booking_id, user_id=user.id)
     return "Success delete"
 
 
-@router.put("/{slot_id}", response_model=BookingRead)
-async def patch_slot(
-    slot_id: uuid.UUID,
+@router.put("/{booking_id}", response_model=BookingRead)
+async def patch_booking(
+    booking_id: uuid.UUID,
     schema: BookingUpdate,
     service: BookingServiceDep,
-    user: User = Depends(manager),
+    user: AuthenticatedUser,
 ) -> BookingRead:
-    slot = await service.patch_slot(
-        slot_id=slot_id, user_id=user.id, schema=schema
+    booking = await service.patch_booking(
+        booking_id=booking_id, user_id=user.id, schema=schema
     )
-    return convert_model_to_scheme(slot)
+    return convert_model_to_scheme(booking)

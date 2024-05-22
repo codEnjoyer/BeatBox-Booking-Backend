@@ -1,20 +1,25 @@
+import datetime as dt
+import uuid
+
 from src.domain.schemas.base import BaseSchema
-from src.domain.schemas.file import FileRead
+from src.domain.models.booking import BookingStatus
 
 
 class BaseBooking(BaseSchema):
+    status: BookingStatus
     name: str
-    description: str
+    surname: str | None
+    starts_at: dt.datetime
+    ends_at: dt.datetime
+    room_id: int
 
 
 class BookingRead(BaseBooking):
-    banner: FileRead
-    images: list[FileRead]
+    id: uuid.UUID
+    user_id: int
 
 
-class BookingCreate(BaseBooking):
-    banner_id: int | None
+class BookingCreate(BaseBooking): ...
 
 
-class BookingUpdate(BaseBooking):
-    banner_id: int | None
+class BookingUpdate(BaseBooking): ...

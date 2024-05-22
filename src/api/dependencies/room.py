@@ -1,7 +1,6 @@
 from typing import Tuple
 
 from src.domain.models.room import Room
-from src.domain.schemas.file import FileBucketRead
 from src.domain.schemas.room import RoomRead
 from src.domain.services.file import FileService
 from src.domain.services.room import RoomService
@@ -10,8 +9,8 @@ from sqlalchemy.exc import NoResultFound
 
 def convert_model_to_scheme(
     room: Room,
-    banner_url: FileBucketRead | None,
-    images_url: list[FileBucketRead] | None,
+    banner_url: str | None,
+    images_url: list[str] | None,
 ) -> RoomRead:
     return RoomRead(
         name=room.name,
@@ -23,8 +22,8 @@ def convert_model_to_scheme(
 
 async def get_images_url(
     room: Room, file_service: FileService, room_service: RoomService
-) -> Tuple[FileBucketRead, list[FileBucketRead]]:
-    banner_url = await file_service.get_url(name=room.banner_id)
+) -> Tuple[str, list[str]]:
+    banner_url = await file_service.try_get_url(name=room.banner_id)
     images_url = []
 
     try:

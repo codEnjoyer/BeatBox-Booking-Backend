@@ -57,20 +57,14 @@ class RoomService(ModelService[RoomRepository, Room, RoomCreate, RoomUpdate]):
         ):
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="Studio with that name not found",
+                detail="Room with that id not found",
             )
 
         await self._repository.check_employee_permissions(
             user_id=user_id, studio_id=studio_id
         )
 
-        room: Room = await self._repository.get(
-            user_id,
-            self._model.id == room_id,
-            self._model.studio_id == studio_id,
-        )
-
-        return await self._repository.delete(self._model.id == room.id)
+        return await self._repository.delete(self._model.id == room_id)
 
     async def update(
         self, room_id: int, studio_id: int, user_id: int, schema: RoomUpdate
@@ -80,19 +74,15 @@ class RoomService(ModelService[RoomRepository, Room, RoomCreate, RoomUpdate]):
         ):
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="Studio with that name not found",
+                detail="Room with that id not found",
             )
 
         await self._repository.check_employee_permissions(
             user_id=user_id, studio_id=studio_id
         )
 
-        room: Room = await self._repository.get(
-            user_id, self._model.id == studio_id
-        )
-
         return await self._repository.update_one(
-            schema, self._model.id == room.id
+            schema, self._model.id == room_id
         )
 
     async def get_all_images(self, room_id: int) -> list[uuid.UUID]:

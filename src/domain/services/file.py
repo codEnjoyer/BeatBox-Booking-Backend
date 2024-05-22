@@ -65,6 +65,18 @@ class FileService(ModelService[FileRepository, File, FileCreate, FileUpdate]):
                 status_code=status.HTTP_404_NOT_FOUND, detail="File not found"
             )
 
+    async def try_get_url(self, name: str) -> str | None:
+        try:
+            file: File = await self._repository.get_one(
+                self._model.name == name
+            )
+            full_name = f"{file.name}.{file.extension.value}"
+            return await self.file_bucket_repository.get_presigned_url(
+                full_name
+            )
+        except Exception:
+            return None
+
     async def update(
         self, schema: FileUpdate | dict[str, ...], *where: ColumnElement[bool]
     ) -> File:

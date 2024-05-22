@@ -3,7 +3,6 @@ from fastapi import APIRouter
 from src.api.dependencies.services.review import ReviewServiceDep
 from src.api.dependencies.auth import AuthenticatedUser
 from src.domain.schemas.review import ReviewCreate, ReviewRead, ReviewUpdate
-from src.domain.models.user import User
 from src.api.dependencies.review import convert_model_to_scheme
 
 router = APIRouter(prefix="/studios", tags=["Review"])

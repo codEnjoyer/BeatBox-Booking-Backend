@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException
 import datetime as dt
-
 from sqlalchemy.exc import NoResultFound
 from starlette import status
 
 from src.api.dependencies.services.room import RoomServiceDep
 from src.api.dependencies.services.studio import StudioServiceDep
+from src.domain.models import Room
 from src.domain.schemas.room import RoomRead, RoomCreate, RoomUpdate
 from src.domain.schemas.booking import BookingRead
 from src.api.dependencies.auth import manager
@@ -45,6 +45,36 @@ async def get_slots_in_studio(
         studio_id=studio_id, start=start, end=end
     )
     return slots
+
+
+@router.get("/all/{studio_id}", response_model=list[RoomRead])
+async def get_all_room_by_studio_id(
+    studio_id: int,
+    room_service: RoomServiceDep,
+    file_service: FileServiceDep,
+) -> list[RoomRead]:
+    try:
+        rooms = await room_service.get_all(Room.studio_id == studio_id)
+        banner_and_images = [
+            await get_images_url(
+                room=room, file_service=file_service, room_service=room_service
+            )
+            for room in rooms
+        ]
+
+        return [
+            convert_model_to_scheme(
+                room=rooms[i],
+                banner_url=banner_and_images[i][0],
+                images_url=banner_and_images[i][1],
+            )
+            for i in range(len(rooms))
+        ]
+
+    except NoResultFound:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Room not found"
+        )
 
 
 @router.post("/{studio_id}", response_model=RoomRead)

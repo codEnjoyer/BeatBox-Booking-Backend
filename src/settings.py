@@ -24,7 +24,7 @@ class Settings(BaseSettings):
     aws_secret_access_key: str
     bucket_name: str
 
-    app_host: str = "localhost"
+    app_host: str = "0.0.0.0"
     app_port: int = 8000
 
     @property

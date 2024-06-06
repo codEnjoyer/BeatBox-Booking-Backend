@@ -18,6 +18,8 @@ class Settings(BaseSettings):
     db_name: str
     db_user: str
 
+    app_port: int
+
     secret_auth_token: str
 
     aws_access_key_id: str
@@ -25,7 +27,6 @@ class Settings(BaseSettings):
     bucket_name: str
 
     app_host: str = "0.0.0.0"
-    app_port: int = 8000
 
     @property
     def database_url(self) -> str:

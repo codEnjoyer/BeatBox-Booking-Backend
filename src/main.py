@@ -12,10 +12,10 @@ def include_routers(app_: FastAPI, *routers: APIRouter) -> None:
 
 
 @asynccontextmanager
-async def lifespan(fastapi_app: FastAPI):
+async def lifespan(app_: FastAPI):
     """Запускаем код до и после запуска приложения"""
     include_routers(
-        fastapi_app,
+        app_,
         auth_router,  # noqa: F405
         employee_router,  # noqa: F405
         file_router,  # noqa: F405
@@ -30,7 +30,10 @@ async def lifespan(fastapi_app: FastAPI):
 
 
 app = FastAPI(
-    title="BeatBox Booking Backend", version="0.0.1", lifespan=lifespan
+    root_path="/api",
+    title="BeatBox Booking Backend",
+    version="0.0.1",
+    lifespan=lifespan,
 )
 
 

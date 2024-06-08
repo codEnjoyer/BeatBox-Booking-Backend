@@ -3,12 +3,12 @@ services:
     build:
       context: ./
       dockerfile: Dockerfile
-    container_name: app
-    expose:
-      - ${APP_PORT}
+    ports:
+      - ${APP_PORT}:${APP_PORT}
     depends_on:
-      - db
-    restart: always
+      db:
+        condition: service_healthy
+    restart: on-failure
     env_file:
       - .env
     deploy:
@@ -16,7 +16,6 @@ services:
         condition: on-failure
 
   db:
-    container_name: bbb_db
     image: postgres:16.2
     environment:
       POSTGRES_USER: ${DB_USER}
@@ -34,8 +33,8 @@ services:
       retries: 5
     volumes:
       - postgres_data:/var/lib/postgresql/data/
-    expose:
-      - ${DB_PORT}
+    ports:
+      - ${DB_PORT}:${DB_PORT}
     env_file:
       - .env
 

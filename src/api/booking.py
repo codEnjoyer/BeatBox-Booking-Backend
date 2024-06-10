@@ -2,7 +2,7 @@ import uuid
 
 from fastapi import APIRouter
 
-from src.api.dependencies.services.booking import BookingServiceDep
+from src.api.dependencies.services import BookingServiceDep
 from src.api.dependencies.auth import AuthenticatedUser
 from src.domain.schemas.booking import BookingCreate, BookingRead, BookingUpdate
 from src.api.dependencies.booking import convert_model_to_scheme

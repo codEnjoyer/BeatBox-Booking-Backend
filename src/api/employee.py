@@ -5,7 +5,7 @@ from src.api.dependencies.auth import (
     get_current_user_employee,
 )
 from src.api.dependencies.employee import can_create_employee
-from src.api.dependencies.services.employee import EmployeeServiceDep
+from src.api.dependencies.services import EmployeeServiceDep
 from src.domain.models import Employee
 from src.domain.schemas.employee import EmployeeRead, EmployeeCreate
 

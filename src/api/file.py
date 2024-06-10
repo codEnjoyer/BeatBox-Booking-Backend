@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 
 from src.api.dependencies.auth import get_current_user
-from src.api.dependencies.services.file import FileServiceDep
+from src.api.dependencies.services import FileServiceDep
 from src.domain.schemas.file import FileRead
 from fastapi import UploadFile
 

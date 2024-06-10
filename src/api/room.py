@@ -3,14 +3,14 @@ import datetime as dt
 from sqlalchemy.exc import NoResultFound
 from starlette import status
 
-from src.api.dependencies.services.room import RoomServiceDep
-from src.api.dependencies.services.studio import StudioServiceDep
+from src.api.dependencies.services import FileServiceDep
+from src.api.dependencies.services import RoomServiceDep
+from src.api.dependencies.services import StudioServiceDep
 from src.domain.models import Room
 from src.domain.schemas.room import RoomRead, RoomCreate, RoomUpdate
 from src.domain.schemas.booking import BookingRead
 from src.api.dependencies.auth import manager
 from src.domain.models.user import User
-from src.api.dependencies.services.file import FileServiceDep
 from src.api.dependencies.room import convert_model_to_scheme, get_images_url
 
 router = APIRouter(prefix="/rooms", tags=["Room"])

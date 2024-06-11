@@ -10,7 +10,6 @@ from src.api.dependencies.auth import (
     get_current_superuser,
     get_current_user_employee,
 )
-from src.api.dependencies.studio import convert_model_to_scheme
 
 router = APIRouter(prefix="/studios", tags=["Studio"])
 
@@ -20,7 +19,7 @@ async def get_all_studios(
     studio_service: StudioServiceDep, offset: int = 0, limit: int = 100
 ) -> list[StudioRead]:
     studios = await studio_service.get_all(offset=offset, limit=limit)
-    return [convert_model_to_scheme(studio) for studio in studios]
+    return studios
 
 
 @router.get("/{studio_id}", response_model=StudioRead)
@@ -28,7 +27,7 @@ async def get_studio(
     studio_id: int, studio_service: StudioServiceDep
 ) -> StudioRead:
     studio = await studio_service.get_by_id(model_id=studio_id)
-    return convert_model_to_scheme(studio)
+    return studio
 
 
 @router.post(
@@ -41,7 +40,7 @@ async def create_studio(
     studio_service: StudioServiceDep,
 ) -> StudioRead:
     studio = await studio_service.create(schema=schema)
-    return convert_model_to_scheme(studio)
+    return studio
 
 
 @router.patch("/{studio_id}/update", response_model=StudioRead)
@@ -54,7 +53,7 @@ async def update_studio(
     studio = await studio_service.update(
         studio_id=studio_id, user_id=employee.user_id, schema=schema
     )
-    return convert_model_to_scheme(studio)
+    return studio
 
 
 @router.delete("/{studio_id}/delete")

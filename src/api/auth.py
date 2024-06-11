@@ -77,8 +77,3 @@ async def token_login(
     return await login(
         UserAuthSchema(email=data.username, password=data.password), session
     )
-
-
-# @router.get("/protected")
-# def protected_route(user: AuthenticatedUser):
-#     return {"message": "This is a protected route", "user": user}

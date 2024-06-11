@@ -1,4 +1,4 @@
-from pydantic import HttpUrl
+from pydantic import AnyHttpUrl
 from src.domain.schemas.base import BaseSchema
 import datetime as dt
 
@@ -13,7 +13,7 @@ class BaseStudio(BaseSchema):
     closing_at: dt.datetime
     latitude: float | None
     longitude: float | None
-    site_url: HttpUrl | None
+    site_url: AnyHttpUrl | None
     contact_phone_number: PhoneNumber | None
     tg: str | None
     vk: str | None
@@ -22,7 +22,7 @@ class BaseStudio(BaseSchema):
 
 class StudioRead(BaseStudio):
     id: int
-    ...
+    average_grade: float
 
 
 class StudioCreate(BaseStudio):

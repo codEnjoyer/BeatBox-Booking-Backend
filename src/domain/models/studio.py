@@ -35,9 +35,9 @@ class Studio(BaseModel):
         DateTime(timezone=True), nullable=False
     )
 
-    site_url: Mapped[Optional[furl]] = mapped_column(URLType, nullable=True)
+    site_url: Mapped[Optional[str]] = mapped_column(String(200), nullable=True)
     contact_phone_number: Mapped[Optional[str]] = mapped_column(
-        PhoneNumberType(region="RU"), nullable=True
+        String(100), nullable=True
     )
     tg: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
     vk: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
@@ -55,6 +55,8 @@ class Studio(BaseModel):
 
     @hybrid_property
     def average_grade(self):
-        return sum([review.grade for review in self.reviews]) / len(
-            self.reviews
-        )
+        if self.reviews:
+            return sum([review.grade for review in self.reviews]) / len(
+                self.reviews
+            )
+        return 0

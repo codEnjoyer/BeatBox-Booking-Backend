@@ -3,7 +3,6 @@ from fastapi import APIRouter
 from src.api.dependencies.services import ReviewServiceDep
 from src.api.dependencies.auth import AuthenticatedUser
 from src.domain.schemas.review import ReviewCreate, ReviewRead, ReviewUpdate
-from src.api.dependencies.review import convert_model_to_scheme
 
 router = APIRouter(prefix="/studios", tags=["Review"])
 
@@ -18,7 +17,7 @@ async def add_review(
     review = await service.create(
         schema=schema, author_id=user.id, studio_id=studio_id
     )
-    return convert_model_to_scheme(review)
+    return review
 
 
 @router.get("/{studio_id}/reviews", response_model=list[ReviewRead])
@@ -28,7 +27,7 @@ async def get_reviews(
     reviews = await service.get_reviews_by_studio_id(
         studio_id=studio_id, offset=offset, limit=limit
     )
-    return [convert_model_to_scheme(review) for review in reviews]
+    return reviews
 
 
 @router.put("/{studio_id}/reviews/{review_id}", response_model=ReviewRead)

@@ -5,7 +5,6 @@ from fastapi import APIRouter
 from src.api.dependencies.services import BookingServiceDep
 from src.api.dependencies.auth import AuthenticatedUser
 from src.domain.schemas.booking import BookingCreate, BookingRead, BookingUpdate
-from src.api.dependencies.booking import convert_model_to_scheme
 
 router = APIRouter(prefix="/bookings", tags=["Booking"])
 
@@ -20,7 +19,7 @@ async def booked_slot(
     review = await service.create(
         schema=schema, user_id=user.id, studio_id=studio_id
     )
-    return convert_model_to_scheme(review)
+    return review
 
 
 @router.get("/my", response_model=list[BookingRead])
@@ -33,7 +32,7 @@ async def get_user_bookings(
     bookings = await service.get_bookings_by_user_id(
         user_id=user.id, offset=offset, limit=limit
     )
-    return [convert_model_to_scheme(booking) for booking in bookings]
+    return bookings
 
 
 @router.delete("/{booking_id}", response_model=str)
@@ -54,4 +53,4 @@ async def patch_booking(
     booking = await service.patch_booking(
         booking_id=booking_id, user_id=user.id, schema=schema
     )
-    return convert_model_to_scheme(booking)
+    return booking

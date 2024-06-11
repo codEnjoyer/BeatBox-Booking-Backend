@@ -15,4 +15,4 @@ class EmployeeCreate(BaseEmployee):
 
 
 class EmployeeUpdate(BaseEmployee):
-
+    ...

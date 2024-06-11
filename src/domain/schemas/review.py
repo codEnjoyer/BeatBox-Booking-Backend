@@ -1,8 +1,10 @@
+from pydantic import Field
+
 from src.domain.schemas.base import BaseSchema
 
 
 class BaseReview(BaseSchema):
-    grade: int
+    grade: int = Field(..., gt=0, le=5)
     text: str
 
 
@@ -19,4 +21,4 @@ class ReviewCreate(BaseReview):
 
 
 class ReviewUpdate(BaseReview):
-    pass
+    ...

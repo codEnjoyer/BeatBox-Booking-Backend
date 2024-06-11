@@ -5,13 +5,7 @@ from sqlalchemy.exc import NoResultFound, IntegrityError
 from starlette import status
 from datetime import timedelta
 
-from src.api.dependencies.auth import (
-    get_user_by_email,
-    manager,
-    AuthenticatedUser,
-)
-from src.database.actions import create_user
-from src.domain.dependencies.auth import verify_password
+from src.api.dependencies.auth import manager
 from src.domain.db import get_async_session
 from src.domain.schemas.auth import Token
 from src.domain.schemas.user import (
@@ -19,6 +13,7 @@ from src.domain.schemas.user import (
     UserReadSchema,
     UserCreateSchema,
 )
+from src.domain.services.user import UserService
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
@@ -29,14 +24,14 @@ async def login(
     session: AsyncSession = Depends(get_async_session),
 ) -> Token:
     try:
-        user = await get_user_by_email(user_schema.email, session)
+        user = await UserService.get_user_by_email(user_schema.email, session)
         if user is None:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Incorrect username",
             )
 
-        if not verify_password(user_schema.password, user.hashed_password):
+        if not UserService.verify_password(user_schema.password, user.hashed_password):
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Incorrect password",
@@ -62,7 +57,7 @@ async def register(
     session: AsyncSession = Depends(get_async_session),
 ) -> UserReadSchema:
     try:
-        user = await create_user(user_schema=user_schema, session=session)
+        user = await UserService.create_user(user_schema=user_schema, session=session)
         return UserReadSchema(
             id=user.id,
             email=user.email,
@@ -84,6 +79,6 @@ async def token_login(
     )
 
 
-@router.get("/protected")
-def protected_route(user: AuthenticatedUser):
-    return {"message": "This is a protected route", "user": user}
+# @router.get("/protected")
+# def protected_route(user: AuthenticatedUser):
+#     return {"message": "This is a protected route", "user": user}

@@ -1,10 +1,11 @@
-from pydantic import constr
+from pydantic import constr, EmailStr
 
 from src.domain.schemas.base import BaseSchema
+from src.domain.schemas.phone_number import PhoneNumber
 
 
 class UserBaseSchema(BaseSchema):
-    email: str
+    email: EmailStr
 
 
 class UserAuthSchema(UserBaseSchema):
@@ -15,7 +16,7 @@ class UserAuthSchema(UserBaseSchema):
 
 
 class UserCreateSchema(UserBaseSchema):
-    phone_number: str
+    phone_number: PhoneNumber
     password: constr(max_length=200)
     is_superuser: bool = False
 
@@ -26,4 +27,4 @@ class UserReadSchema(UserBaseSchema):
 
 
 class UserUpdateSchema(UserBaseSchema):
-    phone_number: str
+    phone_number: PhoneNumber

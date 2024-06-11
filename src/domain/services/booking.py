@@ -23,9 +23,9 @@ class BookingService(
         user_id: int = kwargs.get('user_id')
         studio_id: int = kwargs.get('user_id')
         if await self.is_booking_already_booked(
-            starts_at=schema.starts_at,
-            ends_at=schema.ends_at,
-            room_id=schema.room_id,
+                starts_at=schema.starts_at,
+                ends_at=schema.ends_at,
+                room_id=schema.room_id,
         ):
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
@@ -33,30 +33,21 @@ class BookingService(
             )
 
         if (
-            schema.status == BookingStatus.CLOSED
-            and not await RoomRepository.check_employee_permissions(
-                user_id=user_id, studio_id=studio_id
-            )
+                schema.status == BookingStatus.CLOSED
+                and not await RoomRepository.check_employee_permissions(
+            user_id=user_id, studio_id=studio_id
+        )
         ):
             raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
+                status_code=status.HTTP_403_FORBIDDEN,  # TODO: replace to api layer exception
                 detail="User does not have permission to close the booking",
             )
-
-        booking_data = {
-            "status": schema.status,
-            "name": schema.name,
-            "surname": schema.surname,
-            "starts_at": schema.starts_at,
-            "ends_at": schema.ends_at,
-            "room_id": schema.room_id,
-            "user_id": user_id,
-        }
-
+        booking_data = schema.dict()
+        booking_data["user_id"] = user_id
         return await self._repository.create(booking_data)
 
     async def is_booking_already_booked(
-        self, starts_at: dt.datetime, ends_at: dt.datetime, room_id: int
+            self, starts_at: dt.datetime, ends_at: dt.datetime, room_id: int
     ) -> bool:
         try:
             await self._repository.get_one(
@@ -70,7 +61,7 @@ class BookingService(
         return True
 
     async def check_user_permission(
-        self, booking_id: uuid.UUID, user_id: int
+            self, booking_id: uuid.UUID, user_id: int
     ) -> bool:
         try:
             await self._repository.get_one(
@@ -82,20 +73,20 @@ class BookingService(
         return True
 
     async def get_bookings_by_user_id(
-        self, user_id: int, offset: int = 0, limit: int = 100
+            self, user_id: int, offset: int = 0, limit: int = 100
     ) -> list[Booking]:
         return await self._repository.get_all(
             self._model.user_id == user_id, offset=offset, limit=limit
         )
 
     async def patch_booking(
-        self, booking_id: uuid.UUID, user_id: int, schema: BookingUpdate
+            self, booking_id: uuid.UUID, user_id: int, schema: BookingUpdate
     ) -> Booking:
         if (
-            schema.status == BookingStatus.CANCELED
-            and not await self.check_user_permission(
-                booking_id=booking_id, user_id=user_id
-            )
+                schema.status == BookingStatus.CANCELED
+                and not await self.check_user_permission(
+            booking_id=booking_id, user_id=user_id
+        )
         ):
             raise HTTPException(
                 status.HTTP_403_FORBIDDEN,
@@ -107,10 +98,10 @@ class BookingService(
         )
 
         if (
-            schema.status == BookingStatus.CLOSED
-            and not await RoomRepository.check_employee_permissions(
-                user_id=user_id, studio_id=booking.room.studio_id
-            )
+                schema.status == BookingStatus.CLOSED
+                and not await RoomRepository.check_employee_permissions(
+            user_id=user_id, studio_id=booking.room.studio_id
+        )
         ):
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
@@ -133,7 +124,7 @@ class BookingService(
 
     async def remove(self, booking_id: uuid.UUID, user_id: int) -> None:
         if not await self.check_user_permission(
-            booking_id=booking_id, user_id=user_id
+                booking_id=booking_id, user_id=user_id
         ):
             raise HTTPException(
                 status.HTTP_404_NOT_FOUND,

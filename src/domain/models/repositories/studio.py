@@ -1,6 +1,6 @@
 from typing import override
 
-from sqlalchemy import ColumnElement, select, update
+from sqlalchemy import ColumnElement, select
 from sqlalchemy.exc import NoResultFound
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -42,7 +42,7 @@ class StudioRepository(
             return studio
 
     async def get_one_with_session(
-        self, session: AsyncSession, *where: ColumnElement[bool]
+            self, session: AsyncSession, *where: ColumnElement[bool]
     ) -> Studio:
         stmt = (
             select(self.model)
@@ -55,21 +55,3 @@ class StudioRepository(
         if not studio:
             raise NoResultFound
         return studio
-
-    async def update_one(
-        self, schema: StudioUpdate | dict[str, ...], *where: ColumnElement[bool]
-    ) -> Studio:
-        schema = (
-            schema.model_dump() if isinstance(schema, StudioUpdate) else schema
-        )
-        async with async_session_maker() as session:
-            stmt = (
-                update(self.model)
-                .where(*where)
-                .values(**schema)
-                .returning(self.model)
-            )
-            result = await session.execute(stmt)
-            instances = result.scalar()
-            await session.commit()
-            return instances

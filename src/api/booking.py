@@ -50,7 +50,7 @@ async def patch_booking(
     service: BookingServiceDep,
     user: AuthenticatedUser,
 ) -> BookingRead:
-    booking = await service.patch_booking(
+    booking = await service.update_booking(
         booking_id=booking_id, user_id=user.id, schema=schema
     )
     return booking

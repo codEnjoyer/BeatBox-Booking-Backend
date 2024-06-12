@@ -15,7 +15,7 @@ class RoomService(ModelService[RoomRepository, Room, RoomCreate, RoomUpdate]):
         super().__init__(RoomRepository(), RoomNotFoundException)
 
     async def get(self, room_id: int) -> Room:
-        room = await self._repository.get_one(self._model.id == room_id)
+        room = await self._repository.get_one(self.model.id == room_id)
         if not room:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -26,7 +26,7 @@ class RoomService(ModelService[RoomRepository, Room, RoomCreate, RoomUpdate]):
     async def create(self, schema: RoomCreate, **kwargs) -> Room:
         studio_id = kwargs.get("studio_id")
         if await self._repository.is_room_exist(
-            self._model.name == schema.name, self._model.studio_id == studio_id
+            self.model.name == schema.name, self.model.studio_id == studio_id
         ):
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
@@ -59,7 +59,7 @@ class RoomService(ModelService[RoomRepository, Room, RoomCreate, RoomUpdate]):
         self, room_id: int, studio_id: int, employee_id: int
     ) -> None:
         if not await self._repository.is_room_exist(
-            self._model.id == room_id, self._model.studio_id == studio_id
+            self.model.id == room_id, self.model.studio_id == studio_id
         ):
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -74,13 +74,13 @@ class RoomService(ModelService[RoomRepository, Room, RoomCreate, RoomUpdate]):
                 detail="Invalid permissions",
             )
 
-        return await self._repository.delete(self._model.id == room_id)
+        return await self._repository.delete(self.model.id == room_id)
 
     async def update(
         self, room_id: int, studio_id: int, employee_id: int, schema: RoomUpdate
     ) -> Room:
         if not await self._repository.is_room_exist(
-            self._model.id == room_id, self._model.studio_id == studio_id
+            self.model.id == room_id, self.model.studio_id == studio_id
         ):
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -95,8 +95,8 @@ class RoomService(ModelService[RoomRepository, Room, RoomCreate, RoomUpdate]):
                 detail="Invalid permissions",
             )
 
-        return await self._repository.update_one(
-            schema, self._model.id == room_id
+        return await self._repository.update(
+            schema, self.model.id == room_id
         )
 
     async def get_all_images(self, room_id: int) -> list[uuid.UUID]:

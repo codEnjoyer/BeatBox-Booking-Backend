@@ -16,7 +16,7 @@ class ModelService[
     _not_found_exception: type[NoResultFound]
 
     @property
-    def _model(self) -> type[Model]:
+    def model(self) -> type[Model]:
         return self._repository.model
 
     def __init__(
@@ -37,7 +37,7 @@ class ModelService[
 
     async def get_by_id(self, model_id: int) -> Model:
         try:
-            model = await self._repository.get_one(self._model.id == model_id)
+            model = await self._repository.get_one(self.model.id == model_id)
         except NoResultFound as e:
             raise self._not_found_exception from e
         return model
@@ -54,7 +54,7 @@ class ModelService[
     async def update_by_id(self, schema: UpdateSchema, model_id: int) -> Model:
         try:
             model = await self._repository.update(
-                schema, self._model.id == model_id
+                schema, self.model.id == model_id
             )
         except NoResultFound as e:
             raise self._not_found_exception from e
@@ -62,6 +62,6 @@ class ModelService[
 
     async def delete_by_id(self, model_id: int) -> None:
         try:
-            await self._repository.delete(self._model.id == model_id)
+            await self._repository.delete(self.model.id == model_id)
         except NoResultFound as e:
             raise self._not_found_exception from e

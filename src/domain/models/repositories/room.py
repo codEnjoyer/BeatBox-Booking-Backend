@@ -1,7 +1,7 @@
 import uuid
 from typing import override
 
-from sqlalchemy import ColumnElement, select, update
+from sqlalchemy import ColumnElement, select
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -47,7 +47,7 @@ class RoomRepository(SQLAlchemyRepository[Room, RoomCreate, RoomUpdate]):
             return await self.get_one_with_session(session, *where)
 
     async def get_one_with_session(
-        self, session: AsyncSession, *where: ColumnElement[bool]
+            self, session: AsyncSession, *where: ColumnElement[bool]
     ) -> Room:
         stmt = (
             select(self.model)
@@ -62,24 +62,6 @@ class RoomRepository(SQLAlchemyRepository[Room, RoomCreate, RoomUpdate]):
         if not room:
             raise NoResultFound
         return room
-
-    async def update_one(
-        self, schema: RoomUpdate | dict[str, ...], *where: ColumnElement[bool]
-    ) -> Room:
-        schema = (
-            schema.model_dump() if isinstance(schema, RoomUpdate) else schema
-        )
-        async with async_session_maker() as session:
-            stmt = (
-                update(self.model)
-                .where(*where)
-                .values(**schema)
-                .returning(self.model)
-            )
-            result = await session.execute(stmt)
-            instances = result.scalar()
-            await session.commit()
-            return instances
 
     @staticmethod
     async def get_all_images_by_id(room_id: int) -> list[uuid.UUID]:

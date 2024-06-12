@@ -39,8 +39,8 @@ class ReviewService(
     ) -> bool:
         try:
             await self._repository.get_one(
-                self._model.studio_id == studio_id,
-                self._model.author_id == author_id,
+                self.model.studio_id == studio_id,
+                self.model.author_id == author_id,
             )
         except NoResultFound:
             return False
@@ -50,7 +50,7 @@ class ReviewService(
         self, studio_id: int, offset: int = 0, limit: int = 100
     ) -> list[Review]:
         return await self._repository.get_all(
-            self._model.studio_id == studio_id, offset=offset, limit=limit
+            self.model.studio_id == studio_id, offset=offset, limit=limit
         )
 
     async def update_review(
@@ -67,6 +67,7 @@ class ReviewService(
                 status.HTTP_404_NOT_FOUND,
                 detail="User does not have review.py on this studio",
             )
-        return await self._repository.update_one(
-            schema, self._model.id == review_id
+        result: Review = await self._repository.update(
+            schema, self.model.id == review_id
         )
+        return result

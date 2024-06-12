@@ -40,12 +40,10 @@ class FileService(ModelService[FileRepository, File, FileCreate, FileUpdate]):
 
     async def delete_by_name(self, name: str) -> None:
         try:
-            file: File = await self._repository.get_one(
-                self._model.name == name
-            )
+            file: File = await self._repository.get_one(self.model.name == name)
             full_name = f"{file.name}.{file.extension.value}"
             await self.file_bucket_repository.delete(file_key=full_name)
-            await self._repository.delete(self._model.name == name)
+            await self._repository.delete(self.model.name == name)
         except Exception:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="File not found"
@@ -53,9 +51,7 @@ class FileService(ModelService[FileRepository, File, FileCreate, FileUpdate]):
 
     async def get_url(self, name: str) -> str:
         try:
-            file: File = await self._repository.get_one(
-                self._model.name == name
-            )
+            file: File = await self._repository.get_one(self.model.name == name)
             full_name = f"{file.name}.{file.extension.value}"
             return await self.file_bucket_repository.get_presigned_url(
                 full_name
@@ -67,9 +63,7 @@ class FileService(ModelService[FileRepository, File, FileCreate, FileUpdate]):
 
     async def try_get_url(self, name: str) -> str | None:
         try:
-            file: File = await self._repository.get_one(
-                self._model.name == name
-            )
+            file: File = await self._repository.get_one(self.model.name == name)
             full_name = f"{file.name}.{file.extension.value}"
             return await self.file_bucket_repository.get_presigned_url(
                 full_name

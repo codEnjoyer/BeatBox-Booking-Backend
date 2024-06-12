@@ -2,6 +2,7 @@ import datetime as dt
 import uuid
 
 from fastapi import HTTPException
+from sqlalchemy.orm import selectinload
 from starlette import status
 from sqlalchemy.exc import NoResultFound
 
@@ -52,10 +53,10 @@ class BookingService(
     ) -> bool:
         try:
             await self._repository.get_one(
-                self._model.starts_at == starts_at,
-                self._model.ends_at == ends_at,
-                self._model.room_id == room_id,
-                self._model.status == BookingStatus.BOOKED,
+                self.model.starts_at == starts_at,
+                self.model.ends_at == ends_at,
+                self.model.room_id == room_id,
+                self.model.status == BookingStatus.BOOKED,
             )
         except NoResultFound:
             return False
@@ -66,8 +67,8 @@ class BookingService(
     ) -> bool:
         try:
             await self._repository.get_one(
-                self._model.id == booking_id,
-                self._model.user_id == user_id,
+                self.model.id == booking_id,
+                self.model.user_id == user_id,
             )
         except NoResultFound:
             return False
@@ -77,25 +78,21 @@ class BookingService(
         self, user_id: int, offset: int = 0, limit: int = 100
     ) -> list[Booking]:
         return await self._repository.get_all(
-            self._model.user_id == user_id, offset=offset, limit=limit
+            self.model.user_id == user_id, offset=offset, limit=limit
         )
 
-    async def patch_booking(
+    async def update_booking(
         self, booking_id: uuid.UUID, user_id: int, schema: BookingUpdate
     ) -> Booking:
-        if (
-            schema.status == BookingStatus.CANCELED
-            and not await self.check_user_permission(
-                booking_id=booking_id, user_id=user_id
-            )
-        ):
+        has_permission = await self.check_user_permission(booking_id, user_id)
+        if schema.status == BookingStatus.CANCELED and not has_permission:
             raise HTTPException(
                 status.HTTP_403_FORBIDDEN,
                 detail="User does not have permission to cancel the booking",
             )
-
-        booking = await self._repository.get_one_with_room_relation(
-            self._model.id == booking_id
+        booking = await self._repository.get_one(
+            self.model.id == booking_id,
+            options=(selectinload(self.model.room))
         )
 
         if (
@@ -119,16 +116,15 @@ class BookingService(
             "user_id": user_id,
         }
 
-        return await self._repository.update_one(
-            booking_data, self._model.id == booking_id
+        result: Booking = await self._repository.update(
+            booking_data, self.model.id == booking_id
         )
+        return result
 
     async def remove(self, booking_id: uuid.UUID, user_id: int) -> None:
-        if not await self.check_user_permission(
-            booking_id=booking_id, user_id=user_id
-        ):
+        if not await self.check_user_permission(booking_id, user_id):
             raise HTTPException(
                 status.HTTP_404_NOT_FOUND,
                 detail="User does not have permission to delete the booking",
             )
-        await self._repository.delete(self._model.id == booking_id)
+        await self._repository.delete(self.model.id == booking_id)

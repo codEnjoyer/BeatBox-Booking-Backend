@@ -16,7 +16,7 @@ class StudioService(
 
     async def create(self, schema: StudioCreate, **kwargs) -> Studio:
         if await self._repository.is_studio_exist(
-            self._model.name == schema.name
+            self.model.name == schema.name
         ):
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
@@ -26,7 +26,7 @@ class StudioService(
 
     async def delete(self, studio_id: int, user_id: int) -> None:
         if not await self._repository.is_studio_exist(
-            self._model.id == studio_id
+            self.model.id == studio_id
         ):
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -34,23 +34,23 @@ class StudioService(
             )
 
         studio: Studio = await self._repository.get(
-            user_id, self._model.id == studio_id
+            user_id, self.model.id == studio_id
         )
-        return await self._repository.delete(self._model.id == studio.id)
+        return await self._repository.delete(self.model.id == studio.id)
 
     async def update(
         self, studio_id: int, user_id: int, schema: StudioUpdate
     ) -> Studio:
         if not await self._repository.is_studio_exist(
-            self._model.id == studio_id
+            self.model.id == studio_id
         ):
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Studio with that name not found",
             )
         studio: Studio = await self._repository.get(
-            user_id, self._model.id == studio_id
+            user_id, self.model.id == studio_id
         )
-        return await self._repository.update_one(
-            schema, self._model.id == studio.id
+        return await self._repository.update(
+            schema, self.model.id == studio.id
         )

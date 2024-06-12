@@ -1,3 +1,5 @@
+from typing import override
+
 from sqlalchemy import ColumnElement
 
 from src.domain.models.file import File
@@ -6,8 +8,10 @@ from src.domain.schemas.file import FileCreate, FileUpdate
 
 
 class FileRepository(SQLAlchemyRepository[File, FileCreate, FileUpdate]):
-    def __init__(self):
-        super().__init__(File)
+    @override
+    @property
+    def model(self) -> type[File]:
+        return File
 
     async def update(
         self, schema: FileUpdate | dict[str, ...], *where: ColumnElement[bool]

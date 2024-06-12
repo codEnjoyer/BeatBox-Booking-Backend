@@ -2,14 +2,10 @@ from abc import ABC, abstractmethod
 
 
 class Repository[Item, CreateSchema, UpdateSchema](ABC):
-    _model: type[Item]
 
+    @abstractmethod
     @property
-    def model(self) -> type[Item]:
-        return self._model
-
-    def __init__(self, model: type[Item]):
-        self._model = model
+    def model(self) -> type[Item]: ...
 
     @abstractmethod
     async def create(self, schema: CreateSchema) -> Item: ...

@@ -1,3 +1,5 @@
+from typing import override
+
 from sqlalchemy import ColumnElement, update
 
 from src.domain.db import async_session_maker
@@ -9,8 +11,10 @@ from src.domain.schemas.review import ReviewCreate, ReviewUpdate
 class ReviewRepository(
     SQLAlchemyRepository[Review, ReviewCreate, ReviewUpdate]
 ):
-    def __init__(self):
-        super().__init__(Review)
+    @override
+    @property
+    def model(self) -> type[Review]:
+        return Review
 
     async def update_one(
         self, schema: ReviewUpdate | dict[str, ...], *where: ColumnElement[bool]
@@ -20,10 +24,10 @@ class ReviewRepository(
         )
         async with async_session_maker() as session:
             stmt = (
-                update(self._model)
+                update(self.model)
                 .where(*where)
                 .values(**schema)
-                .returning(self._model)
+                .returning(self.model)
             )
             result = await session.execute(stmt)
             instances = result.scalar()

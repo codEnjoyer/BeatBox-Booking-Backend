@@ -20,5 +20,4 @@ class ReviewCreate(BaseReview):
     room_id: int | None
 
 
-class ReviewUpdate(BaseReview):
-    ...
+class ReviewUpdate(BaseReview): ...

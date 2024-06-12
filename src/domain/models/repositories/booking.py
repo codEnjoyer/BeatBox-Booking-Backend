@@ -1,3 +1,5 @@
+from typing import override
+
 from sqlalchemy import ColumnElement, select, update
 from sqlalchemy.orm import selectinload
 
@@ -11,16 +13,18 @@ from src.domain.exceptions.booking import BookingNotFoundException
 class BookingRepository(
     SQLAlchemyRepository[Booking, BookingCreate, BookingUpdate]
 ):
-    def __init__(self):
-        super().__init__(Booking)
+    @override
+    @property
+    def model(self) -> type[Booking]:
+        return Booking
 
     async def get_one_with_room_relation(
         self, *where: ColumnElement[bool]
     ) -> Booking:
         async with async_session_maker() as session:
             stmt = (
-                select(self._model)
-                .options(selectinload(self._model.room))
+                select(self.model)
+                .options(selectinload(self.model.room))
                 .where(*where)
                 .limit(1)
             )
@@ -40,10 +44,10 @@ class BookingRepository(
         )
         async with async_session_maker() as session:
             stmt = (
-                update(self._model)
+                update(self.model)
                 .where(*where)
                 .values(**schema)
-                .returning(self._model)
+                .returning(self.model)
             )
             result = await session.execute(stmt)
             instance = result.scalar()

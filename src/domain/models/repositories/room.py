@@ -1,4 +1,5 @@
 import uuid
+from typing import override
 
 from sqlalchemy import ColumnElement, select, update
 from sqlalchemy.exc import NoResultFound
@@ -12,8 +13,10 @@ from src.domain.schemas.room import RoomCreate, RoomUpdate
 
 
 class RoomRepository(SQLAlchemyRepository[Room, RoomCreate, RoomUpdate]):
-    def __init__(self):
-        super().__init__(Room)
+    @override
+    @property
+    def model(self) -> type[Room]:
+        return Room
 
     @staticmethod
     async def is_working_in_studio(employee_id: int, studio_id: int) -> bool:
@@ -47,9 +50,9 @@ class RoomRepository(SQLAlchemyRepository[Room, RoomCreate, RoomUpdate]):
         self, session: AsyncSession, *where: ColumnElement[bool]
     ) -> Room:
         stmt = (
-            select(self._model)
+            select(self.model)
             .options(
-                selectinload(self._model.studio, self._model.studio.employees)
+                selectinload(self.model.studio, self.model.studio.employees)
             )
             .where(*where)
             .limit(1)
@@ -68,10 +71,10 @@ class RoomRepository(SQLAlchemyRepository[Room, RoomCreate, RoomUpdate]):
         )
         async with async_session_maker() as session:
             stmt = (
-                update(self._model)
+                update(self.model)
                 .where(*where)
                 .values(**schema)
-                .returning(self._model)
+                .returning(self.model)
             )
             result = await session.execute(stmt)
             instances = result.scalar()

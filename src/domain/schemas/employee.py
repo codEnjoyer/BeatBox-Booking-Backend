@@ -14,5 +14,4 @@ class EmployeeCreate(BaseEmployee):
     user_id: int
 
 
-class EmployeeUpdate(BaseEmployee):
-    ...
+class EmployeeUpdate(BaseEmployee): ...

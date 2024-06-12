@@ -1,11 +1,9 @@
 from typing import TYPE_CHECKING, Optional
 import datetime as dt
 
-from furl import furl
 from sqlalchemy import String, Integer, Float, DateTime
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import mapped_column, relationship, Mapped
-from sqlalchemy_utils import URLType, PhoneNumberType
 
 from src.domain.models.base import BaseModel
 
@@ -54,9 +52,9 @@ class Studio(BaseModel):
     )
 
     @hybrid_property
-    def average_grade(self):
-        if self.reviews:
-            return sum([review.grade for review in self.reviews]) / len(
-                self.reviews
-            )
-        return 0
+    def average_grade(self) -> float:
+        if not self.reviews:
+            return 0
+        total = sum(review.grade for review in self.reviews)
+        count = len(self.reviews)
+        return total / count

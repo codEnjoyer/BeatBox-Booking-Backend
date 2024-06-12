@@ -1,3 +1,5 @@
+from typing import override
+
 from sqlalchemy import ColumnElement, select, update
 from sqlalchemy.exc import NoResultFound
 from fastapi import HTTPException
@@ -14,8 +16,10 @@ from src.domain.schemas.studio import StudioCreate, StudioUpdate
 class StudioRepository(
     SQLAlchemyRepository[Studio, StudioCreate, StudioUpdate]
 ):
-    def __init__(self):
-        super().__init__(Studio)
+    @override
+    @property
+    def model(self) -> type[Studio]:
+        return Studio
 
     async def is_studio_exist(self, *where: ColumnElement[bool]) -> bool:
         try:
@@ -41,8 +45,8 @@ class StudioRepository(
         self, session: AsyncSession, *where: ColumnElement[bool]
     ) -> Studio:
         stmt = (
-            select(self._model)
-            .options(selectinload(self._model.employees))
+            select(self.model)
+            .options(selectinload(self.model.employees))
             .where(*where)
             .limit(1)
         )
@@ -60,10 +64,10 @@ class StudioRepository(
         )
         async with async_session_maker() as session:
             stmt = (
-                update(self._model)
+                update(self.model)
                 .where(*where)
                 .values(**schema)
-                .returning(self._model)
+                .returning(self.model)
             )
             result = await session.execute(stmt)
             instances = result.scalar()

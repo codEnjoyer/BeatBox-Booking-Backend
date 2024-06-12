@@ -24,7 +24,7 @@ async def get_user(email: str) -> User:
 # Для читаемости при прописывании в dependencies эндпоинтов
 get_current_user = manager
 
-AuthenticatedUser = Annotated[User, Depends(manager)]
+AuthenticatedUser = Annotated[User, Depends(get_current_user)]
 
 
 async def get_current_user_employee(user: AuthenticatedUser) -> Employee:

@@ -5,11 +5,11 @@ from src.api.dependencies.services import FileServiceDep
 from src.domain.schemas.file import FileRead
 from fastapi import UploadFile
 
-router = APIRouter(prefix="/file", tags=["File"])
+router = APIRouter(prefix="/files", tags=["File"])
 
 
 @router.post(
-    "/upload",
+    "",
     dependencies=[Depends(get_current_user)],
     response_model=FileRead,
 )
@@ -24,15 +24,12 @@ async def upload_file(
 
 
 @router.get(
-    "/get", dependencies=[Depends(get_current_user)], response_model=FileRead
+    "/{name}", dependencies=[Depends(get_current_user)], response_model=FileRead
 )
-async def get_file_url(file_service: FileServiceDep, name: str) -> str:
+async def get_file_url(name: str, file_service: FileServiceDep) -> str:
     return await file_service.get_url(name=name)
 
 
-@router.delete(
-    "/delete",
-    dependencies=[Depends(get_current_user)],
-)
-async def delete(file_service: FileServiceDep, name: str) -> str:
+@router.delete("/{name}", dependencies=[Depends(get_current_user)])
+async def delete(name: str, file_service: FileServiceDep) -> str:
     return await file_service.delete_by_name(name=name)

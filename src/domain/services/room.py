@@ -33,9 +33,13 @@ class RoomService(ModelService[RoomRepository, Room, RoomCreate, RoomUpdate]):
                 detail="Room with same name already exists",
             )
 
-        await self._repository.check_employee_permissions(
-            user_id=kwargs.get("user_id"), studio_id=studio_id
-        )
+        if not await self._repository.is_working_in_studio(
+            kwargs.get("employee_id"), studio_id
+        ):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Invalid permissions",
+            )
 
         studio_dict = {
             "name": schema.name,
@@ -51,7 +55,9 @@ class RoomService(ModelService[RoomRepository, Room, RoomCreate, RoomUpdate]):
                 detail="File with that id not found",
             )
 
-    async def delete(self, room_id: int, studio_id: int, user_id: int) -> None:
+    async def delete(
+        self, room_id: int, studio_id: int, employee_id: int
+    ) -> None:
         if not await self._repository.is_room_exist(
             self._model.id == room_id, self._model.studio_id == studio_id
         ):
@@ -60,14 +66,18 @@ class RoomService(ModelService[RoomRepository, Room, RoomCreate, RoomUpdate]):
                 detail="Room with that id not found",
             )
 
-        await self._repository.check_employee_permissions(
-            user_id=user_id, studio_id=studio_id
-        )
+        if not await self._repository.is_working_in_studio(
+            employee_id, studio_id
+        ):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Invalid permissions",
+            )
 
         return await self._repository.delete(self._model.id == room_id)
 
     async def update(
-        self, room_id: int, studio_id: int, user_id: int, schema: RoomUpdate
+        self, room_id: int, studio_id: int, employee_id: int, schema: RoomUpdate
     ) -> Room:
         if not await self._repository.is_room_exist(
             self._model.id == room_id, self._model.studio_id == studio_id
@@ -77,9 +87,13 @@ class RoomService(ModelService[RoomRepository, Room, RoomCreate, RoomUpdate]):
                 detail="Room with that id not found",
             )
 
-        await self._repository.check_employee_permissions(
-            user_id=user_id, studio_id=studio_id
-        )
+        if not await self._repository.is_working_in_studio(
+            employee_id, studio_id
+        ):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Invalid permissions",
+            )
 
         return await self._repository.update_one(
             schema, self._model.id == room_id

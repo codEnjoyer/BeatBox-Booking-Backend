@@ -21,7 +21,7 @@ async def add_review(
 
 
 @router.get("/{studio_id}/reviews", response_model=list[ReviewRead])
-async def get_reviews(
+async def get_studio_reviews(
     studio_id: int, service: ReviewServiceDep, offset: int = 0, limit: int = 100
 ) -> list[ReviewRead]:
     reviews = await service.get_reviews_by_studio_id(
@@ -31,14 +31,14 @@ async def get_reviews(
 
 
 @router.put("/{studio_id}/reviews/{review_id}", response_model=ReviewRead)
-async def patch_review(
+async def update_studio_review(
     studio_id: int,
     review_id: int,
     schema: ReviewUpdate,
     service: ReviewServiceDep,
     user: AuthenticatedUser,
 ) -> ReviewRead:
-    review = await service.patch_review(
+    review = await service.update_review(
         studio_id=studio_id,
         author_id=user.id,
         review_id=review_id,

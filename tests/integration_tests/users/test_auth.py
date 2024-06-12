@@ -2,12 +2,12 @@ import pytest
 from fastapi import status
 from httpx import AsyncClient
 
-from src.domain.schemas.user import UserCreateSchema
+from src.domain.schemas.user import UserCreate
 
 
 @pytest.mark.usefixtures("clear_database")
 class TestAuth:
-    user_schema = UserCreateSchema(
+    user_schema = UserCreate(
         username="test", email="test@example.com", hashed_password="test-pass"
     )
 

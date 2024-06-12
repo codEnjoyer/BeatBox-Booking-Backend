@@ -9,9 +9,9 @@ from src.api.dependencies.auth import manager
 from src.domain.db import get_async_session
 from src.domain.schemas.auth import Token
 from src.domain.schemas.user import (
-    UserAuthSchema,
-    UserReadSchema,
-    UserCreateSchema,
+    UserCredentials,
+    UserRead,
+    UserCreate,
 )
 from src.domain.services.user import UserService
 
@@ -20,7 +20,7 @@ router = APIRouter(prefix="/auth", tags=["Auth"])
 
 @router.post("/login", response_model=Token)
 async def login(
-    user_schema: UserAuthSchema,
+    user_schema: UserCredentials,
     session: AsyncSession = Depends(get_async_session),
 ) -> Token:
     try:
@@ -31,7 +31,9 @@ async def login(
                 detail="Incorrect username",
             )
 
-        if not UserService.verify_password(user_schema.password, user.hashed_password):
+        if not UserService.verify_password(
+            user_schema.password, user.hashed_password
+        ):
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Incorrect password",
@@ -49,16 +51,18 @@ async def login(
 
 @router.post(
     "/register",
-    response_model=UserReadSchema,
+    response_model=UserRead,
     status_code=status.HTTP_201_CREATED,
 )
 async def register(
-    user_schema: UserCreateSchema,
+    user_schema: UserCreate,
     session: AsyncSession = Depends(get_async_session),
-) -> UserReadSchema:
+) -> UserRead:
     try:
-        user = await UserService.create_user(user_schema=user_schema, session=session)
-        return UserReadSchema(
+        user = await UserService.create_user(
+            user_schema=user_schema, session=session
+        )
+        return UserRead(
             id=user.id,
             email=user.email,
             is_superuser=user.is_superuser,
@@ -75,5 +79,5 @@ async def token_login(
     session: AsyncSession = Depends(get_async_session),
 ):
     return await login(
-        UserAuthSchema(email=data.username, password=data.password), session
+        UserCredentials(email=data.username, password=data.password), session
     )

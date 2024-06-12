@@ -53,7 +53,7 @@ class ReviewService(
             self._model.studio_id == studio_id, offset=offset, limit=limit
         )
 
-    async def patch_review(
+    async def update_review(
         self,
         studio_id: int,
         author_id: int,

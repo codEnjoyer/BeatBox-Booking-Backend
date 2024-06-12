@@ -31,9 +31,7 @@ async def get_studio(
 
 
 @router.post(
-    "/create",
-    dependencies=[Depends(get_current_superuser)],
-    response_model=StudioRead,
+    "", dependencies=[Depends(get_current_superuser)], response_model=StudioRead
 )
 async def create_studio(
     schema: StudioCreate,
@@ -43,7 +41,7 @@ async def create_studio(
     return studio
 
 
-@router.patch("/{studio_id}/update", response_model=StudioRead)
+@router.put("/{studio_id}", response_model=StudioRead)
 async def update_studio(
     studio_id: int,
     schema: StudioUpdate,
@@ -56,14 +54,13 @@ async def update_studio(
     return studio
 
 
-@router.delete("/{studio_id}/delete")
+@router.delete("/{studio_id}")
 async def delete_studio(
     studio_id: int,
     studio_service: StudioServiceDep,
     employee: AuthenticatedEmployee,
-) -> str:
-    await studio_service.delete(studio_id=studio_id, user_id=employee.user_id)
-    return "Success delete studio"
+) -> None:
+    await studio_service.delete(studio_id, employee.user_id)
 
 
 @router.get(

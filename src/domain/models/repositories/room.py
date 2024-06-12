@@ -2,10 +2,8 @@ import uuid
 
 from sqlalchemy import ColumnElement, select, update
 from sqlalchemy.exc import NoResultFound
-from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
-from starlette import status
 
 from src.domain.db import async_session_maker
 from src.domain.models import Room, Studio, RoomImage
@@ -18,7 +16,7 @@ class RoomRepository(SQLAlchemyRepository[Room, RoomCreate, RoomUpdate]):
         super().__init__(Room)
 
     @staticmethod
-    async def check_employee_permissions(user_id: int, studio_id: int) -> None:
+    async def is_working_in_studio(employee_id: int, studio_id: int) -> bool:
         async with async_session_maker() as session:
             stmt = (
                 select(Studio)
@@ -29,12 +27,10 @@ class RoomRepository(SQLAlchemyRepository[Room, RoomCreate, RoomUpdate]):
             studio = result.scalar()
             if not studio:
                 raise NoResultFound
-            employees = studio.employees
-            if not any(user_id == employee.user_id for employee in employees):
-                raise HTTPException(
-                    status_code=status.HTTP_403_FORBIDDEN,
-                    detail="Invalid permissions",
-                )
+            studio_employees_ids = (
+                employee.id for employee in studio.employees
+            )
+            return employee_id in studio_employees_ids
 
     async def is_room_exist(self, *where: ColumnElement[bool]) -> bool:
         try:

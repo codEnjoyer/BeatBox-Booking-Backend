@@ -33,7 +33,10 @@ class SQLAlchemyRepository[
             return instance
 
     async def get_all(
-        self, *where: ColumnElement[bool], offset: int = 0, limit: int = 100
+        self,
+        *where: ColumnElement[bool],
+        offset: int = 0,
+        limit: int = 100,
     ) -> list[Model]:
         async with async_session_maker() as session:
             stmt = select(self._model).where(*where).offset(offset).limit(limit)

@@ -4,27 +4,27 @@ from src.domain.schemas.base import BaseSchema
 from src.domain.schemas.phone_number import PhoneNumber
 
 
-class UserBaseSchema(BaseSchema):
+class BaseUser(BaseSchema):
     email: EmailStr
 
 
-class UserAuthSchema(UserBaseSchema):
+class UserCredentials(BaseUser):
     password: constr(max_length=200)
 
 
 # TODO: кажется, стоит переосмыслить схемы. сейчас решил ничего не трогать
 
 
-class UserCreateSchema(UserBaseSchema):
+class UserCreate(BaseUser):
     phone_number: PhoneNumber
     password: constr(max_length=200)
     is_superuser: bool = False
 
 
-class UserReadSchema(UserBaseSchema):
+class UserRead(BaseUser):
     id: int
     is_superuser: bool = False
 
 
-class UserUpdateSchema(UserBaseSchema):
+class UserUpdate(BaseUser):
     phone_number: PhoneNumber

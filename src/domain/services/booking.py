@@ -91,8 +91,7 @@ class BookingService(
                 detail="User does not have permission to cancel the booking",
             )
         booking = await self._repository.get_one(
-            self.model.id == booking_id,
-            options=(selectinload(self.model.room))
+            self.model.id == booking_id, options=(selectinload(self.model.room))
         )
 
         if (

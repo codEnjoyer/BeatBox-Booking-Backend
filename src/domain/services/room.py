@@ -1,6 +1,8 @@
 import uuid
 
 from fastapi import HTTPException
+from sqlalchemy import ColumnElement
+from sqlalchemy.exc import NoResultFound
 from starlette import status
 
 from src.domain.exceptions.room import RoomNotFoundException
@@ -23,9 +25,17 @@ class RoomService(ModelService[RoomRepository, Room, RoomCreate, RoomUpdate]):
             )
         return room
 
+    async def is_room_exist(self, *where: ColumnElement[bool]) -> bool:
+        # TODO: переделать
+        try:
+            await self._repository.get_one(*where)
+        except NoResultFound:
+            return False
+        return True
+
     async def create(self, schema: RoomCreate, **kwargs) -> Room:
         studio_id = kwargs.get("studio_id")
-        if await self._repository.is_room_exist(
+        if await self.is_room_exist(
             self.model.name == schema.name, self.model.studio_id == studio_id
         ):
             raise HTTPException(

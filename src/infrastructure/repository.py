@@ -8,7 +8,7 @@ class Repository[Item, CreateSchema, UpdateSchema](ABC):
 
     @abstractmethod
     async def get_all(
-            self, *where, options=None, offset: int = 0, limit: int = 100
+        self, *where, options=None, offset: int = 0, limit: int = 100
     ) -> list[Item]: ...
 
     @abstractmethod
@@ -16,7 +16,7 @@ class Repository[Item, CreateSchema, UpdateSchema](ABC):
 
     @abstractmethod
     async def update(
-            self, schema: UpdateSchema, *where
+        self, schema: UpdateSchema, *where
     ) -> Item | list[Item]: ...
 
     @abstractmethod

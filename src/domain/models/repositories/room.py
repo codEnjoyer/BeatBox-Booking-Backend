@@ -1,7 +1,7 @@
 import uuid
 from typing import override
 
-from sqlalchemy import ColumnElement, select
+from sqlalchemy import select
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import selectinload
 
@@ -19,6 +19,7 @@ class RoomRepository(SQLAlchemyRepository[Room, RoomCreate, RoomUpdate]):
 
     @staticmethod
     async def is_working_in_studio(employee_id: int, studio_id: int) -> bool:
+        # TODO: перенести в зависимости
         async with async_session_maker() as session:
             stmt = (
                 select(Studio)
@@ -33,13 +34,6 @@ class RoomRepository(SQLAlchemyRepository[Room, RoomCreate, RoomUpdate]):
                 employee.id for employee in studio.employees
             )
             return employee_id in studio_employees_ids
-
-    async def is_room_exist(self, *where: ColumnElement[bool]) -> bool:
-        try:
-            await self.get_one(*where)
-        except NoResultFound:
-            return False
-        return True
 
     @staticmethod
     async def get_all_images_by_id(room_id: int) -> list[uuid.UUID]:

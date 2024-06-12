@@ -3,7 +3,6 @@ from typing import override
 
 from sqlalchemy import ColumnElement, select
 from sqlalchemy.exc import NoResultFound
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from src.domain.db import async_session_maker
@@ -41,27 +40,6 @@ class RoomRepository(SQLAlchemyRepository[Room, RoomCreate, RoomUpdate]):
         except NoResultFound:
             return False
         return True
-
-    async def get(self, *where: ColumnElement[bool]) -> Room:
-        async with async_session_maker() as session:
-            return await self.get_one_with_session(session, *where)
-
-    async def get_one_with_session(
-            self, session: AsyncSession, *where: ColumnElement[bool]
-    ) -> Room:
-        stmt = (
-            select(self.model)
-            .options(
-                selectinload(self.model.studio, self.model.studio.employees)
-            )
-            .where(*where)
-            .limit(1)
-        )
-        result = await session.execute(stmt)
-        room: Room | None = result.scalar()
-        if not room:
-            raise NoResultFound
-        return room
 
     @staticmethod
     async def get_all_images_by_id(room_id: int) -> list[uuid.UUID]:

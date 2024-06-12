@@ -1,5 +1,4 @@
 from abc import abstractmethod
-from typing import override
 
 from sqlalchemy import insert, ColumnElement, select, delete, update
 from sqlalchemy.exc import NoResultFound
@@ -12,14 +11,12 @@ from src.infrastructure.repository import Repository
 
 
 class SQLAlchemyRepository[
-Model: BaseModel, CreateSchema: BaseSchema, UpdateSchema: BaseSchema
+    Model: BaseModel, CreateSchema: BaseSchema, UpdateSchema: BaseSchema
 ](Repository[Model, CreateSchema, UpdateSchema]):
 
     @abstractmethod
-    @override
     @property
-    def model(self) -> type[Model]:
-        ...
+    def model(self) -> type[Model]: ...
 
     async def create(self, schema: CreateSchema | dict[str, ...]) -> Model:
         schema = (
@@ -33,11 +30,11 @@ Model: BaseModel, CreateSchema: BaseSchema, UpdateSchema: BaseSchema
             return instance
 
     async def get_all(
-            self,
-            *where: ColumnElement[bool],
-            options: tuple[ExecutableOption] | None = None,
-            offset: int = 0,
-            limit: int = 100,
+        self,
+        *where: ColumnElement[bool],
+        options: tuple[ExecutableOption] | None = None,
+        offset: int = 0,
+        limit: int = 100,
     ) -> list[Model]:
         """
         Raises:
@@ -58,9 +55,9 @@ Model: BaseModel, CreateSchema: BaseSchema, UpdateSchema: BaseSchema
             return instances
 
     async def get_one(
-            self,
-            *where: ColumnElement[bool],
-            options: tuple[ExecutableOption] | None = None,
+        self,
+        *where: ColumnElement[bool],
+        options: tuple[ExecutableOption] | None = None,
     ) -> Model:
         """
         Raises:
@@ -75,8 +72,7 @@ Model: BaseModel, CreateSchema: BaseSchema, UpdateSchema: BaseSchema
             return instance
 
     async def update(
-            self, schema: UpdateSchema | dict[str, ...],
-            *where: ColumnElement[bool]
+        self, schema: UpdateSchema | dict[str, ...], *where: ColumnElement[bool]
     ) -> Model | list[Model]:
         schema = (
             schema.model_dump() if isinstance(schema, BaseSchema) else schema

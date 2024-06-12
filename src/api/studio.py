@@ -46,11 +46,9 @@ async def update_studio(
     studio_id: int,
     schema: StudioUpdate,
     studio_service: StudioServiceDep,
-    employee: AuthenticatedEmployee,
+    _: AuthenticatedEmployee,
 ) -> StudioRead:
-    studio = await studio_service.update(
-        studio_id=studio_id, user_id=employee.user_id, schema=schema
-    )
+    studio = await studio_service.update(studio_id, schema)
     return studio
 
 

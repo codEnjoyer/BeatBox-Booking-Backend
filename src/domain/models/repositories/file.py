@@ -13,6 +13,7 @@ class FileRepository(SQLAlchemyRepository[File, FileCreate, FileUpdate]):
     def model(self) -> type[File]:
         return File
 
+    @override
     async def update(
         self, schema: FileUpdate | dict[str, ...], *where: ColumnElement[bool]
     ) -> File:

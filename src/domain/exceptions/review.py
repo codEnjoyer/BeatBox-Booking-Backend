@@ -1,6 +1,7 @@
-from sqlalchemy.exc import NoResultFound
-
-from src.domain.exceptions.base import BBBException
+from src.domain.exceptions.base import ItemNotFoundException
 
 
-class ReviewNotFoundException(BBBException, NoResultFound): ...
+class ReviewNotFoundException(ItemNotFoundException):
+    @property
+    def item_name(self) -> str:
+        return "Review"

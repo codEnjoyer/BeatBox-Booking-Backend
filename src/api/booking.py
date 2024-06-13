@@ -1,56 +1,66 @@
-import uuid
+from fastapi import APIRouter, HTTPException
+from starlette import status
 
-from fastapi import APIRouter
-
+from src.api.dependencies.booking import OwnedBookingDep
+from src.api.dependencies.room import ValidRoomInStudioDep
 from src.api.dependencies.services import BookingServiceDep
 from src.api.dependencies.auth import AuthenticatedUser
+from src.domain.models.booking import BookingStatus
 from src.domain.schemas.booking import BookingCreate, BookingRead, BookingUpdate
 
-router = APIRouter(prefix="/bookings", tags=["Booking"])
+router = APIRouter(tags=["Booking"])
 
 
-@router.post("", response_model=BookingRead)
-async def booked_slot(
-    studio_id: int,
+@router.post(
+    "/studios/{studio_id}/rooms/{room_name}/bookings",
+    response_model=BookingRead,
+)
+async def book_slot(
+    room: ValidRoomInStudioDep,
     schema: BookingCreate,
     service: BookingServiceDep,
     user: AuthenticatedUser,
 ) -> BookingRead:
-    review = await service.create(
-        schema=schema, user_id=user.id, studio_id=studio_id
+    booking = await service.create(
+        schema=schema, user_id=user.id, studio_id=room.studio_id
     )
-    return review
+    # TODO: улучшить
+    if schema.status == BookingStatus.CLOSED and not user.employee:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="User does not have permission to close the booking",
+        )
+    return booking
 
 
-@router.get("/my", response_model=list[BookingRead])
+@router.get("/me/bookings", response_model=list[BookingRead])
 async def get_user_bookings(
     service: BookingServiceDep,
     user: AuthenticatedUser,
     offset: int = 0,
     limit: int = 100,
 ) -> list[BookingRead]:
-    bookings = await service.get_bookings_by_user_id(
-        user_id=user.id, offset=offset, limit=limit
+    bookings = await service.get_user_bookings(
+        user.id, offset=offset, limit=limit
     )
     return bookings
 
 
-@router.delete("/{booking_id}", response_model=str)
-async def remove_booking(
-    booking_id: uuid.UUID, service: BookingServiceDep, user: AuthenticatedUser
-) -> str:
-    await service.remove(booking_id=booking_id, user_id=user.id)
-    return "Success delete"
-
-
 @router.put("/{booking_id}", response_model=BookingRead)
-async def patch_booking(
-    booking_id: uuid.UUID,
+async def update_booking(
+    booking: OwnedBookingDep,
     schema: BookingUpdate,
     service: BookingServiceDep,
     user: AuthenticatedUser,
 ) -> BookingRead:
     booking = await service.update_booking(
-        booking_id=booking_id, user_id=user.id, schema=schema
+        booking.id, user_id=user.id, schema=schema
     )
     return booking
+
+
+@router.delete("/me/bookings/{booking_id}")
+async def cancel_booking(
+    booking: OwnedBookingDep, service: BookingServiceDep, _: AuthenticatedUser
+) -> None:
+    await service.delete_by_id(booking.id)

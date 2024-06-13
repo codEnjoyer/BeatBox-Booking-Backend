@@ -4,6 +4,7 @@ from fastapi import HTTPException, Depends
 from starlette import status
 
 from src.api.dependencies.services import RoomServiceDep
+from src.api.dependencies.studio import ValidStudioIdDep
 from src.domain.exceptions.room import RoomNotFoundException
 from src.domain.models.room import Room
 from src.domain.schemas.room import RoomRead
@@ -42,9 +43,11 @@ async def get_images_url(
     return banner_url, images_url
 
 
-async def valid_room_id(room_id: int, room_service: RoomServiceDep) -> Room:
+async def valid_room_in_studio_by_name(
+    room_name: str, studio: ValidStudioIdDep, room_service: RoomServiceDep
+) -> Room:
     try:
-        room = await room_service.get_by_id(room_id)
+        room = await room_service.get_by_name_in_studio(room_name, studio.id)
     except RoomNotFoundException as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -53,4 +56,4 @@ async def valid_room_id(room_id: int, room_service: RoomServiceDep) -> Room:
     return room
 
 
-ValidRoomIdDep = Annotated[Room, Depends(valid_room_id)]
+ValidRoomInStudioDep = Annotated[Room, Depends(valid_room_in_studio_by_name)]

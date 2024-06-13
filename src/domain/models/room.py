@@ -18,7 +18,7 @@ class Room(BaseModel):
     __tablename__ = "rooms"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    name: Mapped[str] = mapped_column(String(100))
+    name: Mapped[str] = mapped_column(String(100), nullable=False)
     description: Mapped[str] = mapped_column(String(500))
 
     banner_id: Mapped[Optional[uuid.UUID]] = mapped_column(

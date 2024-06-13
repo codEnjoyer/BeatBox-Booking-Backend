@@ -3,22 +3,21 @@ from starlette import status
 
 from src.api.dependencies.services import FileServiceDep
 from src.api.dependencies.services import RoomServiceDep
-from src.api.dependencies.studio import ValidStudioIdDep, StudioEmployeeDep
+from src.api.dependencies.studio import StudioEmployeeDep
 from src.domain.exceptions.room import RoomWithSameNameAlreadyExistsException
 from src.domain.schemas.room import RoomRead, RoomCreate, RoomUpdate
 from src.api.dependencies.room import (
     convert_model_to_scheme,
     get_images_url,
-    ValidRoomIdDep,
+    ValidRoomInStudioDep,
 )
 
 router = APIRouter(tags=["Room"])
 
 
-@router.get("/studios/{studio_id}/rooms/{room_id}", response_model=RoomRead)
+@router.get("/studios/{studio_id}/rooms/{room_name}", response_model=RoomRead)
 async def get_room(
-    _: ValidStudioIdDep,
-    room: ValidRoomIdDep,
+    room: ValidRoomInStudioDep,
     room_service: RoomServiceDep,
     file_service: FileServiceDep,
 ) -> RoomRead:
@@ -28,37 +27,6 @@ async def get_room(
     return convert_model_to_scheme(
         room=room, banner_url=banner_url, images_url=images_url
     )
-
-
-# @router.get("/all/{studio_id}", response_model=list[RoomRead])
-# async def get_all_studio_rooms(
-#         studio_id: int,
-#         room_service: RoomServiceDep,
-#         file_service: FileServiceDep,
-# ) -> list[RoomRead]:
-#     try:
-#         rooms = await room_service.get_all(Room.studio_id == studio_id)
-#         banner_and_images = [
-#             await get_images_url(room=room,
-#                                  file_service=file_service,
-#                                  room_service=room_service
-#             )
-#             for room in rooms
-#         ]
-#
-#         return [
-#             convert_model_to_scheme(
-#                 room=rooms[i],
-#                 banner_url=banner_and_images[i][0],
-#                 images_url=banner_and_images[i][1],
-#             )
-#             for i in range(len(rooms))
-#         ]
-#
-#     except NoResultFound:
-#         raise HTTPException(
-#             status_code=status.HTTP_404_NOT_FOUND, detail="Room not found"
-#         )
 
 
 @router.post("/studios/{studio_id}/rooms", response_model=RoomRead)
@@ -85,9 +53,9 @@ async def create_room_in_studio(
     )
 
 
-@router.put("/studios/{studio_id}/rooms/{room_id}", response_model=RoomRead)
+@router.put("/studios/{studio_id}/rooms/{room_name}", response_model=RoomRead)
 async def update_room(
-    room: ValidRoomIdDep,
+    room: ValidRoomInStudioDep,
     schema: RoomUpdate,
     room_service: RoomServiceDep,
     file_service: FileServiceDep,
@@ -104,7 +72,7 @@ async def update_room(
 
 @router.delete("/studios/{studio_id}/rooms/{room_id}")
 async def delete_room(
-    room: ValidRoomIdDep,
+    room: ValidRoomInStudioDep,
     room_service: RoomServiceDep,
     _: StudioEmployeeDep,
 ) -> None:

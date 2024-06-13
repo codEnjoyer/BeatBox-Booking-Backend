@@ -62,19 +62,7 @@ class BookingService(
             return False
         return True
 
-    async def check_user_permission(
-        self, booking_id: uuid.UUID, user_id: int
-    ) -> bool:
-        try:
-            await self._repository.get_one(
-                self.model.id == booking_id,
-                self.model.user_id == user_id,
-            )
-        except NoResultFound:
-            return False
-        return True
-
-    async def get_bookings_by_user_id(
+    async def get_user_bookings(
         self, user_id: int, offset: int = 0, limit: int = 100
     ) -> list[Booking]:
         return await self._repository.get_all(
@@ -119,11 +107,3 @@ class BookingService(
             booking_data, self.model.id == booking_id
         )
         return result
-
-    async def remove(self, booking_id: uuid.UUID, user_id: int) -> None:
-        if not await self.check_user_permission(booking_id, user_id):
-            raise HTTPException(
-                status.HTTP_404_NOT_FOUND,
-                detail="User does not have permission to delete the booking",
-            )
-        await self._repository.delete(self.model.id == booking_id)

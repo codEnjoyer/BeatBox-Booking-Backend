@@ -41,7 +41,9 @@ async def update_studio(
     studio_service: StudioServiceDep,
     studio_employee: StudioEmployeeDep,
 ) -> StudioRead:
-    studio = await studio_service.update(studio_employee.studio_id, schema)
+    studio = await studio_service.update_by_id(
+        studio_employee.studio_id, schema
+    )
     return studio
 
 
@@ -53,7 +55,7 @@ async def delete_studio(
     studio: ValidStudioIdDep,
     studio_service: StudioServiceDep,
 ) -> None:
-    await studio_service.delete(studio.id)
+    await studio_service.delete_by_id(studio.id)
 
 
 @router.get(

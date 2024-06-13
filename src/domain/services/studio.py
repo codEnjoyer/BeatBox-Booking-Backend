@@ -29,9 +29,3 @@ class StudioService(
         except NoResultFound:
             return False
         return True
-
-    async def update(self, studio_id: int, schema: StudioUpdate) -> Studio:
-        return await self.update_by_id(schema, studio_id)
-
-    async def delete(self, studio_id: int) -> None:
-        return await self.delete_by_id(studio_id)

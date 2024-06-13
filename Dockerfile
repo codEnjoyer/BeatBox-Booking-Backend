@@ -1,5 +1,5 @@
 # Используем официальный образ Python
-FROM python:3.12.3-slim-bullseye
+FROM python:3.12.2-slim-bullseye
 
 # Устанавливем рабочую директорию в /backend-app
 WORKDIR /backend-app

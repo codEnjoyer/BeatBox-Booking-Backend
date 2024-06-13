@@ -15,26 +15,20 @@ class ReviewService(
     def __init__(self):
         super().__init__(ReviewRepository(), ReviewNotFoundException)
 
-    async def create(self, schema: ReviewCreate, **kwargs) -> Review:
-        author_id: int = kwargs.get('author_id')
-        studio_id: int = kwargs.get('studio_id')
-        if await self.is_review_already_exist(author_id, studio_id):
+    async def add_new_from_user(self,
+                                schema: ReviewCreate,
+                                user_id: int,
+                                studio_id: int) -> Review:
+        if await self.is_review_exist(user_id, studio_id):
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
                 detail="User already has a review.py on this studio",
             )
+        schema_dict = schema.model_dump()
+        schema_dict.update(author_id=user_id, studio_id=studio_id)
+        return await self._repository.create(schema_dict)
 
-        review_data = {
-            'text': schema.text,
-            'grade': schema.grade,
-            'author_id': author_id,
-            'room_id': schema.room_id,
-            'studio_id': studio_id,
-        }
-
-        return await self._repository.create(review_data)
-
-    async def is_review_already_exist(
+    async def is_review_exist(
         self, author_id: int, studio_id: int
     ) -> bool:
         try:
@@ -46,28 +40,9 @@ class ReviewService(
             return False
         return True
 
-    async def get_reviews_by_studio_id(
+    async def get_studio_reviews(
         self, studio_id: int, offset: int = 0, limit: int = 100
     ) -> list[Review]:
         return await self._repository.get_all(
             self.model.studio_id == studio_id, offset=offset, limit=limit
         )
-
-    async def update_review(
-        self,
-        studio_id: int,
-        author_id: int,
-        review_id: int,
-        schema: ReviewUpdate,
-    ) -> Review:
-        if not await self.is_review_already_exist(
-            studio_id=studio_id, author_id=author_id
-        ):
-            raise HTTPException(
-                status.HTTP_404_NOT_FOUND,
-                detail="User does not have review.py on this studio",
-            )
-        result: Review = await self._repository.update(
-            schema, self.model.id == review_id
-        )
-        return result

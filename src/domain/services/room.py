@@ -16,15 +16,6 @@ class RoomService(ModelService[RoomRepository, Room, RoomCreate, RoomUpdate]):
     def __init__(self):
         super().__init__(RoomRepository(), RoomNotFoundException)
 
-    async def get(self, room_id: int) -> Room:
-        room = await self.get_by_id(room_id)
-        if not room:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Room with that id not found",
-            )
-        return room
-
     async def is_room_exist(self, *where: ColumnElement[bool]) -> bool:
         # TODO: переделать
         try:
@@ -68,14 +59,6 @@ class RoomService(ModelService[RoomRepository, Room, RoomCreate, RoomUpdate]):
     async def delete(
         self, room_id: int, studio_id: int, employee_id: int
     ) -> None:
-        if not await self._repository.is_room_exist(
-            self.model.id == room_id, self.model.studio_id == studio_id
-        ):
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Room with that id not found",
-            )
-
         if not await self._repository.is_working_in_studio(
             employee_id, studio_id
         ):
@@ -89,14 +72,6 @@ class RoomService(ModelService[RoomRepository, Room, RoomCreate, RoomUpdate]):
     async def update(
         self, room_id: int, studio_id: int, employee_id: int, schema: RoomUpdate
     ) -> Room:
-        if not await self._repository.is_room_exist(
-            self.model.id == room_id, self.model.studio_id == studio_id
-        ):
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Room with that id not found",
-            )
-
         if not await self._repository.is_working_in_studio(
             employee_id, studio_id
         ):

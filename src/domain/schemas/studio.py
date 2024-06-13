@@ -14,6 +14,8 @@ class BaseStudio(BaseSchema):
     latitude: float | None
     longitude: float | None
     site_url: AnyHttpUrl | None
+    # TODO: при дампе url конвертировать в строку
+    # бд не принимает Url при создании студии
     contact_phone_number: PhoneNumber | None
     tg: str | None
     vk: str | None

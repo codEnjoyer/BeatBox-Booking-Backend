@@ -15,8 +15,8 @@ class BBBException(Exception):
 
 
 class ItemNotFoundException(BBBException, NoResultFound):
-    @abstractmethod
     @property
+    @abstractmethod
     def item_name(self) -> str: ...
 
     def __init__(self):

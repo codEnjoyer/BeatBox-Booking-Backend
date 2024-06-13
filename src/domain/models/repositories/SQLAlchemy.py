@@ -1,4 +1,5 @@
 from abc import abstractmethod
+from typing import Iterable
 
 from sqlalchemy import insert, ColumnElement, select, delete, update
 from sqlalchemy.exc import NoResultFound
@@ -14,8 +15,8 @@ class SQLAlchemyRepository[
     Model: BaseModel, CreateSchema: BaseSchema, UpdateSchema: BaseSchema
 ](Repository[Model, CreateSchema, UpdateSchema]):
 
-    @abstractmethod
     @property
+    @abstractmethod
     def model(self) -> type[Model]: ...
 
     async def create(self, schema: CreateSchema | dict[str, ...]) -> Model:
@@ -32,7 +33,7 @@ class SQLAlchemyRepository[
     async def get_all(
         self,
         *where: ColumnElement[bool],
-        options: tuple[ExecutableOption] | None = None,
+        options: Iterable[ExecutableOption] | None = None,
         offset: int = 0,
         limit: int = 100,
     ) -> list[Model]:
@@ -40,6 +41,8 @@ class SQLAlchemyRepository[
         Raises:
             NoResultFound
         """
+        if not options:
+            options = ()
         async with async_session_maker() as session:
             stmt = (
                 select(self.model)
@@ -57,12 +60,14 @@ class SQLAlchemyRepository[
     async def get_one(
         self,
         *where: ColumnElement[bool],
-        options: tuple[ExecutableOption] | None = None,
+        options: Iterable[ExecutableOption] | None = None,
     ) -> Model:
         """
         Raises:
             NoResultFound
         """
+        if not options:
+            options = ()
         async with async_session_maker() as session:
             stmt = select(self.model).where(*where).options(*options).limit(1)
             result = await session.execute(stmt)

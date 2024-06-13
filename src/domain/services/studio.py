@@ -22,7 +22,7 @@ class StudioService(
                 status_code=status.HTTP_409_CONFLICT,
                 detail="Studio with same name already exists",
             )
-        return await self.create(schema)
+        return await self._repository.create(schema)
 
     async def is_already_exist_with_name(self, name: str) -> bool:
         try:
@@ -32,20 +32,16 @@ class StudioService(
         return True
 
     async def update(self, studio_id: int, schema: StudioUpdate) -> Studio:
-        if not await self.is_already_exist_with_id(studio_id):
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Studio with that name not found",
-            )
         return await self.update_by_id(schema, studio_id)
 
     async def delete(self, studio_id: int, user_id: int) -> None:
         studio: Studio = await self.get_by_id(
             studio_id, options=(selectinload(Studio.employees))
         )
-        # TODO: добавить обработку ошибки при отсутствии
 
-        if any(user_id == employee.user_id for employee in studio.employees):
+        if not any(
+            user_id == employee.user_id for employee in studio.employees
+        ):
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Invalid permissions",

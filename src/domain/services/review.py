@@ -15,10 +15,9 @@ class ReviewService(
     def __init__(self):
         super().__init__(ReviewRepository(), ReviewNotFoundException)
 
-    async def add_new_from_user(self,
-                                schema: ReviewCreate,
-                                user_id: int,
-                                studio_id: int) -> Review:
+    async def add_new_from_user(
+        self, schema: ReviewCreate, user_id: int, studio_id: int
+    ) -> Review:
         if await self.is_review_exist(user_id, studio_id):
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
@@ -28,9 +27,7 @@ class ReviewService(
         schema_dict.update(author_id=user_id, studio_id=studio_id)
         return await self._repository.create(schema_dict)
 
-    async def is_review_exist(
-        self, author_id: int, studio_id: int
-    ) -> bool:
+    async def is_review_exist(self, author_id: int, studio_id: int) -> bool:
         try:
             await self._repository.get_one(
                 self.model.studio_id == studio_id,

@@ -9,8 +9,8 @@ class BaseStudio(BaseSchema):
     name: str
     description: str
     address: str
-    opening_at: dt.datetime
-    closing_at: dt.datetime
+    opening_at: dt.time
+    closing_at: dt.time
     latitude: float | None
     longitude: float | None
     site_url: AnyHttpUrl | None

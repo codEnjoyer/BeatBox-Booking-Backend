@@ -10,9 +10,9 @@ from src.domain.exceptions.review import ReviewNotFoundException
 from src.domain.models import Review
 
 
-async def valid_review_id(_: ValidStudioIdDep,
-                          review_id: int,
-                          review_service: ReviewServiceDep) -> Review:
+async def valid_review_id(
+    _: ValidStudioIdDep, review_id: int, review_service: ReviewServiceDep
+) -> Review:
     try:
         review = await review_service.get_by_id(review_id)
     except ReviewNotFoundException as e:
@@ -26,8 +26,9 @@ async def valid_review_id(_: ValidStudioIdDep,
 ValidReviewIdDep = Annotated[Review, Depends(valid_review_id)]
 
 
-async def owned_review(review: ValidReviewIdDep,
-                       user: AuthenticatedUser) -> Review:
+async def owned_review(
+    review: ValidReviewIdDep, user: AuthenticatedUser
+) -> Review:
     if review.author_id != user.id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,

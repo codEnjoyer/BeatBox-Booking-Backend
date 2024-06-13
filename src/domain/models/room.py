@@ -1,3 +1,4 @@
+import datetime
 import uuid
 from typing import TYPE_CHECKING, Optional
 
@@ -46,6 +47,14 @@ class Room(BaseModel):
     studio: Mapped["Studio"] = relationship(
         back_populates="rooms", lazy="joined", foreign_keys=[studio_id]
     )
+
+    def is_free_at_interval(
+        self, from_: datetime.datetime, to: datetime.datetime
+    ) -> bool:
+        for booking in self.bookings:
+            if booking.within_range(from_, to):
+                return False
+        return True
 
 
 class RoomImage(BaseModel):

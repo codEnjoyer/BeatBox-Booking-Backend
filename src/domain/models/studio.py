@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING, Optional
 import datetime as dt
 
-from sqlalchemy import String, Integer, Float, DateTime
+from sqlalchemy import String, Integer, Float, Time
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import mapped_column, relationship, Mapped
 
@@ -26,11 +26,11 @@ class Studio(BaseModel):
     latitude: Mapped[float] = mapped_column(Float(precision=8), nullable=False)
     longitude: Mapped[float] = mapped_column(Float(precision=8), nullable=False)
 
-    opening_at: Mapped[dt.datetime] = mapped_column(
-        DateTime(timezone=True), nullable=False
+    opening_at: Mapped[dt.time] = mapped_column(
+        Time(timezone=True), nullable=False
     )
     closing_at: Mapped[dt.datetime] = mapped_column(
-        DateTime(timezone=True), nullable=False
+        Time(timezone=True), nullable=False
     )
 
     site_url: Mapped[Optional[str]] = mapped_column(String(200), nullable=True)

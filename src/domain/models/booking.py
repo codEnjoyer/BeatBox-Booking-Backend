@@ -49,3 +49,6 @@ class Booking(BaseModel):
     user: Mapped["User"] = relationship(
         back_populates="bookings", lazy="joined"
     )
+
+    def within_range(self, from_: dt.datetime, to: dt.datetime) -> bool:
+        return self.starts_at <= to and self.ends_at >= from_

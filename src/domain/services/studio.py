@@ -1,6 +1,5 @@
 from fastapi import HTTPException
 from sqlalchemy.exc import NoResultFound
-from sqlalchemy.orm import selectinload
 from starlette import status
 
 from src.domain.exceptions.studio import StudioNotFoundException
@@ -34,16 +33,5 @@ class StudioService(
     async def update(self, studio_id: int, schema: StudioUpdate) -> Studio:
         return await self.update_by_id(schema, studio_id)
 
-    async def delete(self, studio_id: int, user_id: int) -> None:
-        studio: Studio = await self.get_by_id(
-            studio_id, options=(selectinload(Studio.employees))
-        )
-
-        if not any(
-            user_id == employee.user_id for employee in studio.employees
-        ):
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Invalid permissions",
-            )
-        return await self.delete_by_id(studio.id)
+    async def delete(self, studio_id: int) -> None:
+        return await self.delete_by_id(studio_id)

@@ -2,15 +2,11 @@ from fastapi import APIRouter, Depends
 
 from src.api.dependencies.services import EmployeeServiceDep
 from src.api.dependencies.services import StudioServiceDep
-from src.api.dependencies.studio import ValidStudioIdDep
+from src.api.dependencies.studio import ValidStudioIdDep, StudioEmployeeDep
 from src.domain.models import Employee
 from src.domain.schemas.employee import EmployeeRead
 from src.domain.schemas.studio import StudioRead, StudioCreate, StudioUpdate
-from src.api.dependencies.auth import (
-    AuthenticatedEmployee,
-    get_current_superuser,
-    get_current_user_employee,
-)
+from src.api.dependencies.auth import get_current_superuser
 
 router = APIRouter(prefix="/studios", tags=["Studio"])
 
@@ -42,31 +38,32 @@ async def create_studio(
 @router.put("/{studio_id}", response_model=StudioRead)
 async def update_studio(
     schema: StudioUpdate,
-    studio: ValidStudioIdDep,
     studio_service: StudioServiceDep,
-    _: AuthenticatedEmployee,
+    studio_employee: StudioEmployeeDep,
 ) -> StudioRead:
-    studio = await studio_service.update(studio.id, schema)
+    studio = await studio_service.update(studio_employee.studio_id, schema)
     return studio
 
 
-@router.delete("/{studio_id}")
+@router.delete(
+    "/{studio_id}",
+    dependencies=[Depends(get_current_superuser)],
+)
 async def delete_studio(
     studio: ValidStudioIdDep,
     studio_service: StudioServiceDep,
-    employee: AuthenticatedEmployee,
 ) -> None:
-    await studio_service.delete(studio.id, employee.user_id)
+    await studio_service.delete(studio.id)
 
 
 @router.get(
     "/{studio_id}/employees",
     tags=["Employee"],
-    dependencies=[Depends(get_current_user_employee)],
     response_model=list[EmployeeRead],
 )
 async def get_all_studio_employees(
     studio: ValidStudioIdDep,
+    _: StudioEmployeeDep,
     employee_service: EmployeeServiceDep,
     limit: int = 100,
     offset: int = 0,

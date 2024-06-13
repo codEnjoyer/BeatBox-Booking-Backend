@@ -1,10 +1,11 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
+from starlette import status
 
 from src.api.dependencies.services import FileServiceDep
 from src.api.dependencies.services import RoomServiceDep
-from src.api.dependencies.studio import ValidStudioIdDep
+from src.api.dependencies.studio import ValidStudioIdDep, StudioEmployeeDep
+from src.domain.exceptions.room import RoomWithSameNameAlreadyExistsException
 from src.domain.schemas.room import RoomRead, RoomCreate, RoomUpdate
-from src.api.dependencies.auth import AuthenticatedEmployee
 from src.api.dependencies.room import (
     convert_model_to_scheme,
     get_images_url,
@@ -62,15 +63,20 @@ async def get_room(
 
 @router.post("/studios/{studio_id}/rooms", response_model=RoomRead)
 async def create_room_in_studio(
-    studio: ValidStudioIdDep,
     schema: RoomCreate,
     room_service: RoomServiceDep,
     file_service: FileServiceDep,
-    employee: AuthenticatedEmployee,
+    studio_employee: StudioEmployeeDep,
 ) -> RoomRead:
-    room = await room_service.create(
-        schema=schema, studio_id=studio.id, employee_id=employee.id
-    )
+    try:
+        room = await room_service.create_room_in_studio(
+            studio_employee.studio_id, schema
+        )
+    except RoomWithSameNameAlreadyExistsException as e:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=str(e),
+        ) from e
     banner_url, images_url = await get_images_url(
         room=room, file_service=file_service, room_service=room_service
     )
@@ -81,14 +87,13 @@ async def create_room_in_studio(
 
 @router.put("/studios/{studio_id}/rooms/{room_id}", response_model=RoomRead)
 async def update_room(
-    studio: ValidStudioIdDep,
     room: ValidRoomIdDep,
     schema: RoomUpdate,
     room_service: RoomServiceDep,
     file_service: FileServiceDep,
-    employee: AuthenticatedEmployee,
+    _: StudioEmployeeDep,
 ) -> RoomRead:
-    room = await room_service.update(room.id, studio.id, employee.id, schema)
+    room = await room_service.update_by_id(schema, room.id)
     banner_url, images_url = await get_images_url(
         room=room, file_service=file_service, room_service=room_service
     )
@@ -99,9 +104,8 @@ async def update_room(
 
 @router.delete("/studios/{studio_id}/rooms/{room_id}")
 async def delete_room(
-    studio: ValidStudioIdDep,
     room: ValidRoomIdDep,
     room_service: RoomServiceDep,
-    employee: AuthenticatedEmployee,
+    _: StudioEmployeeDep,
 ) -> None:
-    await room_service.delete(room.id, studio.id, employee.id)
+    await room_service.delete_by_id(room.id)

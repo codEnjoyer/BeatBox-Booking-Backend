@@ -5,7 +5,10 @@ from sqlalchemy import ColumnElement
 from sqlalchemy.exc import NoResultFound
 from starlette import status
 
-from src.domain.exceptions.room import RoomNotFoundException
+from src.domain.exceptions.room import (
+    RoomNotFoundException,
+    RoomWithSameNameAlreadyExistsException,
+)
 from src.domain.models import Room
 from src.domain.models.repositories.room import RoomRepository
 from src.domain.schemas.room import RoomCreate, RoomUpdate
@@ -24,63 +27,22 @@ class RoomService(ModelService[RoomRepository, Room, RoomCreate, RoomUpdate]):
             return False
         return True
 
-    async def create(self, schema: RoomCreate, **kwargs) -> Room:
-        studio_id = kwargs.get("studio_id")
+    async def create_room_in_studio(
+        self, studio_id: int, schema: RoomCreate
+    ) -> Room:
         if await self.is_room_exist(
             self.model.name == schema.name, self.model.studio_id == studio_id
         ):
-            raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT,
-                detail="Room with same name already exists",
-            )
-
-        if not await self._repository.is_working_in_studio(
-            kwargs.get("employee_id"), studio_id
-        ):
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Invalid permissions",
-            )
-
-        studio_dict = {
-            "name": schema.name,
-            "description": schema.description,
-            "banner_id": schema.banner_id,
-            "studio_id": studio_id,
-        }
+            raise RoomWithSameNameAlreadyExistsException()
+        schema_dict = schema.model_dump()
+        schema_dict["studio_id"] = studio_id
         try:
-            return await self._repository.create(studio_dict)
+            return await self._repository.create(schema_dict)
         except Exception:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="File with that id not found",
             )
-
-    async def delete(
-        self, room_id: int, studio_id: int, employee_id: int
-    ) -> None:
-        if not await self._repository.is_working_in_studio(
-            employee_id, studio_id
-        ):
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Invalid permissions",
-            )
-
-        return await self._repository.delete(self.model.id == room_id)
-
-    async def update(
-        self, room_id: int, studio_id: int, employee_id: int, schema: RoomUpdate
-    ) -> Room:
-        if not await self._repository.is_working_in_studio(
-            employee_id, studio_id
-        ):
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Invalid permissions",
-            )
-
-        return await self.update_by_id(schema, room_id)
 
     async def get_all_images(self, room_id: int) -> list[uuid.UUID]:
         return await self._repository.get_all_images_by_id(room_id=room_id)

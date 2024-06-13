@@ -21,3 +21,8 @@ class ItemNotFoundException(BBBException, NoResultFound):
 
     def __init__(self):
         super().__init__(f"{self.item_name} not found")
+
+
+class BadDataException(BBBException):
+    def __init__(self, message: str = "Bad data"):
+        super().__init__(message)

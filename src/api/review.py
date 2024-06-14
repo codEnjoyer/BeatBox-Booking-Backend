@@ -37,7 +37,9 @@ async def post_review_on_studio(
     return review
 
 
-@router.put("/studios/{studio_id}/reviews/{review_id}", response_model=ReviewRead)
+@router.put(
+    "/studios/{studio_id}/reviews/{review_id}", response_model=ReviewRead
+)
 async def update_my_studio_review(
     review: OwnedReviewDep,
     schema: ReviewUpdate,

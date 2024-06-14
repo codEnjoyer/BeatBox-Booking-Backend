@@ -17,12 +17,11 @@ router = APIRouter(tags=["Room"])
 
 # NOTE: get_studio_rooms отсутствует намеренно, так как все комнаты можно
 # получить из GET /studios/{studio_id}
-@router.get("/studios/{studio_id}/rooms/{room_name}",
-            response_model=RoomRead)
+@router.get("/studios/{studio_id}/rooms/{room_name}", response_model=RoomRead)
 async def get_room(
-        room: ValidStudioRoomNameDep,
-        room_service: RoomServiceDep,
-        file_service: FileServiceDep,
+    room: ValidStudioRoomNameDep,
+    room_service: RoomServiceDep,
+    file_service: FileServiceDep,
 ) -> RoomRead:
     banner_url, images_url = await get_images_url(
         room=room, file_service=file_service, room_service=room_service
@@ -34,10 +33,10 @@ async def get_room(
 
 @router.post("/studios/{studio_id}/rooms", response_model=RoomRead)
 async def create_room(
-        schema: RoomCreate,
-        room_service: RoomServiceDep,
-        file_service: FileServiceDep,
-        studio_employee: StudioEmployeeDep,
+    schema: RoomCreate,
+    room_service: RoomServiceDep,
+    file_service: FileServiceDep,
+    studio_employee: StudioEmployeeDep,
 ) -> RoomRead:
     try:
         room = await room_service.create_room_in_studio(
@@ -58,11 +57,11 @@ async def create_room(
 
 @router.put("/studios/{studio_id}/rooms/{room_name}", response_model=RoomRead)
 async def update_room(
-        room: ValidStudioRoomNameDep,
-        schema: RoomUpdate,
-        room_service: RoomServiceDep,
-        file_service: FileServiceDep,
-        _: StudioEmployeeDep,
+    room: ValidStudioRoomNameDep,
+    schema: RoomUpdate,
+    room_service: RoomServiceDep,
+    file_service: FileServiceDep,
+    _: StudioEmployeeDep,
 ) -> RoomRead:
     room = await room_service.update_by_id(schema, room.id)
     banner_url, images_url = await get_images_url(
@@ -75,8 +74,8 @@ async def update_room(
 
 @router.delete("/studios/{studio_id}/rooms/{room_id}")
 async def delete_room(
-        room: ValidStudioRoomNameDep,
-        room_service: RoomServiceDep,
-        _: StudioEmployeeDep,
+    room: ValidStudioRoomNameDep,
+    room_service: RoomServiceDep,
+    _: StudioEmployeeDep,
 ) -> None:
     await room_service.delete_by_id(room.id)

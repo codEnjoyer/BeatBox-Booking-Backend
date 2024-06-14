@@ -1,3 +1,4 @@
+import datetime
 from typing import TYPE_CHECKING, Optional
 
 from sqlalchemy import (
@@ -23,12 +24,12 @@ class Review(BaseModel):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
 
-    date: Mapped[str] = mapped_column(
-        DateTime(timezone=True), nullable=False, server_default=func.now()
-    )
     text: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     grade: Mapped[int] = mapped_column(
         Integer, CheckConstraint('grade > 0 AND grade <= 5'), nullable=False
+    )
+    published_at: Mapped[datetime.datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now()
     )
 
     author_id: Mapped[int] = mapped_column(

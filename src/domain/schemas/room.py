@@ -1,5 +1,3 @@
-import uuid
-
 from pydantic import PositiveInt, Field, HttpUrl
 
 from src.domain.schemas.additional_service import (
@@ -29,10 +27,9 @@ class RoomRead(BaseRoom):
 
 
 class RoomCreate(BaseRoom):
-    banner_id: uuid.UUID | None
     additional_services: list[AdditionalServiceCreate]
 
 
-class RoomUpdate(RoomCreate):
-    banner_id: uuid.UUID | None
+class RoomUpdate(BaseRoom):
+    ...
     # NOTE: additional_services отсутствуют намеренно

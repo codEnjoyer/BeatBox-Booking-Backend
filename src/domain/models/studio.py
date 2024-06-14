@@ -21,11 +21,6 @@ class Studio(BaseModel):
     description: Mapped[Optional[str]] = mapped_column(
         String(500), nullable=True
     )
-
-    address: Mapped[str] = mapped_column(String(200), nullable=False)
-    latitude: Mapped[float] = mapped_column(Float(precision=8), nullable=False)
-    longitude: Mapped[float] = mapped_column(Float(precision=8), nullable=False)
-
     opening_at: Mapped[dt.time] = mapped_column(
         Time(timezone=True), nullable=False
     )
@@ -33,7 +28,12 @@ class Studio(BaseModel):
         Time(timezone=True), nullable=False
     )
 
-    site_url: Mapped[Optional[str]] = mapped_column(String(200), nullable=True)
+    banner: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+
+    latitude: Mapped[float] = mapped_column(Float(precision=8), nullable=False)
+    longitude: Mapped[float] = mapped_column(Float(precision=8), nullable=False)
+
+    site: Mapped[Optional[str]] = mapped_column(String(200), nullable=True)
     contact_phone_number: Mapped[Optional[str]] = mapped_column(
         String(100), nullable=True
     )

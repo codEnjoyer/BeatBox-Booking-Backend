@@ -1,33 +1,40 @@
-from pydantic import AnyHttpUrl
+import datetime
+
+from pydantic import Field, HttpUrl, PositiveInt
 from src.domain.schemas.base import BaseSchema
-import datetime as dt
 
 from src.domain.schemas.phone_number import PhoneNumber
+from src.domain.schemas.room import RoomRead
 
 
 class BaseStudio(BaseSchema):
-    name: str
-    description: str
-    address: str
-    opening_at: dt.time
-    closing_at: dt.time
-    latitude: float | None
-    longitude: float | None
-    site_url: AnyHttpUrl | None
-    # TODO: при дампе url конвертировать в строку
-    # бд не принимает Url при создании студии
+    name: str = Field(min_length=1, max_length=100)
+    # TODO: проверить поведение description
+    description: str | None = Field(min_length=1)
+    opening_at: datetime.time
+    closing_at: datetime.time
+    # TODO: opening_at < closing_at
+    latitude: float
+    longitude: float
+
+    site: HttpUrl | None
     contact_phone_number: PhoneNumber | None
+    # TODO: добавить валидацию соц. сетей
     tg: str | None
     vk: str | None
     whats_app: str | None
 
 
 class StudioRead(BaseStudio):
-    id: int
+    id: PositiveInt
     average_grade: float
 
+    rooms: list[RoomRead]
 
-class StudioCreate(BaseStudio): ...
+
+class StudioCreate(BaseStudio):
+    ...
 
 
-class StudioUpdate(BaseStudio): ...
+class StudioUpdate(BaseStudio):
+    ...

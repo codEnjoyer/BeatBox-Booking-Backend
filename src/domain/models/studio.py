@@ -29,7 +29,7 @@ class Studio(BaseModel):
     opening_at: Mapped[dt.time] = mapped_column(
         Time(timezone=True), nullable=False
     )
-    closing_at: Mapped[dt.datetime] = mapped_column(
+    closing_at: Mapped[dt.time] = mapped_column(
         Time(timezone=True), nullable=False
     )
 

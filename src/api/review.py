@@ -10,7 +10,7 @@ from src.domain.schemas.review import ReviewCreate, ReviewRead, ReviewUpdate
 router = APIRouter(tags=["Review"])
 
 
-@router.get("/{studio_id}/reviews", response_model=list[ReviewRead])
+@router.get("/studios/{studio_id}/reviews", response_model=list[ReviewRead])
 async def get_studio_reviews(
     studio: ValidStudioIdDep,
     service: ReviewServiceDep,
@@ -27,7 +27,7 @@ async def get_studio_reviews(
 
 
 @router.post("/studios/{studio_id}/reviews", response_model=ReviewRead)
-async def create_review(
+async def post_review_on_studio(
     studio: ValidStudioIdDep,
     schema: ReviewCreate,
     review_service: ReviewServiceDep,
@@ -37,8 +37,8 @@ async def create_review(
     return review
 
 
-@router.put("/{studio_id}/reviews/{review_id}", response_model=ReviewRead)
-async def update_studio_review(
+@router.put("/studios/{studio_id}/reviews/{review_id}", response_model=ReviewRead)
+async def update_my_studio_review(
     review: OwnedReviewDep,
     schema: ReviewUpdate,
     review_service: ReviewServiceDep,

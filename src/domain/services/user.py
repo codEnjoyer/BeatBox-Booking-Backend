@@ -40,7 +40,6 @@ class UserService(ModelService[UserRepository, User, UserCreate, UserUpdate]):
         new_user = User(
             email=user_schema.email,
             hashed_password=UserService.pwd_context.hash(user_schema.password),
-            is_superuser=user_schema.is_superuser,
             phone_number=user_schema.phone_number,
         )
         session.add(new_user)

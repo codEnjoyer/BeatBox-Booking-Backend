@@ -1,30 +1,26 @@
-from pydantic import constr, EmailStr
+from pydantic import EmailStr, PositiveInt, Field
 
 from src.domain.schemas.base import BaseSchema
-from src.domain.schemas.phone_number import PhoneNumber
+from src.domain.schemas.employee import EmployeeRead
 
 
 class BaseUser(BaseSchema):
     email: EmailStr
 
 
-class UserCredentials(BaseUser):
-    password: constr(max_length=200)
-
-
-# TODO: кажется, стоит переосмыслить схемы. сейчас решил ничего не трогать
-
-
-class UserCreate(BaseUser):
-    phone_number: PhoneNumber
-    password: constr(max_length=200)
-    is_superuser: bool = False
-
-
 class UserRead(BaseUser):
-    id: int
-    is_superuser: bool = False
+    id: PositiveInt
+    is_superuser: bool
+    employee: EmployeeRead | None
+
+
+class UserCredentials(BaseUser):
+    password: str = Field(..., min_length=8, max_length=24)
+
+
+class UserCreate(UserCredentials):
+    ...
 
 
 class UserUpdate(BaseUser):
-    phone_number: PhoneNumber
+    ...

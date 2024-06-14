@@ -1,8 +1,12 @@
 import datetime
 from fastapi import APIRouter
 
-from src.api.dependencies.booking import OwnedBookingDep
-from src.api.dependencies.room import ValidRoomInStudioDep
+from src.api.dependencies.booking import (
+    OwnedBookingDep,
+    BookingCancelerDep,
+    ValidBookingIdDep,
+)
+from src.api.dependencies.room import ValidStudioRoomNameDep
 from src.api.dependencies.services import BookingServiceDep
 from src.api.dependencies.auth import AuthenticatedUser
 from src.api.dependencies.studio import ValidStudioIdDep
@@ -16,8 +20,8 @@ router = APIRouter(tags=["Booking"])
 async def get_my_bookings(
     booking_service: BookingServiceDep,
     user: AuthenticatedUser,
-    limit: QueryLimit = 100,
     offset: QueryOffset = 0,
+    limit: QueryLimit = 100,
 ) -> list[BookingRead]:
     bookings = await booking_service.get_user_bookings(
         user.id, offset=offset, limit=limit
@@ -32,8 +36,8 @@ async def get_studio_bookings(
     _: AuthenticatedUser,
     from_: datetime.date | None = None,
     to: datetime.date | None = None,
-    limit: QueryLimit = 100,
     offset: QueryOffset = 0,
+    limit: QueryLimit = 100,
 ):
     studio_bookings = []
     for room in studio.rooms:
@@ -49,13 +53,13 @@ async def get_studio_bookings(
     response_model=list[BookingRead],
 )
 async def get_room_bookings(
-    room: ValidRoomInStudioDep,
-    booking_service: BookingServiceDep,
+    room: ValidStudioRoomNameDep,
     _: AuthenticatedUser,
+    booking_service: BookingServiceDep,
     from_: datetime.date | None = None,
     to: datetime.date | None = None,
-    limit: QueryLimit = 100,
     offset: QueryOffset = 0,
+    limit: QueryLimit = 100,
 ):
     room_bookings = await booking_service.get_room_bookings(
         room.id, from_, to, offset=offset, limit=limit
@@ -69,7 +73,7 @@ async def get_room_bookings(
 )
 async def book_slot(
     schema: BookingCreate,
-    room: ValidRoomInStudioDep,
+    room: ValidStudioRoomNameDep,
     booking_service: BookingServiceDep,
     user: AuthenticatedUser,
 ) -> BookingRead:
@@ -86,21 +90,27 @@ async def book_slot(
     return booking
 
 
-@router.put("/{booking_id}", response_model=BookingRead)
-async def update_booking(
-    booking: OwnedBookingDep,
+@router.put(
+    "/studios/{studio_id}/rooms/{room_name}/bookings/{booking_id}",
+    response_model=BookingRead,
+)
+async def confirm_payment_for_booking(
     schema: BookingUpdate,
-    service: BookingServiceDep,
+    booking: OwnedBookingDep,
+    booking_service: BookingServiceDep,
     user: AuthenticatedUser,
 ) -> BookingRead:
-    booking = await service.update_booking(
+    # TODO: заменить на соответствующую логику
+    booking = await booking_service.update_booking(
         booking.id, user_id=user.id, schema=schema
     )
     return booking
 
 
-@router.delete("/me/bookings/{booking_id}")
+@router.delete("/studios/{studio_id}/rooms/{room_name}/bookings/{booking_id}")
 async def cancel_booking(
-    booking: OwnedBookingDep, service: BookingServiceDep, _: AuthenticatedUser
+    booking: ValidBookingIdDep,
+    _: BookingCancelerDep,
+    booking_service: BookingServiceDep,
 ) -> None:
-    await service.delete_by_id(booking.id)
+    await booking_service.delete_by_id(booking.id)

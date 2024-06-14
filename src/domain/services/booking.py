@@ -30,8 +30,8 @@ class BookingService(
         room_id: int,
         from_: datetime.date | None = None,
         to: datetime.date | None = None,
-        limit: int = 100,
         offset: int = 0,
+        limit: int = 100,
     ) -> list[Booking]:
         date_filter = []
         if from_:
@@ -83,6 +83,7 @@ class BookingService(
     async def update_booking(
         self, booking_id: uuid.UUID, user_id: int, schema: BookingUpdate
     ) -> Booking:
+        # TODO: заменить на confirm_payment_for_booking
         has_permission = await self.check_user_permission(booking_id, user_id)
         if schema.status == BookingStatus.CANCELED and not has_permission:
             raise HTTPException(

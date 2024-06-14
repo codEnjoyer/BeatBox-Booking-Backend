@@ -1,41 +1,47 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter
 
-from src.api.dependencies.auth import (
-    get_current_superuser,
-    get_current_user_employee,
-)
-from src.api.dependencies.employee import can_create_employee
+from src.api.dependencies.employee import ValidEmployeeIdDep, StudioManagerDep
 from src.api.dependencies.services import EmployeeServiceDep
+from src.api.dependencies.studio import ValidStudioIdDep
+from src.api.dependencies.types import QueryOffset, QueryLimit
 from src.domain.models import Employee
 from src.domain.schemas.employee import EmployeeRead, EmployeeCreate
 
-router = APIRouter(prefix="/employees", tags=["Employee"])
+router = APIRouter(tags=["Employee"])
 
 
 @router.get(
-    "",
-    dependencies=[Depends(get_current_superuser)],
+    "/studios/{studio_id}/employees",
+    tags=["Employee"],
     response_model=list[EmployeeRead],
 )
-async def get_all_employees(
-    employee_service: EmployeeServiceDep, limit: int = 100, offset: int = 0
+async def get_studio_employees(
+    studio: ValidStudioIdDep,
+    _: StudioManagerDep,
+    employee_service: EmployeeServiceDep,
+    offset: QueryOffset = 0,
+    limit: QueryLimit = 100,
 ) -> list[Employee]:
-    return await employee_service.get_all(limit=limit, offset=offset)
+    return await employee_service.get_all_by_studio_id(
+        studio.id, offset=offset, limit=limit
+    )
 
 
-@router.post(
-    "", dependencies=[Depends(can_create_employee)], response_model=EmployeeRead
-)
-async def create_studio_employee(
-    schema: EmployeeCreate, employee_service: EmployeeServiceDep
+@router.post("/studios/{studio_id}/employees", response_model=EmployeeRead)
+async def create_employee_in_studio(
+    schema: EmployeeCreate,
+    _: StudioManagerDep,
+    employee_service: EmployeeServiceDep,
 ) -> Employee:
     return await employee_service.create(schema)
 
 
 @router.delete(
-    "/{employee_id}", dependencies=[Depends(get_current_user_employee)]
+    "/studios/{studio_id}/employees/{employee_id}",
 )
 async def delete_employee(
-    employee_id: int, employee_service: EmployeeServiceDep
+    _: StudioManagerDep,
+    employee: ValidEmployeeIdDep,
+    employee_service: EmployeeServiceDep,
 ) -> None:
-    return await employee_service.delete_by_id(employee_id)
+    await employee_service.delete_by_id(employee.id)

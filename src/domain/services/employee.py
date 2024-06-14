@@ -12,7 +12,7 @@ class EmployeeService(
         super().__init__(EmployeeRepository(), EmployeeNotFoundException)
 
     async def get_all_by_studio_id(
-        self, studio_id: int, limit: int = 100, offset: int = 0
+        self, studio_id: int, offset: int = 0, limit: int = 100
     ) -> list[Employee]:
         return await self._repository.get_all(
             Employee.studio_id == studio_id, limit=limit, offset=offset

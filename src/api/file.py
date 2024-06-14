@@ -21,6 +21,7 @@ async def upload_file(
     return FileRead(
         name=str(orm_file.name), extension=str(orm_file.extension), url=file_url
     )
+    # TODO: перенести в создание студии и комнаты
 
 
 @router.get(
@@ -31,5 +32,5 @@ async def get_file_url(name: str, file_service: FileServiceDep) -> str:
 
 
 @router.delete("/{name}", dependencies=[Depends(get_current_user)])
-async def delete(name: str, file_service: FileServiceDep) -> str:
-    return await file_service.delete_by_name(name=name)
+async def delete(name: str, file_service: FileServiceDep) -> None:
+    await file_service.delete_by_name(name=name)

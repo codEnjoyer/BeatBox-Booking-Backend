@@ -56,4 +56,4 @@ async def valid_room_in_studio_by_name(
     return room
 
 
-ValidRoomInStudioDep = Annotated[Room, Depends(valid_room_in_studio_by_name)]
+ValidStudioRoomNameDep = Annotated[Room, Depends(valid_room_in_studio_by_name)]

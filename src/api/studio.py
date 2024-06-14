@@ -1,10 +1,8 @@
 from fastapi import APIRouter, Depends
 
-from src.api.dependencies.services import EmployeeServiceDep
 from src.api.dependencies.services import StudioServiceDep
 from src.api.dependencies.studio import ValidStudioIdDep, StudioEmployeeDep
-from src.domain.models import Employee
-from src.domain.schemas.employee import EmployeeRead
+from src.api.dependencies.types import QueryOffset, QueryLimit
 from src.domain.schemas.studio import StudioRead, StudioCreate, StudioUpdate
 from src.api.dependencies.auth import get_current_superuser
 
@@ -13,7 +11,9 @@ router = APIRouter(prefix="/studios", tags=["Studio"])
 
 @router.get("", response_model=list[StudioRead])
 async def get_all_studios(
-    studio_service: StudioServiceDep, offset: int = 0, limit: int = 100
+    studio_service: StudioServiceDep,
+    offset: QueryOffset = 0,
+    limit: QueryLimit = 100,
 ) -> list[StudioRead]:
     studios = await studio_service.get_all(offset=offset, limit=limit)
     return studios
@@ -56,20 +56,3 @@ async def delete_studio(
     studio_service: StudioServiceDep,
 ) -> None:
     await studio_service.delete_by_id(studio.id)
-
-
-@router.get(
-    "/{studio_id}/employees",
-    tags=["Employee"],
-    response_model=list[EmployeeRead],
-)
-async def get_all_studio_employees(
-    studio: ValidStudioIdDep,
-    _: StudioEmployeeDep,
-    employee_service: EmployeeServiceDep,
-    limit: int = 100,
-    offset: int = 0,
-) -> list[Employee]:
-    return await employee_service.get_all_by_studio_id(
-        studio.id, limit=limit, offset=offset
-    )

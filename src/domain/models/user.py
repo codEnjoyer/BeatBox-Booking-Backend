@@ -33,3 +33,8 @@ class User(BaseModel):
     reviews: Mapped[list["Review"]] = relationship(
         back_populates="author", cascade="all, delete-orphan"
     )
+
+    def can_manage_studio(self, studio_id: int) -> bool:
+        return (
+            self.employee and self.employee.studio_id == studio_id
+        ) or self.is_superuser

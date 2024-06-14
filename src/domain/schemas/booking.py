@@ -26,3 +26,6 @@ class BookingCreate(BaseBooking): ...
 
 
 class BookingUpdate(BaseBooking): ...
+
+
+# TODO: оставить только name и surname?

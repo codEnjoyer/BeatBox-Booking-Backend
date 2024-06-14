@@ -9,7 +9,7 @@ from src.domain.schemas.room import RoomRead, RoomCreate, RoomUpdate
 from src.api.dependencies.room import (
     convert_model_to_scheme,
     get_images_url,
-    ValidRoomInStudioDep,
+    ValidStudioRoomNameDep,
 )
 
 router = APIRouter(tags=["Room"])
@@ -17,7 +17,7 @@ router = APIRouter(tags=["Room"])
 
 @router.get("/studios/{studio_id}/rooms/{room_name}", response_model=RoomRead)
 async def get_room(
-    room: ValidRoomInStudioDep,
+    room: ValidStudioRoomNameDep,
     room_service: RoomServiceDep,
     file_service: FileServiceDep,
 ) -> RoomRead:
@@ -30,7 +30,7 @@ async def get_room(
 
 
 @router.post("/studios/{studio_id}/rooms", response_model=RoomRead)
-async def create_room_in_studio(
+async def create_room(
     schema: RoomCreate,
     room_service: RoomServiceDep,
     file_service: FileServiceDep,
@@ -55,7 +55,7 @@ async def create_room_in_studio(
 
 @router.put("/studios/{studio_id}/rooms/{room_name}", response_model=RoomRead)
 async def update_room(
-    room: ValidRoomInStudioDep,
+    room: ValidStudioRoomNameDep,
     schema: RoomUpdate,
     room_service: RoomServiceDep,
     file_service: FileServiceDep,
@@ -72,7 +72,7 @@ async def update_room(
 
 @router.delete("/studios/{studio_id}/rooms/{room_id}")
 async def delete_room(
-    room: ValidRoomInStudioDep,
+    room: ValidStudioRoomNameDep,
     room_service: RoomServiceDep,
     _: StudioEmployeeDep,
 ) -> None:

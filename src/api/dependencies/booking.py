@@ -5,13 +5,16 @@ from fastapi import HTTPException, Depends
 from starlette import status
 
 from src.api.dependencies.auth import AuthenticatedUser
+from src.api.dependencies.room import ValidStudioRoomNameDep
 from src.api.dependencies.services import BookingServiceDep
 from src.domain.exceptions.booking import BookingNotFoundException
-from src.domain.models import Booking
+from src.domain.models import Booking, User
 
 
 async def valid_booking_id(
-    booking_id: uuid.UUID, booking_service: BookingServiceDep
+    booking_id: uuid.UUID,
+    _: ValidStudioRoomNameDep,
+    booking_service: BookingServiceDep,
 ) -> Booking:
     try:
         booking = await booking_service.get_by_id(booking_id)
@@ -29,7 +32,7 @@ ValidBookingIdDep = Annotated[Booking, Depends(valid_booking_id)]
 async def owned_booking(
     booking: ValidBookingIdDep, user: AuthenticatedUser
 ) -> Booking:
-    if booking.user_id != user.id:
+    if not booking.is_owned_by(user.id):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="You must be owner of this booking",
@@ -38,3 +41,20 @@ async def owned_booking(
 
 
 OwnedBookingDep = Annotated[Booking, Depends(owned_booking)]
+
+
+async def booking_canceler(
+    booking: ValidBookingIdDep, user: AuthenticatedUser
+) -> User:
+    if not (
+        booking.is_owned_by(user.id)
+        or user.can_manage_studio(booking.room.studio.id)
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission denied",
+        )
+    return user
+
+
+BookingCancelerDep = Annotated[User, Depends(booking_canceler)]

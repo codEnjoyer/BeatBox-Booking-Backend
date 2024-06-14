@@ -50,5 +50,8 @@ class Booking(BaseModel):
         back_populates="bookings", lazy="joined"
     )
 
-    def within_range(self, from_: dt.datetime, to: dt.datetime) -> bool:
+    def is_within_range(self, from_: dt.datetime, to: dt.datetime) -> bool:
         return self.starts_at <= to and self.ends_at >= from_
+
+    def is_owned_by(self, user_id: int) -> bool:
+        return self.user_id == user_id

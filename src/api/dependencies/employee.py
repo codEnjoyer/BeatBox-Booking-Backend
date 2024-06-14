@@ -1,13 +1,37 @@
-from fastapi import HTTPException, status
+from typing import Annotated
+
+from fastapi import HTTPException, status, Depends
 
 from src.api.dependencies.auth import AuthenticatedUser
-from src.domain.models import User
+from src.api.dependencies.services import EmployeeServiceDep
+from src.api.dependencies.studio import ValidStudioIdDep
+from src.domain.exceptions.employee import EmployeeNotFoundException
+from src.domain.models import User, Employee
 
 
-def can_create_employee(user: AuthenticatedUser) -> User:
-    can_create = user.is_superuser or user.employee is not None
-    if not can_create:
+def can_manage_studio(
+    studio: ValidStudioIdDep, user: AuthenticatedUser
+) -> User:
+    if not user.can_manage_studio(studio.id):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN, detail="Permission denied"
         )
     return user
+
+
+StudioManagerDep = Annotated[User, Depends(can_manage_studio)]
+
+
+async def valid_employee_id(
+    employee_id: int, employee_service: EmployeeServiceDep
+) -> Employee:
+    try:
+        employee = await employee_service.get_by_id(employee_id)
+    except EmployeeNotFoundException as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=str(e)
+        )
+    return employee
+
+
+ValidEmployeeIdDep = Annotated[Employee, Depends(valid_employee_id)]

@@ -1,6 +1,6 @@
 import typing
 
-from sqlalchemy import Integer, ForeignKey
+from sqlalchemy import Integer, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.domain.models.base import BaseModel
@@ -14,6 +14,7 @@ class Employee(BaseModel):
     __tablename__ = "employees"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    name: Mapped[str] = mapped_column(String, nullable=False)
 
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
     studio_id: Mapped[int] = mapped_column(

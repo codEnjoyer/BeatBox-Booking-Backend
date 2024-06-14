@@ -1,17 +1,20 @@
+from pydantic import Field, PositiveInt
+
 from src.domain.schemas.base import BaseSchema
 
 
 class BaseEmployee(BaseSchema):
-    studio_id: int
+    studio_id: PositiveInt
+    user_id: PositiveInt
 
 
 class EmployeeRead(BaseEmployee):
-    id: int
-    user_id: int
+    id: PositiveInt
 
 
 class EmployeeCreate(BaseEmployee):
-    user_id: int
+    name: str = Field(min_length=3)
 
 
-class EmployeeUpdate(BaseEmployee): ...
+class EmployeeUpdate(BaseSchema):
+    name: str = Field(min_length=3)

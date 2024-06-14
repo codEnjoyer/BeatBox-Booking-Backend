@@ -5,8 +5,7 @@ from src.domain.schemas.studio import StudioRead
 from src.domain.schemas.user import UserRead
 
 
-class BaseEmployee(BaseSchema):
-    ...
+class BaseEmployee(BaseSchema): ...
 
 
 class EmployeeRead(BaseEmployee):

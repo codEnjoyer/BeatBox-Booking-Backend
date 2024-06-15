@@ -4,7 +4,6 @@ from pydantic import Field, HttpUrl, PositiveInt
 from src.domain.schemas.base import BaseSchema
 
 from src.domain.schemas.phone_number import PhoneNumber
-from src.domain.schemas.room import RoomRead
 
 
 class BaseStudio(BaseSchema):
@@ -14,8 +13,8 @@ class BaseStudio(BaseSchema):
     opening_at: datetime.time
     closing_at: datetime.time
     # TODO: opening_at < closing_at
-    latitude: float
-    longitude: float
+    latitude: float = Field(gt=-90, le=90)
+    longitude: float = Field(gt=-180, le=180)
 
     site: HttpUrl | None
     contact_phone_number: PhoneNumber | None
@@ -28,8 +27,6 @@ class BaseStudio(BaseSchema):
 class StudioRead(BaseStudio):
     id: PositiveInt
     average_grade: float
-
-    rooms: list[RoomRead]
 
 
 class StudioCreate(BaseStudio): ...

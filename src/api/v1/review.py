@@ -23,7 +23,7 @@ async def get_studio_reviews(
     return reviews
 
 
-# TODO: get room reviews?
+# TODO: get room reviews
 
 
 @router.post("/studios/{studio_id}/reviews", response_model=ReviewRead)

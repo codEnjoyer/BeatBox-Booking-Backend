@@ -1,7 +1,8 @@
+import typing
+
 from pydantic import EmailStr, PositiveInt, Field
 
 from src.domain.schemas.base import BaseSchema
-from src.domain.schemas.employee import EmployeeRead
 
 
 class BaseUser(BaseSchema):
@@ -11,7 +12,7 @@ class BaseUser(BaseSchema):
 class UserRead(BaseUser):
     id: PositiveInt
     is_superuser: bool
-    employee: EmployeeRead | None
+    employee: typing.Optional["EmployeeRead"]
 
 
 class UserCredentials(BaseUser):
@@ -22,3 +23,8 @@ class UserCreate(UserCredentials): ...
 
 
 class UserUpdate(BaseUser): ...
+
+
+from src.domain.schemas.employee import EmployeeRead
+
+UserRead.update_forward_refs()

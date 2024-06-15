@@ -3,8 +3,8 @@ from typing import Tuple, Annotated
 from fastapi import HTTPException, Depends
 from starlette import status
 
-from src.api.dependencies.services import RoomServiceDep
-from src.api.dependencies.studio import ValidStudioIdDep
+from src.api.v1.dependencies.services import RoomServiceDep
+from src.api.v1.dependencies.studio import ValidStudioIdDep
 from src.domain.exceptions.room import RoomNotFoundException
 from src.domain.models.room import Room
 from src.domain.schemas.room import RoomRead

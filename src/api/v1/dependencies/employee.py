@@ -2,9 +2,9 @@ from typing import Annotated
 
 from fastapi import HTTPException, status, Depends
 
-from src.api.dependencies.auth import AuthenticatedUser
-from src.api.dependencies.services import EmployeeServiceDep
-from src.api.dependencies.studio import ValidStudioIdDep
+from src.api.v1.dependencies.auth import AuthenticatedUser
+from src.api.v1.dependencies.services import EmployeeServiceDep
+from src.api.v1.dependencies.studio import ValidStudioIdDep
 from src.domain.exceptions.employee import EmployeeNotFoundException
 from src.domain.models import User, Employee
 

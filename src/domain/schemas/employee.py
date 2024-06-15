@@ -1,8 +1,6 @@
 from pydantic import Field, PositiveInt
 
 from src.domain.schemas.base import BaseSchema
-from src.domain.schemas.studio import StudioRead
-from src.domain.schemas.user import UserRead
 
 
 class BaseEmployee(BaseSchema): ...
@@ -10,8 +8,8 @@ class BaseEmployee(BaseSchema): ...
 
 class EmployeeRead(BaseEmployee):
     id: PositiveInt
-    user: UserRead
-    studio: StudioRead
+    studio_id: PositiveInt
+    user: "UserRead"
 
 
 class EmployeeCreate(BaseEmployee):
@@ -22,3 +20,8 @@ class EmployeeCreate(BaseEmployee):
 
 class EmployeeUpdate(BaseEmployee):
     name: str = Field(min_length=3)
+
+
+from src.domain.schemas.user import UserRead
+
+EmployeeRead.update_forward_refs()

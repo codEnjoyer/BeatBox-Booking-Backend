@@ -3,8 +3,8 @@ from typing import Annotated
 from fastapi import HTTPException, Depends
 from starlette import status
 
-from src.api.dependencies.auth import AuthenticatedEmployee
-from src.api.dependencies.services import StudioServiceDep
+from src.api.v1.dependencies.auth import AuthenticatedEmployee
+from src.api.v1.dependencies.services import StudioServiceDep
 from src.domain.exceptions.studio import StudioNotFoundException
 from src.domain.models import Studio, Employee
 

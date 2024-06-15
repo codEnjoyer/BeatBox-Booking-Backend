@@ -15,8 +15,7 @@ from src.domain.schemas.room import RoomRead, RoomCreate, RoomUpdate
 router = APIRouter(tags=["Room"])
 
 
-# NOTE: get_studio_rooms отсутствует намеренно, так как все комнаты можно
-# получить из GET /studios/{studio_id}
+# TODO: get studio rooms
 @router.get("/studios/{studio_id}/rooms/{room_name}", response_model=RoomRead)
 async def get_room(
     room: ValidStudioRoomNameDep,

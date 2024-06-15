@@ -3,9 +3,9 @@ from typing import Annotated
 from fastapi import HTTPException, Depends
 from starlette import status
 
-from src.api.dependencies.auth import AuthenticatedUser
-from src.api.dependencies.services import ReviewServiceDep
-from src.api.dependencies.studio import ValidStudioIdDep
+from src.api.v1.dependencies.auth import AuthenticatedUser
+from src.api.v1.dependencies.services import ReviewServiceDep
+from src.api.v1.dependencies.studio import ValidStudioIdDep
 from src.domain.exceptions.review import ReviewNotFoundException
 from src.domain.models import Review
 

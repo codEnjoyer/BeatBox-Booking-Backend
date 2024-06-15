@@ -4,9 +4,9 @@ from typing import Annotated
 from fastapi import HTTPException, Depends
 from starlette import status
 
-from src.api.dependencies.auth import AuthenticatedUser
-from src.api.dependencies.room import ValidStudioRoomNameDep
-from src.api.dependencies.services import BookingServiceDep
+from src.api.v1.dependencies.auth import AuthenticatedUser
+from src.api.v1.dependencies.room import ValidStudioRoomNameDep
+from src.api.v1.dependencies.services import BookingServiceDep
 from src.domain.exceptions.booking import BookingNotFoundException
 from src.domain.models import Booking, User
 

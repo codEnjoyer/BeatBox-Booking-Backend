@@ -57,7 +57,7 @@ class ModelService[
             raise self._not_found_exception from e
         return model
 
-    async def is_already_exist_with_id(self, model_id: int) -> bool:
+    async def is_exist_with_id(self, model_id: int) -> bool:
         try:
             _ = await self.get_by_id(model_id)
         except self._not_found_exception:

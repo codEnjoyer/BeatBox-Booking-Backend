@@ -13,9 +13,11 @@ BearerTokenDep = Annotated[str, Depends(oauth2_scheme)]
 OAuth2Dep = Annotated[OAuth2PasswordRequestForm, Depends()]
 
 
-async def get_current_user(token: BearerTokenDep,
-                           auth_service: AuthServiceDep,
-                           user_service: UserServiceDep) -> User:
+async def get_current_user(
+    token: BearerTokenDep,
+    auth_service: AuthServiceDep,
+    user_service: UserServiceDep,
+) -> User:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",

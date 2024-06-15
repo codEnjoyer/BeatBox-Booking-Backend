@@ -1,12 +1,13 @@
+import typing
 from typing import Optional
 
 from sqlalchemy import ForeignKey, String, Text, Integer
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.domain.models.base import BaseModel
 
-# if TYPE_CHECKING:
-#     from src.domain.models.room import Room
+if typing.TYPE_CHECKING:
+    from src.domain.models.room import Room
 
 
 class AdditionalService(BaseModel):
@@ -18,4 +19,4 @@ class AdditionalService(BaseModel):
 
     room_id: Mapped[int] = mapped_column(ForeignKey("rooms.id"), nullable=False)
 
-    # room: Mapped["Room"] = relationship(back_populates="additional_services")
+    room: Mapped["Room"] = relationship(back_populates="additional_services")

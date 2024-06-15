@@ -1,7 +1,6 @@
-import datetime
 import uuid
 
-from pydantic import PositiveInt
+from pydantic import PositiveInt, AwareDatetime
 
 from src.domain.schemas.base import BaseSchema
 from src.domain.models.booking import BookingStatus
@@ -19,15 +18,15 @@ class BookingRead(BaseBooking):
     user: "UserRead"
     room_id: PositiveInt
 
-    starts_at: datetime.datetime
-    ends_at: datetime.datetime
+    starts_at: AwareDatetime
+    ends_at: AwareDatetime
     # TODO: starts_at > ends_at
     # TODO: check for minutes 00 or 30
 
 
 class BookingCreate(BaseBooking):
-    starts_at: datetime.datetime
-    ends_at: datetime.datetime
+    starts_at: AwareDatetime
+    ends_at: AwareDatetime
 
     # TODO: starts_at > ends_at
     # TODO: check for minutes 00 or 30

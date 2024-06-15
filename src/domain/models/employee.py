@@ -7,8 +7,7 @@ from src.domain.models.base import BaseModel
 
 if typing.TYPE_CHECKING:
     from src.domain.models.user import User
-
-    # from src.domain.models.studio import Studio
+    from src.domain.models.studio import Studio
 
 
 class Employee(BaseModel):
@@ -25,4 +24,4 @@ class Employee(BaseModel):
     user: Mapped["User"] = relationship(
         back_populates="employee", lazy="joined"
     )
-    # studio: Mapped["Studio"] = relationship(back_populates="employees")
+    studio: Mapped["Studio"] = relationship(back_populates="employees")

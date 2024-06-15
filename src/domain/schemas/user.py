@@ -15,12 +15,8 @@ class UserRead(BaseUser):
     employee: typing.Optional["EmployeeRead"]
 
 
-class UserCredentials(BaseUser):
+class UserCreate(BaseUser):
     password: str = Field(..., min_length=8, max_length=24)
-
-
-class UserCreate(UserCredentials):
-    ...
 
 
 class UserUpdate(BaseUser): ...

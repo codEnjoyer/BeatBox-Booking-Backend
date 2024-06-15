@@ -6,10 +6,9 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from src.domain.models.base import BaseModel
 
 if TYPE_CHECKING:
-    # from src.domain.models.booking import Booking
+    from src.domain.models.booking import Booking
     from src.domain.models.employee import Employee
-
-    # from src.domain.models.review import Review
+    from src.domain.models.review import Review
 
 
 class User(BaseModel):
@@ -24,12 +23,12 @@ class User(BaseModel):
     )
 
     employee: Mapped[Optional["Employee"]] = relationship(
-        back_populates="user", lazy="joined"
+        back_populates="user", lazy="joined", cascade="all, delete-orphan"
     )
-    # bookings: Mapped[list["Booking"]] = relationship(back_populates="user")
-    # reviews: Mapped[list["Review"]] = relationship(
-    #     back_populates="author", cascade="all, delete-orphan"
-    # )
+    bookings: Mapped[list["Booking"]] = relationship(back_populates="user")
+    reviews: Mapped[list["Review"]] = relationship(
+        back_populates="author", cascade="all, delete-orphan"
+    )
 
     def can_manage_studio(self, studio_id: int) -> bool:
         return (

@@ -9,7 +9,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from src.domain.models.base import BaseModel
 
 if typing.TYPE_CHECKING:
-    # from src.domain.models.room import Room
+    from src.domain.models.room import Room
     from src.domain.models.user import User
 
 
@@ -43,9 +43,9 @@ class Booking(BaseModel):
     room_id: Mapped[int] = mapped_column(ForeignKey("rooms.id"), nullable=False)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
 
-    # room: Mapped["Room"] = relationship(
-    #     back_populates="bookings", lazy="joined"
-    # )
+    room: Mapped["Room"] = relationship(
+        back_populates="bookings", lazy="joined"
+    )
     user: Mapped["User"] = relationship(
         back_populates="bookings", lazy="joined"
     )

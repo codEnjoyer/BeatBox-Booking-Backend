@@ -53,8 +53,6 @@ class SQLAlchemyRepository[
             )
             result = await session.execute(stmt)
             instances = result.unique().scalars().all()
-            if not instances:
-                raise NoResultFound
             return instances
 
     async def get_one(

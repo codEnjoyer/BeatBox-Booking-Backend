@@ -7,7 +7,7 @@ from src.api.v1.dependencies.auth import (
 from src.api.v1.dependencies.services import UserServiceDep
 from src.api.v1.dependencies.types import QueryLimit, QueryOffset
 from src.api.v1.dependencies.user import ValidUserIdDep
-from src.domain.schemas.user import UserRead, UserUpdate
+from src.domain.schemas.user import UserRead
 from src.domain.models.user import User
 
 router = APIRouter(prefix="/users", tags=["User"])
@@ -32,14 +32,14 @@ async def get_authenticated_user(user: AuthenticatedUser) -> User:
     return user
 
 
-@router.put("/me", response_model=UserRead)
-async def update_authenticated_user(
-    schema: UserUpdate,
-    user: AuthenticatedUser,
-    user_service: UserServiceDep,
-) -> User:
-    user = await user_service.update_by_id(schema, user.id)
-    return user
+# @router.put("/me", response_model=UserRead)
+# async def update_authenticated_user(
+#     schema: UserUpdate,
+#     user: AuthenticatedUser,
+#     user_service: UserServiceDep,
+# ) -> User:
+#     user = await user_service.update_by_id(schema, user.id)
+#     return user
 
 
 @router.get(

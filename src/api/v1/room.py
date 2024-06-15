@@ -1,16 +1,16 @@
 from fastapi import APIRouter, HTTPException
 from starlette import status
 
-from src.api.dependencies.services import FileServiceDep
-from src.api.dependencies.services import RoomServiceDep
-from src.api.dependencies.studio import StudioEmployeeDep
-from src.domain.exceptions.room import RoomWithSameNameAlreadyExistsException
-from src.domain.schemas.room import RoomRead, RoomCreate, RoomUpdate
-from src.api.dependencies.room import (
+from src.api.v1.dependencies.services import FileServiceDep
+from src.api.v1.dependencies.services import RoomServiceDep
+from src.api.v1.dependencies.studio import StudioEmployeeDep
+from src.api.v1.dependencies.room import (
     convert_model_to_scheme,
     get_images_url,
     ValidStudioRoomNameDep,
 )
+from src.domain.exceptions.room import RoomWithSameNameAlreadyExistsException
+from src.domain.schemas.room import RoomRead, RoomCreate, RoomUpdate
 
 router = APIRouter(tags=["Room"])
 

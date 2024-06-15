@@ -1,16 +1,16 @@
 import datetime
 from fastapi import APIRouter
 
-from src.api.dependencies.booking import (
+from src.api.v1.dependencies.booking import (
     OwnedBookingDep,
     BookingCancelerDep,
     ValidBookingIdDep,
 )
-from src.api.dependencies.room import ValidStudioRoomNameDep
-from src.api.dependencies.services import BookingServiceDep
-from src.api.dependencies.auth import AuthenticatedUser
-from src.api.dependencies.studio import ValidStudioIdDep
-from src.api.dependencies.types import QueryLimit, QueryOffset
+from src.api.v1.dependencies.room import ValidStudioRoomNameDep
+from src.api.v1.dependencies.services import BookingServiceDep
+from src.api.v1.dependencies.auth import AuthenticatedUser
+from src.api.v1.dependencies.studio import ValidStudioIdDep
+from src.api.v1.dependencies.types import QueryLimit, QueryOffset
 from src.domain.schemas.booking import BookingCreate, BookingRead, BookingUpdate
 
 router = APIRouter(tags=["Booking"])

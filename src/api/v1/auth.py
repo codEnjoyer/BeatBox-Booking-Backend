@@ -5,7 +5,7 @@ from sqlalchemy.exc import NoResultFound, IntegrityError
 from starlette import status
 from datetime import timedelta
 
-from src.api.dependencies.auth import manager
+from src.api.v1.dependencies.auth import manager
 from src.domain.db import get_async_session
 from src.domain.schemas.auth import Token
 from src.domain.schemas.user import (

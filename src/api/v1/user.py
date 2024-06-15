@@ -1,8 +1,11 @@
 from fastapi import APIRouter, Depends
 
-from src.api.dependencies.auth import get_current_superuser, AuthenticatedUser
-from src.api.dependencies.services import UserServiceDep
-from src.api.dependencies.types import QueryLimit, QueryOffset
+from src.api.v1.dependencies.auth import (
+    get_current_superuser,
+    AuthenticatedUser,
+)
+from src.api.v1.dependencies.services import UserServiceDep
+from src.api.v1.dependencies.types import QueryLimit, QueryOffset
 from src.domain.schemas.user import UserRead, UserUpdate
 from src.domain.models.user import User
 

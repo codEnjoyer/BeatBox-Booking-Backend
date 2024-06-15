@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends
 
-from src.api.dependencies.services import StudioServiceDep
-from src.api.dependencies.studio import ValidStudioIdDep, StudioEmployeeDep
-from src.api.dependencies.types import QueryOffset, QueryLimit
+from src.api.v1.dependencies.services import StudioServiceDep
+from src.api.v1.dependencies.studio import ValidStudioIdDep, StudioEmployeeDep
+from src.api.v1.dependencies.types import QueryOffset, QueryLimit
+from src.api.v1.dependencies.auth import get_current_superuser
 from src.domain.schemas.studio import StudioRead, StudioCreate, StudioUpdate
-from src.api.dependencies.auth import get_current_superuser
 
 router = APIRouter(prefix="/studios", tags=["Studio"])
 

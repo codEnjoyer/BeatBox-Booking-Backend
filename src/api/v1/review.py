@@ -1,10 +1,10 @@
 from fastapi import APIRouter
 
-from src.api.dependencies.review import OwnedReviewDep
-from src.api.dependencies.services import ReviewServiceDep
-from src.api.dependencies.auth import AuthenticatedUser
-from src.api.dependencies.studio import ValidStudioIdDep
-from src.api.dependencies.types import QueryOffset, QueryLimit
+from src.api.v1.dependencies.review import OwnedReviewDep
+from src.api.v1.dependencies.services import ReviewServiceDep
+from src.api.v1.dependencies.auth import AuthenticatedUser
+from src.api.v1.dependencies.studio import ValidStudioIdDep
+from src.api.v1.dependencies.types import QueryOffset, QueryLimit
 from src.domain.schemas.review import ReviewCreate, ReviewRead, ReviewUpdate
 
 router = APIRouter(tags=["Review"])

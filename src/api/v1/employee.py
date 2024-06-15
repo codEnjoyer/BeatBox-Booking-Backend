@@ -1,9 +1,12 @@
 from fastapi import APIRouter
 
-from src.api.dependencies.employee import ValidEmployeeIdDep, StudioManagerDep
-from src.api.dependencies.services import EmployeeServiceDep
-from src.api.dependencies.studio import ValidStudioIdDep
-from src.api.dependencies.types import QueryOffset, QueryLimit
+from src.api.v1.dependencies.employee import (
+    ValidEmployeeIdDep,
+    StudioManagerDep,
+)
+from src.api.v1.dependencies.services import EmployeeServiceDep
+from src.api.v1.dependencies.studio import ValidStudioIdDep
+from src.api.v1.dependencies.types import QueryOffset, QueryLimit
 from src.domain.models import Employee
 from src.domain.schemas.employee import EmployeeRead, EmployeeCreate
 

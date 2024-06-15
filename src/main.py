@@ -2,29 +2,14 @@ from contextlib import asynccontextmanager
 
 from sqlalchemy.exc import NoResultFound, IntegrityError
 
-from src.api import *  # noqa: F403
-from fastapi import FastAPI, APIRouter, Request, Response, HTTPException, status
-
-
-def include_routers(app_: FastAPI, *routers: APIRouter) -> None:
-    for routers in routers:
-        app_.include_router(routers)
+from src.api import v1_router
+from fastapi import FastAPI, Request, Response, HTTPException, status
 
 
 @asynccontextmanager
 async def lifespan(app_: FastAPI):
     """Запускаем код до и после запуска приложения"""
-    include_routers(
-        app_,
-        auth_router,  # noqa: F405
-        employee_router,  # noqa: F405
-        file_router,  # noqa: F405
-        review_router,  # noqa: F405
-        studio_router,  # noqa: F405
-        user_router,  # noqa: F405
-        room_router,  # noqa: F405
-        booking_router,  # noqa: F405
-    )
+    app_.include_router(v1_router)
     yield  # Возвращаем работу приложению
     # Тут можно выполнить код после завершения приложения
 

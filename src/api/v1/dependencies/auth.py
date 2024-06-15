@@ -1,28 +1,40 @@
 from typing import Annotated
 
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi import Depends, HTTPException, status
-from fastapi_login import LoginManager
+from jwt import InvalidTokenError
 
-from src.domain.db import async_session_maker
+from src.api.v1.dependencies.services import UserServiceDep, AuthServiceDep
+from src.domain.exceptions.user import UserNotFoundException
 from src.domain.models import User, Employee
-from src.domain.services.user import UserService
-from src.settings import settings
 
-manager = LoginManager(settings.secret_auth_token, token_url="/auth/token")
-
-
-@manager.user_loader()
-async def get_user(email: str) -> User:
-    """
-    Raises:
-        `LoginManager.not_authenticated_exception`: If the user is not found
-    """
-    async with async_session_maker() as db:
-        return await UserService.get_user_by_email(email, db)
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/v1/login")
+BearerTokenDep = Annotated[str, Depends(oauth2_scheme)]
+OAuth2Dep = Annotated[OAuth2PasswordRequestForm, Depends()]
 
 
-# Для читаемости при прописывании в dependencies эндпоинтов
-get_current_user = manager
+async def get_current_user(token: BearerTokenDep,
+                           auth_service: AuthServiceDep,
+                           user_service: UserServiceDep) -> User:
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        payload = auth_service.decode_jwt(token)
+        email: str = payload.get("sub")
+        if email is None:
+            raise credentials_exception
+    except InvalidTokenError as e:
+        raise credentials_exception from e
+
+    try:
+        user = await user_service.get_by_email(email)
+    except UserNotFoundException as e:
+        raise credentials_exception from e
+    return user
+
 
 AuthenticatedUser = Annotated[User, Depends(get_current_user)]
 

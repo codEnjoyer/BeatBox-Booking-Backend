@@ -14,7 +14,6 @@ class EmployeeRead(BaseEmployee):
 
 class EmployeeCreate(BaseEmployee):
     name: str = Field(min_length=3)
-    studio_id: PositiveInt
     user_id: PositiveInt
 
 

@@ -1,7 +1,9 @@
 from fastapi import APIRouter
 
-from src.api.v1.dependencies.auth import (AuthenticatedUser,
-                                          AuthenticatedSuperuser)
+from src.api.v1.dependencies.auth import (
+    AuthenticatedUser,
+    AuthenticatedSuperuser,
+)
 from src.api.v1.dependencies.services import UserServiceDep
 from src.api.v1.dependencies.types import QueryLimit, QueryOffset
 from src.api.v1.dependencies.user import ValidUserIdDep

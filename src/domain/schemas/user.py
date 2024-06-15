@@ -19,7 +19,8 @@ class UserCredentials(BaseUser):
     password: str = Field(..., min_length=8, max_length=24)
 
 
-class UserCreate(UserCredentials): ...
+class UserCreate(UserCredentials):
+    ...
 
 
 class UserUpdate(BaseUser): ...

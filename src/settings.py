@@ -20,8 +20,6 @@ class Settings(BaseSettings):
 
     app_port: int
 
-    secret_auth_token: str
-
     aws_access_key_id: str
     aws_secret_access_key: str
     bucket_name: str
@@ -42,3 +40,16 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+
+
+class AuthSettings(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_file=".env", env_file_encoding="utf-8", extra="allow"
+    )
+
+    secret_auth_token: str
+    auth_token_expiration_hours: int
+    algorithm: str = "HS256"
+
+
+auth_settings = AuthSettings()

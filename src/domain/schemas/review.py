@@ -3,25 +3,27 @@ import datetime
 from pydantic import Field, PositiveInt
 
 from src.domain.schemas.base import BaseSchema
-from src.domain.schemas.room import RoomRead
 
 
 class BaseReview(BaseSchema):
     grade: PositiveInt = Field(..., gt=0, le=5)
     text: str | None
+    room_id: PositiveInt | None
 
 
 class ReviewRead(BaseReview):
     id: PositiveInt
-    published_at: datetime.datetime
-    author_id: PositiveInt
+    author: "UserRead"
     studio_id: PositiveInt
-    room: RoomRead | None
+    published_at: datetime.datetime
 
 
-class ReviewCreate(BaseReview):
-    room_id: PositiveInt | None
+class ReviewCreate(BaseReview): ...
 
 
-class ReviewUpdate(BaseReview):
-    room_id: PositiveInt | None
+class ReviewUpdate(BaseReview): ...
+
+
+from src.domain.schemas.user import UserRead
+
+ReviewRead.update_forward_refs()

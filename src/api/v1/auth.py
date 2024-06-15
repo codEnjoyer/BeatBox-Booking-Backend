@@ -1,52 +1,17 @@
-from fastapi import APIRouter, Depends, HTTPException
-from fastapi.security import OAuth2PasswordRequestForm
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.exc import NoResultFound, IntegrityError
+from fastapi import APIRouter, HTTPException
 from starlette import status
-from datetime import timedelta
 
-from src.api.v1.dependencies.auth import manager
-from src.domain.db import get_async_session
+from src.api.v1.dependencies.auth import OAuth2Dep
+from src.api.v1.dependencies.services import UserServiceDep, AuthServiceDep
+from src.domain.exceptions.user import UserNotFoundException
+from src.domain.models import User
 from src.domain.schemas.auth import Token
 from src.domain.schemas.user import (
-    UserCredentials,
     UserRead,
-    UserCreate,
+    UserCreate
 )
-from src.domain.services.user import UserService
 
-router = APIRouter(prefix="/auth", tags=["Auth"])
-
-
-@router.post("/login", response_model=Token)
-async def login(
-    user_schema: UserCredentials,
-    session: AsyncSession = Depends(get_async_session),
-) -> Token:
-    try:
-        user = await UserService.get_user_by_email(user_schema.email, session)
-        if user is None:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Incorrect username",
-            )
-
-        if not UserService.verify_password(
-            user_schema.password, user.hashed_password
-        ):
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Incorrect password",
-            )
-
-        access_token = manager.create_access_token(
-            data=dict(sub=user_schema.email), expires=timedelta(hours=48)
-        )
-        return Token(access_token=access_token, token_type='bearer')
-    except NoResultFound:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Invalid credentials"
-        )
+router = APIRouter(tags=["Auth"])
 
 
 @router.post(
@@ -55,29 +20,38 @@ async def login(
     status_code=status.HTTP_201_CREATED,
 )
 async def register(
-    user_schema: UserCreate,
-    session: AsyncSession = Depends(get_async_session),
-) -> UserRead:
-    try:
-        user = await UserService.create_user(
-            user_schema=user_schema, session=session
-        )
-        return UserRead(
-            id=user.id,
-            email=user.email,
-            is_superuser=user.is_superuser,
-        )
-    except IntegrityError:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT, detail="User already exists"
-        )
+        schema: UserCreate,
+        user_service: UserServiceDep,
+) -> User:
+    user = await user_service.create(schema)
+    return user
 
 
-@router.post('/token')
-async def token_login(
-    data: OAuth2PasswordRequestForm = Depends(),
-    session: AsyncSession = Depends(get_async_session),
-):
-    return await login(
-        UserCredentials(email=data.username, password=data.password), session
+@router.post("/login", response_model=Token)
+async def login(
+        form_data: OAuth2Dep,
+        user_service: UserServiceDep,
+        auth_service: AuthServiceDep
+) -> dict[str, str]:
+    email, password = form_data.username, form_data.password
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
     )
+    try:
+        user = await user_service.get_by_email(email)
+    except UserNotFoundException as e:
+        raise credentials_exception from e
+
+    if not user_service.is_password_valid(plain=password,
+                                          hashed=user.hashed_password):
+        raise credentials_exception
+
+    token = auth_service.create_access_token(
+        data={'sub': user.email},
+    )
+    return {
+        "access_token": token,
+        "token_type": "bearer"
+    }

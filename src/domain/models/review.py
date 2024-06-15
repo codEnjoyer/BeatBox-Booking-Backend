@@ -15,8 +15,9 @@ from src.domain.models.base import BaseModel
 
 if TYPE_CHECKING:
     from src.domain.models.user import User
-    from src.domain.models.room import Room
-    from src.domain.models.studio import Studio
+
+    # from src.domain.models.room import Room
+    # from src.domain.models.studio import Studio
 
 
 class Review(BaseModel):
@@ -43,11 +44,10 @@ class Review(BaseModel):
     )
 
     author: Mapped["User"] = relationship(
-        back_populates="reviews", lazy='joined', foreign_keys=[author_id]
+        back_populates="reviews", lazy="joined"
     )
-    room: Mapped[Optional["Room"]] = relationship(
-        back_populates="reviews", lazy='joined', foreign_keys=[room_id]
-    )
-    studio: Mapped["Studio"] = relationship(
-        back_populates="reviews", lazy='joined', foreign_keys=[studio_id]
-    )
+    # room: Mapped[Optional["Room"]] = relationship(back_populates="reviews")
+    # studio: Mapped["Studio"] = relationship(back_populates="reviews")
+
+    def is_written_by(self, user_id: int) -> bool:
+        return self.author_id == user_id

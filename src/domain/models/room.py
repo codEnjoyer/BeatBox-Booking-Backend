@@ -10,7 +10,8 @@ from src.domain.models.base import BaseModel
 
 if TYPE_CHECKING:
     from src.domain.models.booking import Booking
-    from src.domain.models.review import Review
+
+    # from src.domain.models.review import Review
     from src.domain.models.studio import Studio
 
 
@@ -30,16 +31,16 @@ class Room(BaseModel):
     )
 
     additional_services: Mapped[list["AdditionalService"]] = relationship(
-        back_populates="room", cascade="all, delete-orphan"
+        back_populates="room", cascade="all, delete-orphan", lazy="selectin"
     )
     bookings: Mapped[list["Booking"]] = relationship(
         back_populates="room", cascade="all, delete-orphan", lazy="selectin"
     )
-    reviews: Mapped[list["Review"]] = relationship(
-        back_populates="room", lazy="joined", cascade="all, delete-orphan"
-    )
+    # reviews: Mapped[list["Review"]] = relationship(
+    #     back_populates="room", lazy="selectin", cascade="all, delete-orphan"
+    # )
     studio: Mapped["Studio"] = relationship(
-        back_populates="rooms", lazy="joined", foreign_keys=[studio_id]
+        back_populates="rooms", lazy="joined"
     )
 
     def is_free_at_interval(

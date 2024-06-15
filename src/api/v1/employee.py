@@ -20,8 +20,8 @@ router = APIRouter(tags=["Employee"])
 )
 async def get_studio_employees(
     studio: ValidStudioIdDep,
-    _: StudioManagerDep,
     employee_service: EmployeeServiceDep,
+    _: StudioManagerDep,
     offset: QueryOffset = 0,
     limit: QueryLimit = 100,
 ) -> list[Employee]:
@@ -33,8 +33,8 @@ async def get_studio_employees(
 @router.post("/studios/{studio_id}/employees", response_model=EmployeeRead)
 async def create_employee_in_studio(
     schema: EmployeeCreate,
-    _: StudioManagerDep,
     employee_service: EmployeeServiceDep,
+    _: StudioManagerDep,
 ) -> Employee:
     return await employee_service.create(schema)
 
@@ -43,8 +43,8 @@ async def create_employee_in_studio(
     "/studios/{studio_id}/employees/{employee_id}",
 )
 async def delete_employee(
-    _: StudioManagerDep,
     employee: ValidEmployeeIdDep,
     employee_service: EmployeeServiceDep,
+    _: StudioManagerDep,
 ) -> None:
     await employee_service.delete_by_id(employee.id)

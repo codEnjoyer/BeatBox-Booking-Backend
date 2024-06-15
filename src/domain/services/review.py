@@ -37,9 +37,16 @@ class ReviewService(
             return False
         return True
 
-    async def get_studio_reviews(
+    async def get_from_studio(
         self, studio_id: int, offset: int = 0, limit: int = 100
     ) -> list[Review]:
         return await self._repository.get_all(
             self.model.studio_id == studio_id, offset=offset, limit=limit
+        )
+
+    async def get_from_room(
+        self, room_id: int, offset: int = 0, limit: int = 0
+    ) -> list[Review]:
+        return await self._repository.get_all(
+            self.model.room_id == room_id, offset=offset, limit=limit
         )

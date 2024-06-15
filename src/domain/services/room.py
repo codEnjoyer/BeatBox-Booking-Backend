@@ -2,7 +2,7 @@ import uuid
 
 from fastapi import HTTPException
 from sqlalchemy.exc import NoResultFound
-from sqlalchemy.sql.base import ExecutableOption
+from sqlalchemy.orm import selectinload
 from starlette import status
 
 from src.domain.exceptions.room import (
@@ -19,17 +19,32 @@ class RoomService(ModelService[RoomRepository, Room, RoomCreate, RoomUpdate]):
     def __init__(self):
         super().__init__(RoomRepository(), RoomNotFoundException)
 
+    async def get_all_in_studio(self, studio_id: int) -> list[Room]:
+        try:
+            model = await self._repository.get_all(
+                self.model.studio_id == studio_id,
+                options=(
+                    selectinload(self.model.additional_services),
+                    selectinload(self.model.bookings),
+                ),
+            )
+        except NoResultFound as e:
+            raise self._not_found_exception from e
+        return model
+
     async def get_by_name_in_studio(
         self,
         name: str,
         studio_id: int,
-        options: tuple[ExecutableOption] | None = None,
     ) -> Room:
         try:
             model = await self._repository.get_one(
                 self.model.name == name,
                 self.model.studio_id == studio_id,
-                options=options,
+                options=(
+                    selectinload(self.model.additional_services),
+                    selectinload(self.model.bookings),
+                ),
             )
         except NoResultFound as e:
             raise self._not_found_exception from e

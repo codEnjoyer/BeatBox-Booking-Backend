@@ -1,3 +1,5 @@
+from typing import Iterable
+
 from sqlalchemy import ColumnElement
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.sql.base import ExecutableOption
@@ -45,7 +47,7 @@ class ModelService[
         return models
 
     async def get_by_id(
-        self, model_id: int, options: tuple[ExecutableOption] | None = None
+        self, model_id: int, options: Iterable[ExecutableOption] | None = None
     ) -> Model:
         try:
             model = await self._repository.get_one(

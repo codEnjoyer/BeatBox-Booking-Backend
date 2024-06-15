@@ -13,7 +13,7 @@ async def valid_studio_id(
     studio_id: int, studio_service: StudioServiceDep
 ) -> Studio:
     try:
-        studio = await studio_service.get_by_id(model_id=studio_id)
+        studio = await studio_service.get_by_id(studio_id)
     except StudioNotFoundException as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

@@ -30,7 +30,6 @@ StudioWorkingTime = Annotated[
 
 class BaseStudio(BaseSchema):
     name: str = Field(min_length=1, max_length=100)
-    # TODO: проверить поведение description
     description: str | None = Field(min_length=1, max_length=500)
     opening_at: StudioWorkingTime
     closing_at: StudioWorkingTime

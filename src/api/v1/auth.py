@@ -3,7 +3,10 @@ from starlette import status
 
 from src.api.v1.dependencies.auth import OAuth2Dep
 from src.api.v1.dependencies.services import UserServiceDep, AuthServiceDep
-from src.domain.exceptions.user import UserNotFoundException
+from src.domain.exceptions.user import (
+    UserNotFoundException,
+    EmailAlreadyTakenException,
+)
 from src.domain.models import User
 from src.domain.schemas.auth import Token
 from src.domain.schemas.user import UserRead, UserCreate
@@ -20,7 +23,12 @@ async def register(
     schema: UserCreate,
     user_service: UserServiceDep,
 ) -> User:
-    user = await user_service.create(schema)
+    try:
+        user = await user_service.create(schema)
+    except EmailAlreadyTakenException as e:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT, detail=str(e)
+        ) from e
     return user
 
 

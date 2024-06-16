@@ -1,12 +1,17 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from starlette import status
 
 from src.api.v1.dependencies.review import OwnedReviewDep
 from src.api.v1.dependencies.room import ValidStudioRoomNameDep
-from src.api.v1.dependencies.services import ReviewServiceDep
+from src.api.v1.dependencies.services import ReviewServiceDep, RoomServiceDep
 from src.api.v1.dependencies.auth import AuthenticatedUser
 from src.api.v1.dependencies.studio import ValidStudioIdDep
 from src.api.v1.dependencies.types import QueryOffset, QueryLimit
+from src.domain.exceptions.review import ReviewAlreadyExistException
+from src.domain.exceptions.room import (
+    RoomNotFoundException,
+    RoomDoesNotExistInStudioException,
+)
 from src.domain.schemas.review import ReviewCreate, ReviewRead, ReviewUpdate
 
 router = APIRouter(tags=["Review"])
@@ -41,14 +46,37 @@ async def get_room_reviews(
     return reviews
 
 
-@router.post("/studios/{studio_id}/reviews", response_model=ReviewRead)
+@router.post("/studios/{studio_id}/reviews",
+             response_model=ReviewRead)
 async def post_review_on_studio(
     studio: ValidStudioIdDep,
     schema: ReviewCreate,
     review_service: ReviewServiceDep,
+    room_service: RoomServiceDep,
     user: AuthenticatedUser,
 ) -> ReviewRead:
-    review = await review_service.add_new_from_user(schema, user.id, studio.id)
+    if schema.room_id:
+        try:
+            await room_service.check_if_room_in_studio(
+                schema.room_id, studio.id
+            )
+        except RoomNotFoundException as e:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail=str(e)
+            ) from e
+        except RoomDoesNotExistInStudioException as e:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail=str(e)
+            ) from e
+    # TODO: add check if user has bookings in this studio (and room)
+    try:
+        review = await review_service.add_new_from_user(
+            schema, user.id, studio.id
+        )
+    except ReviewAlreadyExistException as e:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT, detail=str(e)
+        ) from e
     return review
 
 
@@ -59,9 +87,25 @@ async def update_my_studio_review(
     review: OwnedReviewDep,
     schema: ReviewUpdate,
     review_service: ReviewServiceDep,
+    room_service: RoomServiceDep,
     _: AuthenticatedUser,
 ) -> ReviewRead:
-    return await review_service.update_by_id(review.id, schema)
+    if schema.room_id:
+        try:
+            await room_service.check_if_room_in_studio(
+                schema.room_id, review.studio_id
+            )
+        except RoomNotFoundException as e:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail=str(e)
+            ) from e
+        except RoomDoesNotExistInStudioException as e:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail=str(e)
+            ) from e
+    updated = await review_service.update_by_id(review.id, schema)
+    with_author = await review_service.get_by_id(updated.id)
+    return with_author
 
 
 @router.delete(

@@ -29,7 +29,7 @@ ValidReviewIdDep = Annotated[Review, Depends(valid_review_id)]
 async def owned_review(
     review: ValidReviewIdDep, user: AuthenticatedUser
 ) -> Review:
-    if review.is_written_by(user.id):
+    if not review.is_written_by(user.id):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="You must be author of this review",

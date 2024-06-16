@@ -1,21 +1,21 @@
-import datetime
-
 from pydantic import Field, PositiveInt
 
-from src.domain.schemas.base import BaseSchema
+from src.domain.schemas.base import BaseSchema, DatetimeTZ
 
 
 class BaseReview(BaseSchema):
-    grade: PositiveInt = Field(..., gt=0, le=5)
-    text: str | None
-    room_id: PositiveInt | None
+    grade: PositiveInt = Field(..., ge=1, le=5, examples=[4])
+    text: str | None = Field(
+        min_length=1, max_length=500, examples=["Nice", None]
+    )
+    room_id: PositiveInt | None = Field(examples=[1, None])
 
 
 class ReviewRead(BaseReview):
     id: PositiveInt
     author: "UserRead"
     studio_id: PositiveInt
-    published_at: datetime.datetime
+    published_at: DatetimeTZ
 
 
 class ReviewCreate(BaseReview): ...

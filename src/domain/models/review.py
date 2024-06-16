@@ -33,13 +33,13 @@ class Review(BaseModel):
     )
 
     author_id: Mapped[int] = mapped_column(
-        ForeignKey("users.id"), nullable=False
+        ForeignKey("users.id", ondelete="CASCADE"), nullable=False
     )
     room_id: Mapped[Optional[int]] = mapped_column(
-        ForeignKey("rooms.id"), nullable=True
+        ForeignKey("rooms.id", ondelete="CASCADE"), nullable=True
     )
     studio_id: Mapped[int] = mapped_column(
-        ForeignKey("studios.id"), nullable=False
+        ForeignKey("studios.id", ondelete="CASCADE"), nullable=False
     )
 
     author: Mapped["User"] = relationship(

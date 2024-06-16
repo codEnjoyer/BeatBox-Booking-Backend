@@ -23,7 +23,10 @@ class User(BaseModel):
     )
 
     employee: Mapped[Optional["Employee"]] = relationship(
-        back_populates="user", lazy="joined", cascade="all, delete-orphan"
+        back_populates="user",
+        lazy="joined",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
     )
     bookings: Mapped[list["Booking"]] = relationship(back_populates="user")
     reviews: Mapped[list["Review"]] = relationship(

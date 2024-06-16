@@ -42,13 +42,20 @@ class Studio(BaseModel):
     whats_app: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
 
     employees: Mapped[list["Employee"]] = relationship(
-        back_populates="studio", cascade="all, delete-orphan"
+        back_populates="studio",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
     )
     reviews: Mapped[list["Review"]] = relationship(
-        back_populates="studio", lazy="joined", cascade="all, delete-orphan"
+        back_populates="studio",
+        lazy="joined",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
     )
     rooms: Mapped[list["Room"]] = relationship(
-        back_populates="studio", cascade="all, delete-orphan"
+        back_populates="studio",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
     )
 
     @hybrid_property

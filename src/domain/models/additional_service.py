@@ -17,6 +17,8 @@ class AdditionalService(BaseModel):
     name: Mapped[str] = mapped_column(String, nullable=False)
     description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
-    room_id: Mapped[int] = mapped_column(ForeignKey("rooms.id"), nullable=False)
+    room_id: Mapped[int] = mapped_column(
+        ForeignKey("rooms.id", ondelete="CASCADE"), nullable=False
+    )
 
     room: Mapped["Room"] = relationship(back_populates="additional_services")

@@ -26,17 +26,26 @@ class Room(BaseModel):
         ARRAY(String), nullable=False, server_default="{}"
     )
     studio_id: Mapped[int] = mapped_column(
-        ForeignKey("studios.id"), nullable=False
+        ForeignKey("studios.id", ondelete="CASCADE"), nullable=False
     )
 
     additional_services: Mapped[list["AdditionalService"]] = relationship(
-        back_populates="room", cascade="all, delete-orphan", lazy="selectin"
+        back_populates="room",
+        cascade="all, delete-orphan",
+        lazy="selectin",
+        passive_deletes=True,
     )
     bookings: Mapped[list["Booking"]] = relationship(
-        back_populates="room", cascade="all, delete-orphan", lazy="selectin"
+        back_populates="room",
+        cascade="all, delete-orphan",
+        lazy="selectin",
+        passive_deletes=True,
     )
     reviews: Mapped[list["Review"]] = relationship(
-        back_populates="room", lazy="selectin", cascade="all, delete-orphan"
+        back_populates="room",
+        lazy="selectin",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
     )
     studio: Mapped["Studio"] = relationship(
         back_populates="rooms", lazy="joined"

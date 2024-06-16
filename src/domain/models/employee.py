@@ -16,9 +16,11 @@ class Employee(BaseModel):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     name: Mapped[str] = mapped_column(String, nullable=False)
 
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    user_id: Mapped[int] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
     studio_id: Mapped[int] = mapped_column(
-        ForeignKey("studios.id"), nullable=False
+        ForeignKey("studios.id", ondelete="CASCADE"), nullable=False
     )
 
     user: Mapped["User"] = relationship(

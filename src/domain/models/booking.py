@@ -40,14 +40,24 @@ class Booking(BaseModel):
         DateTime(timezone=True), nullable=False
     )
 
-    room_id: Mapped[int] = mapped_column(ForeignKey("rooms.id"), nullable=False)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    room_id: Mapped[int] = mapped_column(
+        ForeignKey("rooms.id", ondelete="CASCADE"), nullable=False
+    )
+    user_id: Mapped[int] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
 
     room: Mapped["Room"] = relationship(
-        back_populates="bookings", lazy="joined"
+        back_populates="bookings",
+        lazy="joined",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
     )
     user: Mapped["User"] = relationship(
-        back_populates="bookings", lazy="joined"
+        back_populates="bookings",
+        lazy="joined",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
     )
 
     def is_within_range(self, from_: dt.datetime, to: dt.datetime) -> bool:

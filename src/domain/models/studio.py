@@ -63,5 +63,5 @@ class Studio(BaseModel):
         if not self.reviews:
             return 0
         total = sum(review.grade for review in self.reviews)
-        count = len(self.reviews)
+        count = len(self.reviews)  # noqa
         return total / count

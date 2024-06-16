@@ -43,7 +43,8 @@ class Review(BaseModel):
     )
 
     author: Mapped["User"] = relationship(
-        back_populates="reviews", lazy="joined"
+        back_populates="reviews",
+        lazy="joined"
     )
     room: Mapped[Optional["Room"]] = relationship(back_populates="reviews")
     studio: Mapped["Studio"] = relationship(back_populates="reviews")

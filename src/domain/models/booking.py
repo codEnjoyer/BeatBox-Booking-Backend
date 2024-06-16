@@ -50,14 +50,10 @@ class Booking(BaseModel):
     room: Mapped["Room"] = relationship(
         back_populates="bookings",
         lazy="joined",
-        cascade="all, delete-orphan",
-        passive_deletes=True,
     )
     user: Mapped["User"] = relationship(
         back_populates="bookings",
         lazy="joined",
-        cascade="all, delete-orphan",
-        passive_deletes=True,
     )
 
     def is_within_range(self, from_: dt.datetime, to: dt.datetime) -> bool:

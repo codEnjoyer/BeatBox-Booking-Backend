@@ -1,6 +1,6 @@
 from contextlib import asynccontextmanager
 
-from sqlalchemy.exc import NoResultFound, IntegrityError
+from sqlalchemy.exc import NoResultFound
 
 from src.api import v1_router
 from fastapi import FastAPI, Request, Response, HTTPException, status
@@ -27,12 +27,4 @@ async def not_found_handler(_: Request, exc: NoResultFound) -> Response:
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
         detail="Requested item was not found",
-    ) from exc
-
-
-@app.exception_handler(IntegrityError)
-async def integrity_error_handler(_: Request, exc: IntegrityError) -> Response:
-    raise HTTPException(
-        status_code=status.HTTP_400_BAD_REQUEST,
-        detail="Data is invalid",
     ) from exc

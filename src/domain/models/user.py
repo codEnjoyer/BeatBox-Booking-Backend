@@ -28,9 +28,15 @@ class User(BaseModel):
         cascade="all, delete-orphan",
         passive_deletes=True,
     )
-    bookings: Mapped[list["Booking"]] = relationship(back_populates="user")
+    bookings: Mapped[list["Booking"]] = relationship(
+        back_populates="user",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+    )
     reviews: Mapped[list["Review"]] = relationship(
-        back_populates="author", cascade="all, delete-orphan"
+        back_populates="author",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
     )
 
     def can_manage_studio(self, studio_id: int) -> bool:

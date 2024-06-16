@@ -64,14 +64,14 @@ class ModelService[
             return False
         return True
 
-    async def update_by_id(self, schema: UpdateSchema, model_id: int) -> Model:
+    async def update_by_id(self, model_id: int, schema: UpdateSchema) -> Model:
         try:
             model = await self._repository.update(
                 schema, self.model.id == model_id
             )
         except NoResultFound as e:
             raise self._not_found_exception from e
-        return model.one()
+        return model
 
     async def delete_by_id(self, model_id: int) -> None:
         try:

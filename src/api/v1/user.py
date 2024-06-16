@@ -1,4 +1,5 @@
 from fastapi import APIRouter
+from starlette import status
 
 from src.api.v1.dependencies.auth import (
     AuthenticatedUser,
@@ -38,7 +39,7 @@ async def get_authenticated_user(user: AuthenticatedUser) -> User:
 #     user: AuthenticatedUser,
 #     user_service: UserServiceDep,
 # ) -> User:
-#     user = await user_service.update_by_id(schema, user.id)
+#     user = await user_service.update_by_id(user.id, schema)
 #     return user
 
 
@@ -54,7 +55,10 @@ async def get_user(
     return await user_service.get_by_id(user.id)
 
 
-@router.delete("/{user_id}")
+@router.delete(
+    "/{user_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
 async def delete_user(
     user: ValidUserIdDep,
     user_service: UserServiceDep,

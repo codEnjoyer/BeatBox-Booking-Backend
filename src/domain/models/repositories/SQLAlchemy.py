@@ -88,7 +88,7 @@ class SQLAlchemyRepository[
                 .returning(self.model)
             )
             result = await session.execute(stmt)
-            instances = result.scalars()
+            instances = result.unique().scalars().all()
             await session.commit()
             return instances[0] if len(instances) == 1 else instances
 

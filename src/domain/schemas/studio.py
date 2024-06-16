@@ -1,5 +1,5 @@
 import datetime
-from typing import Self, Any
+from typing import Self, Annotated
 
 from pydantic import (
     Field,
@@ -9,29 +9,47 @@ from pydantic import (
     model_validator,
     field_serializer,
 )
-from pydantic_core.core_schema import ValidationInfo, SerializationInfo
+from pydantic_core.core_schema import SerializationInfo
 
 from src.domain.schemas.base import BaseSchema
 
-from src.domain.schemas.phone_number import PhoneNumber
+from src.domain.schemas.phone_number import RuPhoneNumber
+
+StudioWorkingTime = Annotated[
+    datetime.time,
+    Field(
+        examples=[
+            "10:00:00+0500",
+            datetime.time(
+                hour=10, minute=0, second=0, tzinfo=datetime.timezone.utc
+            ),
+        ]
+    ),
+]
 
 
 class BaseStudio(BaseSchema):
     name: str = Field(min_length=1, max_length=100)
     # TODO: проверить поведение description
-    description: str | None = Field(min_length=1)
-    opening_at: datetime.time
-    closing_at: datetime.time
-    # TODO: opening_at/closing_at привести к HH:MM+TZ
-    latitude: float = Field(gt=-90, le=90)
-    longitude: float = Field(gt=-180, le=180)
+    description: str | None = Field(min_length=1, max_length=500)
+    opening_at: StudioWorkingTime
+    closing_at: StudioWorkingTime
+    latitude: float = Field(gt=-90, le=90, examples=[0.0])
+    longitude: float = Field(gt=-180, le=180, examples=[0.0])
 
     site: HttpUrl | None
-    contact_phone_number: PhoneNumber | None
+    contact_phone_number: RuPhoneNumber | None = Field(examples=["79123456789"])
     # TODO: добавить валидацию соц. сетей
     tg: str | None
     vk: str | None
     whats_app: str | None
+
+    @field_validator("opening_at", "closing_at")
+    @classmethod
+    def time_with_tz(cls, value: datetime.time) -> datetime.time:
+        if value.tzinfo is None or value.tzinfo.utcoffset(None) is None:
+            raise ValueError("time must be with timezone")
+        return value
 
     @model_validator(mode="after")
     def closing_at_greater_than_opening_at(self) -> Self:
@@ -43,41 +61,13 @@ class BaseStudio(BaseSchema):
     def url_to_string(self, value: HttpUrl, _: SerializationInfo) -> str:
         return value.unicode_string()
 
-    # @field_serializer("opening_at", "closing_at")
-    # def time_to_string(self, value: datetime.time, _: SerializationInfo)
-    # -> str:
-    #     return value.strftime("%H:%M%z")
-
 
 class StudioRead(BaseStudio):
     id: PositiveInt
-    average_grade: float
-
-    @field_validator("opening_at", "closing_at", mode="before")
-    @classmethod
-    def time_with_timezone(cls, value: Any, _: ValidationInfo) -> datetime.time:
-        if not isinstance(value, str):
-            raise ValueError("time must be parsed from string")
-        date_time = datetime.datetime.strptime(value, "%H:%M%z")
-        return datetime.time(
-            hour=date_time.hour,
-            minute=date_time.minute,
-            tzinfo=date_time.tzinfo,
-        )
+    average_grade: float = Field(ge=0, le=5, examples=[4.4])
 
 
-class StudioCreate(BaseStudio):
-    @field_validator("opening_at", "closing_at", mode="before")
-    @classmethod
-    def time_with_timezone(cls, value: Any, _: ValidationInfo) -> datetime.time:
-        if not isinstance(value, str):
-            raise ValueError("time must be parsed from string")
-        date_time = datetime.datetime.strptime(value, "%H:%M%z")
-        return datetime.time(
-            hour=date_time.hour,
-            minute=date_time.minute,
-            tzinfo=date_time.tzinfo,
-        )
+class StudioCreate(BaseStudio): ...
 
 
 class StudioUpdate(BaseStudio): ...

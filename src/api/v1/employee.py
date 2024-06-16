@@ -1,4 +1,5 @@
 from fastapi import APIRouter
+from starlette import status
 
 from src.api.v1.dependencies.employee import (
     ValidEmployeeIdDep,
@@ -41,6 +42,7 @@ async def create_employee_in_studio(
 
 @router.delete(
     "/studios/{studio_id}/employees/{employee_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
 )
 async def delete_employee(
     employee: ValidEmployeeIdDep,

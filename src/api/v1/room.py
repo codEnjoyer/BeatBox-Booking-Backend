@@ -63,7 +63,7 @@ async def update_room(
     file_service: FileServiceDep,
     _: StudioManagerDep,
 ) -> RoomRead:
-    room = await room_service.update_by_id(schema, room.id)
+    room = await room_service.update_by_id(room.id, schema)
     banner_url, images_url = await get_images_url(
         room=room, file_service=file_service, room_service=room_service
     )
@@ -72,7 +72,10 @@ async def update_room(
     )
 
 
-@router.delete("/studios/{studio_id}/rooms/{room_id}")
+@router.delete(
+    "/studios/{studio_id}/rooms/{room_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
 async def delete_room(
     room: ValidStudioRoomNameDep,
     room_service: RoomServiceDep,

@@ -1,6 +1,6 @@
-from fastapi import HTTPException
-from sqlalchemy.exc import NoResultFound
-from starlette import status
+from typing import override
+
+from sqlalchemy.orm import selectinload
 
 from src.domain.exceptions.studio import StudioNotFoundException
 from src.domain.models import Studio
@@ -15,17 +15,18 @@ class StudioService(
     def __init__(self):
         super().__init__(StudioRepository(), StudioNotFoundException)
 
+    @override
     async def create(self, schema: StudioCreate, **kwargs) -> Studio:
-        if await self.is_already_exist_with_name(schema.name):
-            raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT,
-                detail="Studio with same name already exists",
-            )
-        return await self._repository.create(schema)
+        created = await self._repository.create(schema)
+        with_reviews = await self.get_by_id(
+            created.id, options=(selectinload(self.model.reviews),)
+        )
+        return with_reviews
 
-    async def is_already_exist_with_name(self, name: str) -> bool:
-        try:
-            _ = await self._repository.get_one(self.model.name == name)
-        except NoResultFound:
-            return False
-        return True
+    @override
+    async def update_by_id(self, model_id: int, schema: StudioUpdate) -> Studio:
+        updated = await super().update_by_id(model_id, schema)
+        with_reviews = await self.get_by_id(
+            updated.id, options=(selectinload(self.model.reviews),)
+        )
+        return with_reviews

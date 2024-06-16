@@ -1,4 +1,5 @@
 from fastapi import APIRouter
+from starlette import status
 
 from src.api.v1.dependencies.employee import StudioManagerDep
 from src.api.v1.dependencies.services import StudioServiceDep
@@ -46,6 +47,7 @@ async def update_studio(
 
 @router.delete(
     "/{studio_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
 )
 async def delete_studio(
     studio: ValidStudioIdDep,

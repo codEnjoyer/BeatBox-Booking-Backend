@@ -1,5 +1,6 @@
 import datetime
 from fastapi import APIRouter
+from starlette import status
 
 from src.api.v1.dependencies.booking import (
     OwnedBookingDep,
@@ -107,7 +108,10 @@ async def confirm_payment_for_booking(
     return booking
 
 
-@router.delete("/studios/{studio_id}/rooms/{room_name}/bookings/{booking_id}")
+@router.delete(
+    "/studios/{studio_id}/rooms/{room_name}/bookings/{booking_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
 async def cancel_booking(
     booking: ValidBookingIdDep,
     _: BookingCancelerDep,

@@ -1,4 +1,5 @@
 from fastapi import APIRouter
+from starlette import status
 
 from src.api.v1.dependencies.review import OwnedReviewDep
 from src.api.v1.dependencies.room import ValidStudioRoomNameDep
@@ -60,11 +61,12 @@ async def update_my_studio_review(
     review_service: ReviewServiceDep,
     _: AuthenticatedUser,
 ) -> ReviewRead:
-    return await review_service.update_by_id(schema, review.id)
+    return await review_service.update_by_id(review.id, schema)
 
 
 @router.delete(
     "/studios/{studio_id}/reviews/{review_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
 )
 async def delete_my_studio_review(
     review: OwnedReviewDep,

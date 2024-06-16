@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException
 from starlette import status
 
 from src.api.v1.dependencies.review import OwnedReviewDep
-from src.api.v1.dependencies.room import ValidStudioRoomNameDep
+from src.api.v1.dependencies.room import ValidStudioRoomIdDep
 from src.api.v1.dependencies.services import ReviewServiceDep, RoomServiceDep
 from src.api.v1.dependencies.auth import AuthenticatedUser
 from src.api.v1.dependencies.studio import ValidStudioIdDep
@@ -31,11 +31,11 @@ async def get_studio_reviews(
 
 
 @router.get(
-    "/studios/{studio_id}/rooms/{room_name}/reviews",
+    "/studios/{studio_id}/rooms/{room_id}/reviews",
     response_model=list[ReviewRead],
 )
 async def get_room_reviews(
-    room: ValidStudioRoomNameDep,
+    room: ValidStudioRoomIdDep,
     review_service: ReviewServiceDep,
     offset: QueryOffset = 0,
     limit: QueryLimit = 100,

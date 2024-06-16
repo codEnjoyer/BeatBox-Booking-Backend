@@ -5,12 +5,13 @@ from starlette import status
 
 from src.api.v1.dependencies.auth import AuthenticatedEmployee
 from src.api.v1.dependencies.services import StudioServiceDep
+from src.api.v1.dependencies.types import PathIntID
 from src.domain.exceptions.studio import StudioNotFoundException
 from src.domain.models import Studio, Employee
 
 
 async def valid_studio_id(
-    studio_id: int, studio_service: StudioServiceDep
+    studio_id: PathIntID, studio_service: StudioServiceDep
 ) -> Studio:
     try:
         studio = await studio_service.get_by_id(studio_id)

@@ -5,6 +5,7 @@ from fastapi import HTTPException, status, Depends
 from src.api.v1.dependencies.auth import AuthenticatedUser
 from src.api.v1.dependencies.services import EmployeeServiceDep
 from src.api.v1.dependencies.studio import ValidStudioIdDep
+from src.api.v1.dependencies.types import PathIntID
 from src.domain.exceptions.employee import EmployeeNotFoundException
 from src.domain.models import User, Employee
 
@@ -23,7 +24,7 @@ StudioManagerDep = Annotated[User, Depends(can_manage_studio)]
 
 
 async def valid_employee_id(
-    employee_id: int, employee_service: EmployeeServiceDep
+    employee_id: PathIntID, employee_service: EmployeeServiceDep
 ) -> Employee:
     try:
         employee = await employee_service.get_by_id(employee_id)

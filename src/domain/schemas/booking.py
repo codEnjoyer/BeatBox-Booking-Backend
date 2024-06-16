@@ -1,4 +1,7 @@
 import uuid
+from typing import Self
+
+from pydantic import model_validator, field_validator
 
 from src.domain.schemas.base import (
     BaseSchema,
@@ -23,16 +26,39 @@ class BookingRead(BaseBooking):
 
     starts_at: DatetimeTZ
     ends_at: DatetimeTZ
-    # TODO: starts_at > ends_at
-    # TODO: check for minutes 00 or 30
+
+    @model_validator(mode="after")
+    def starts_before_ends(self) -> Self:
+        if self.starts_at >= self.ends_at:
+            raise ValueError("starts_at must be before ends_at")
+        return self
+
+    @field_validator("starts_at", "ends_at")
+    @classmethod
+    def multiples_of_30(cls, value: DatetimeTZ) -> DatetimeTZ:
+        if value.minute % 30 != 0:
+            raise ValueError("starts_at and ends_at"
+                             " must be multiples of 30 minutes")
+        return value
 
 
 class BookingCreate(BaseBooking):
     starts_at: DatetimeTZ
     ends_at: DatetimeTZ
 
-    # TODO: starts_at > ends_at
-    # TODO: check for minutes 00 or 30
+    @model_validator(mode="after")
+    def starts_before_ends(self) -> Self:
+        if self.starts_at >= self.ends_at:
+            raise ValueError("starts_at must be before ends_at")
+        return self
+
+    @field_validator("starts_at", "ends_at")
+    @classmethod
+    def multiples_of_30(cls, value: DatetimeTZ) -> DatetimeTZ:
+        if value.minute % 30 != 0:
+            raise ValueError("starts_at and ends_at"
+                             " must be multiples of 30 minutes")
+        return value
 
 
 class BookingUpdate(BaseBooking): ...

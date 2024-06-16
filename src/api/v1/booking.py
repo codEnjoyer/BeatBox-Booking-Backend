@@ -7,7 +7,7 @@ from src.api.v1.dependencies.booking import (
     BookingCancelerDep,
     ValidBookingIdDep,
 )
-from src.api.v1.dependencies.room import ValidStudioRoomNameDep
+from src.api.v1.dependencies.room import ValidStudioRoomIdDep
 from src.api.v1.dependencies.services import BookingServiceDep
 from src.api.v1.dependencies.auth import AuthenticatedUser
 from src.api.v1.dependencies.studio import ValidStudioIdDep
@@ -50,11 +50,11 @@ async def get_studio_bookings(
 
 
 @router.get(
-    "/studios/{studio_id}/rooms/{room_name}/bookings",
+    "/studios/{studio_id}/rooms/{room_id}/bookings",
     response_model=list[BookingRead],
 )
 async def get_room_bookings(
-    room: ValidStudioRoomNameDep,
+    room: ValidStudioRoomIdDep,
     _: AuthenticatedUser,
     booking_service: BookingServiceDep,
     from_: datetime.date | None = None,
@@ -69,12 +69,12 @@ async def get_room_bookings(
 
 
 @router.post(
-    "/studios/{studio_id}/rooms/{room_name}/bookings",
+    "/studios/{studio_id}/rooms/{room_id}/bookings",
     response_model=BookingRead,
 )
 async def book_slot(
+    room: ValidStudioRoomIdDep,
     schema: BookingCreate,
-    room: ValidStudioRoomNameDep,
     booking_service: BookingServiceDep,
     user: AuthenticatedUser,
 ) -> BookingRead:
@@ -92,7 +92,7 @@ async def book_slot(
 
 
 @router.put(
-    "/studios/{studio_id}/rooms/{room_name}/bookings/{booking_id}",
+    "/studios/{studio_id}/rooms/{room_id}/bookings/{booking_id}",
     response_model=BookingRead,
 )
 async def confirm_payment_for_booking(
@@ -109,7 +109,7 @@ async def confirm_payment_for_booking(
 
 
 @router.delete(
-    "/studios/{studio_id}/rooms/{room_name}/bookings/{booking_id}",
+    "/studios/{studio_id}/rooms/{room_id}/bookings/{booking_id}",
     status_code=status.HTTP_204_NO_CONTENT,
 )
 async def cancel_booking(

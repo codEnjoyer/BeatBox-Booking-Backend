@@ -28,3 +28,4 @@ DatetimeTZ = Annotated[
     Field(examples=['2024-06-16T11:36:43+0000']),
 ]
 IntID = Annotated[PositiveInt, Field(examples=[1])]
+NonEmptyString = Annotated[str, Field(min_length=1)]

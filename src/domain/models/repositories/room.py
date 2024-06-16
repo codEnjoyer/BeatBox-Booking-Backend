@@ -1,12 +1,11 @@
 import uuid
-from typing import override
+from typing import override, Iterable
 
-from sqlalchemy import select
-from sqlalchemy.exc import NoResultFound
+from sqlalchemy import ColumnElement
 from sqlalchemy.orm import selectinload
+from sqlalchemy.sql.base import ExecutableOption
 
-from src.domain.db import async_session_maker
-from src.domain.models import Room, Studio
+from src.domain.models import Room
 from src.domain.models.repositories.SQLAlchemy import SQLAlchemyRepository
 from src.domain.schemas.room import RoomCreate, RoomUpdate
 
@@ -17,23 +16,40 @@ class RoomRepository(SQLAlchemyRepository[Room, RoomCreate, RoomUpdate]):
     def model(self) -> type[Room]:
         return Room
 
-    @staticmethod
-    async def is_working_in_studio(employee_id: int, studio_id: int) -> bool:
-        # TODO: перенести в зависимости
-        async with async_session_maker() as session:
-            stmt = (
-                select(Studio)
-                .where(Studio.id == studio_id)
-                .options(selectinload(Studio.employees))
-            )
-            result = await session.execute(stmt)
-            studio = result.scalar()
-            if not studio:
-                raise NoResultFound
-            studio_employees_ids = (
-                employee.id for employee in studio.employees
-            )
-            return employee_id in studio_employees_ids
+    @override
+    async def get_all(
+        self,
+        *where: ColumnElement[bool],
+        options: Iterable[ExecutableOption] | None = None,
+        offset: int = 0,
+        limit: int = 100,
+    ) -> list[Room]:
+        """
+        Load rooms with bookings
+        """
+        options = options or ()
+        rooms = await super().get_all(
+            *where,
+            options=(*options, selectinload(self.model.bookings)),
+            offset=offset,
+            limit=limit,
+        )
+        return rooms
+
+    @override
+    async def get_one(
+        self,
+        *where: ColumnElement[bool],
+        options: Iterable[ExecutableOption] | None = None,
+    ) -> Room:
+        """
+        Load room with bookings
+        """
+        options = options or ()
+        room = await super().get_one(
+            *where, options=(*options, selectinload(self.model.bookings))
+        )
+        return room
 
     @staticmethod
     async def get_all_images_by_id(room_id: int) -> list[uuid.UUID]:

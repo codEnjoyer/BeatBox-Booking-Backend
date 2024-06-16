@@ -1,12 +1,17 @@
 import uuid
 
-from src.domain.schemas.base import BaseSchema, IntID, DatetimeTZ
+from src.domain.schemas.base import (
+    BaseSchema,
+    IntID,
+    DatetimeTZ,
+    NonEmptyString,
+)
 from src.domain.models.booking import BookingStatus
 
 
 class BaseBooking(BaseSchema):
-    name: str
-    surname: str | None
+    name: NonEmptyString
+    surname: NonEmptyString | None
 
 
 class BookingRead(BaseBooking):

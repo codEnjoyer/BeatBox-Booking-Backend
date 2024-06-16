@@ -2,12 +2,13 @@ from fastapi import APIRouter, HTTPException
 from starlette import status
 
 from src.api.v1.dependencies.employee import StudioManagerDep
-from src.api.v1.dependencies.services import FileServiceDep
+
+# from src.api.v1.dependencies.services import FileServiceDep
 from src.api.v1.dependencies.services import RoomServiceDep
 from src.api.v1.dependencies.studio import ValidStudioIdDep
 from src.api.v1.dependencies.room import (
-    convert_model_to_scheme,
-    get_images_url,
+    # convert_model_to_scheme,
+    # get_images_url,
     ValidStudioRoomNameDep,
 )
 from src.domain.exceptions.room import RoomWithSameNameAlreadyExistsException
@@ -34,12 +35,12 @@ async def get_studio_room(
 
 @router.post("/studios/{studio_id}/rooms", response_model=RoomRead)
 async def create_room(
-    schema: RoomCreate,
     studio: ValidStudioIdDep,
+    schema: RoomCreate,
     room_service: RoomServiceDep,
-    file_service: FileServiceDep,
+    # file_service: FileServiceDep,
     _: StudioManagerDep,
-) -> RoomRead:
+) -> Room:
     try:
         room = await room_service.create_room_in_studio(studio.id, schema)
     except RoomWithSameNameAlreadyExistsException as e:
@@ -47,12 +48,13 @@ async def create_room(
             status_code=status.HTTP_409_CONFLICT,
             detail=str(e),
         ) from e
-    banner_url, images_url = await get_images_url(
-        room=room, file_service=file_service, room_service=room_service
-    )
-    return convert_model_to_scheme(
-        room=room, banner_url=banner_url, images_url=images_url
-    )
+    return room
+    # banner_url, images_url = await get_images_url(
+    #     room=room, file_service=file_service, room_service=room_service
+    # )
+    # return convert_model_to_scheme(
+    #     room=room, banner_url=banner_url, images_url=images_url
+    # )
 
 
 @router.put("/studios/{studio_id}/rooms/{room_name}", response_model=RoomRead)
@@ -60,20 +62,22 @@ async def update_room(
     room: ValidStudioRoomNameDep,
     schema: RoomUpdate,
     room_service: RoomServiceDep,
-    file_service: FileServiceDep,
+    # file_service: FileServiceDep,
     _: StudioManagerDep,
 ) -> RoomRead:
+    # TODO: Check
     room = await room_service.update_by_id(room.id, schema)
-    banner_url, images_url = await get_images_url(
-        room=room, file_service=file_service, room_service=room_service
-    )
-    return convert_model_to_scheme(
-        room=room, banner_url=banner_url, images_url=images_url
-    )
+    # banner_url, images_url = await get_images_url(
+    #     room=room, file_service=file_service, room_service=room_service
+    # )
+    # return convert_model_to_scheme(
+    #     room=room, banner_url=banner_url, images_url=images_url
+    # )
+    return room
 
 
 @router.delete(
-    "/studios/{studio_id}/rooms/{room_id}",
+    "/studios/{studio_id}/rooms/{room_name}",
     status_code=status.HTTP_204_NO_CONTENT,
 )
 async def delete_room(

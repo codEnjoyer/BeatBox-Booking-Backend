@@ -5,7 +5,6 @@ from sqlalchemy import Integer, String, ForeignKey
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import mapped_column, relationship, Mapped
 
-from src.domain.models.additional_service import AdditionalService
 from src.domain.models.base import BaseModel
 
 if TYPE_CHECKING:
@@ -20,21 +19,17 @@ class Room(BaseModel):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     description: Mapped[str] = mapped_column(String(500), nullable=True)
+    additional_services: Mapped[str] = mapped_column(String(500), nullable=True)
 
     banner: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     images: Mapped[list[str]] = mapped_column(
         ARRAY(String), nullable=False, server_default="{}"
     )
+
     studio_id: Mapped[int] = mapped_column(
         ForeignKey("studios.id", ondelete="CASCADE"), nullable=False
     )
 
-    additional_services: Mapped[list["AdditionalService"]] = relationship(
-        back_populates="room",
-        cascade="all, delete-orphan",
-        lazy="selectin",
-        passive_deletes=True,
-    )
     bookings: Mapped[list["Booking"]] = relationship(
         back_populates="room",
         cascade="all, delete-orphan",

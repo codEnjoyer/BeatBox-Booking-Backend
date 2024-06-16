@@ -1,10 +1,8 @@
-from pydantic import Field
-
-from src.domain.schemas.base import BaseSchema, IntID
+from src.domain.schemas.base import BaseSchema, IntID, NonEmptyString
 
 
 class BaseEmployee(BaseSchema):
-    name: str = Field(min_length=3)
+    name: NonEmptyString
 
 
 class EmployeeRead(BaseEmployee):

@@ -1,32 +1,25 @@
-from pydantic import Field, HttpUrl
+from pydantic import HttpUrl
 
-from src.domain.schemas.base import BaseSchema, IntID
+from src.domain.schemas.base import BaseSchema, IntID, NonEmptyString
 
-from src.domain.schemas.additional_service import (
-    AdditionalServiceRead,
-    AdditionalServiceCreate,
-)
 from src.domain.schemas.booking import BookingRead
 
 
 class BaseRoom(BaseSchema):
-    name: str = Field(min_length=1)
-    description: str = Field(min_length=1)
+    name: NonEmptyString
+    description: NonEmptyString | None
+    additional_services: NonEmptyString | None
 
 
 class RoomRead(BaseRoom):
     id: IntID
     banner: HttpUrl | None
-
     images: list[HttpUrl]
-    additional_services: list[AdditionalServiceRead]
+
     bookings: list[BookingRead]
 
 
-class RoomCreate(BaseRoom):
-    additional_services: list[AdditionalServiceCreate]
+class RoomCreate(BaseRoom): ...
 
 
-class RoomUpdate(BaseRoom):
-    ...
-    # NOTE: additional_services отсутствуют намеренно
+class RoomUpdate(BaseRoom): ...

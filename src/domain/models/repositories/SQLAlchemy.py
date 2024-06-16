@@ -41,8 +41,7 @@ class SQLAlchemyRepository[
         Raises:
             NoResultFound
         """
-        if not options:
-            options = ()
+        options = options or ()
         async with async_session_maker() as session:
             stmt = (
                 select(self.model)
@@ -64,8 +63,7 @@ class SQLAlchemyRepository[
         Raises:
             NoResultFound
         """
-        if not options:
-            options = ()
+        options = options or ()
         async with async_session_maker() as session:
             stmt = select(self.model).where(*where).options(*options).limit(1)
             result = await session.execute(stmt)

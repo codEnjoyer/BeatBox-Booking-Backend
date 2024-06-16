@@ -47,7 +47,7 @@ async def valid_room_in_studio_by_name(
     room_name: str, studio: ValidStudioIdDep, room_service: RoomServiceDep
 ) -> Room:
     try:
-        room = await room_service.get_by_name_in_studio(room_name, studio.id)
+        room = await room_service.get_by_name(room_name, studio_id=studio.id)
     except RoomNotFoundException as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

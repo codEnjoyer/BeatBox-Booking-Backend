@@ -1,9 +1,7 @@
 import uuid
+from typing import override
 
-from fastapi import HTTPException
 from sqlalchemy.exc import NoResultFound
-from sqlalchemy.orm import selectinload
-from starlette import status
 
 from src.domain.exceptions.room import (
     RoomNotFoundException,
@@ -21,35 +19,22 @@ class RoomService(ModelService[RoomRepository, Room, RoomCreate, RoomUpdate]):
         super().__init__(RoomRepository(), RoomNotFoundException)
 
     async def get_all_in_studio(self, studio_id: int) -> list[Room]:
-        try:
-            model = await self._repository.get_all(
-                self.model.studio_id == studio_id,
-                options=(
-                    selectinload(self.model.additional_services),
-                    selectinload(self.model.bookings),
-                ),
-            )
-        except NoResultFound as e:
-            raise self._not_found_exception from e
-        return model
+        rooms = await self._repository.get_all(
+            self.model.studio_id == studio_id,
+        )
+        return rooms
 
-    async def get_by_name_in_studio(
-        self,
-        name: str,
-        studio_id: int,
+    async def get_by_name(
+        self, name: str, *, studio_id: int | None = None
     ) -> Room:
+        where = [self.model.name == name]
+        if studio_id:
+            where.append(self.model.studio_id == studio_id)
         try:
-            model = await self._repository.get_one(
-                self.model.name == name,
-                self.model.studio_id == studio_id,
-                options=(
-                    selectinload(self.model.additional_services),
-                    selectinload(self.model.bookings),
-                ),
-            )
+            room = await self._repository.get_one(*where)
         except NoResultFound as e:
             raise self._not_found_exception from e
-        return model
+        return room
 
     async def create_room_in_studio(
         self, studio_id: int, schema: RoomCreate
@@ -59,19 +44,19 @@ class RoomService(ModelService[RoomRepository, Room, RoomCreate, RoomUpdate]):
 
         schema_dict = schema.model_dump()
         schema_dict["studio_id"] = studio_id
-        try:
-            return await self._repository.create(schema_dict)
-        except Exception:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="File with that id not found",
-            )
+        created = await self._repository.create(schema_dict)
+        return await self.get_by_id(created.id)
+
+    @override
+    async def update_by_id(self, room_id: int, schema: RoomUpdate) -> Room:
+        updated = await super().update_by_id(room_id, schema)
+        return await self.get_by_id(updated.id)
 
     async def is_room_with_name_exist_in_studio(
         self, name: str, studio_id: int
     ) -> bool:
         try:
-            await self.get_by_name_in_studio(name, studio_id)
+            await self.get_by_name(name, studio_id=studio_id)
         except RoomNotFoundException:
             return False
         return True

@@ -1,10 +1,13 @@
-from fastapi import HTTPException
-from starlette import status
+from typing import override
+
 from sqlalchemy.exc import NoResultFound
 
 from src.domain.models.review import Review
 from src.domain.schemas.review import ReviewCreate, ReviewUpdate
-from src.domain.exceptions.review import ReviewNotFoundException
+from src.domain.exceptions.review import (
+    ReviewNotFoundException,
+    ReviewAlreadyExistException,
+)
 from src.domain.models.repositories.review import ReviewRepository
 from src.domain.services.base import ModelService
 
@@ -15,58 +18,46 @@ class ReviewService(
     def __init__(self):
         super().__init__(ReviewRepository(), ReviewNotFoundException)
 
-    async def create(self, schema: ReviewCreate, **kwargs) -> Review:
-        author_id: int = kwargs.get('author_id')
-        studio_id: int = kwargs.get('studio_id')
-        if await self.is_review_already_exist(author_id, studio_id):
-            raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT,
-                detail="User already has a review.py on this studio",
-            )
+    async def get_from_studio(
+        self, studio_id: int, offset: int = 0, limit: int = 100
+    ) -> list[Review]:
+        return await self._repository.get_all(
+            self.model.studio_id == studio_id, offset=offset, limit=limit
+        )
 
-        review_data = {
-            'text': schema.text,
-            'grade': schema.grade,
-            'author_id': author_id,
-            'room_id': schema.room_id,
-            'studio_id': studio_id,
-        }
+    async def get_from_room(
+        self, room_id: int, offset: int = 0, limit: int = 0
+    ) -> list[Review]:
+        return await self._repository.get_all(
+            self.model.room_id == room_id, offset=offset, limit=limit
+        )
 
-        return await self._repository.create(review_data)
+    async def add_new_from_user(
+        self, schema: ReviewCreate, user_id: int, studio_id: int
+    ) -> Review:
+        if await self.is_review_from_user_exist(user_id, studio_id):
+            raise ReviewAlreadyExistException()
+        schema_dict = schema.model_dump()
+        schema_dict["author_id"] = user_id
+        schema_dict["studio_id"] = studio_id
+        created = await self._repository.create(schema_dict)
+        # NOTE: get_by_id is needed to load author
+        return await self.get_by_id(created.id)
 
-    async def is_review_already_exist(
+    @override
+    async def update_by_id(self, model_id: int, schema: ReviewUpdate) -> Review:
+        updated = await super().update_by_id(model_id, schema)
+        with_author = await self.get_by_id(updated.id)
+        return with_author
+
+    async def is_review_from_user_exist(
         self, author_id: int, studio_id: int
     ) -> bool:
         try:
             await self._repository.get_one(
-                self._model.studio_id == studio_id,
-                self._model.author_id == author_id,
+                self.model.studio_id == studio_id,
+                self.model.author_id == author_id,
             )
         except NoResultFound:
             return False
         return True
-
-    async def get_reviews_by_studio_id(
-        self, studio_id: int, offset: int = 0, limit: int = 100
-    ) -> list[Review]:
-        return await self._repository.get_all(
-            self._model.studio_id == studio_id, offset=offset, limit=limit
-        )
-
-    async def patch_review(
-        self,
-        studio_id: int,
-        author_id: int,
-        review_id: int,
-        schema: ReviewUpdate,
-    ) -> Review:
-        if not await self.is_review_already_exist(
-            studio_id=studio_id, author_id=author_id
-        ):
-            raise HTTPException(
-                status.HTTP_404_NOT_FOUND,
-                detail="User does not have review.py on this studio",
-            )
-        return await self._repository.update_one(
-            schema, self._model.id == review_id
-        )

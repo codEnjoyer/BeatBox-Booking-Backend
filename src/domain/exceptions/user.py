@@ -1,6 +1,12 @@
-from sqlalchemy.exc import NoResultFound
-
-from src.domain.exceptions.base import BBBException
+from src.domain.exceptions.base import ItemNotFoundException, BadDataException
 
 
-class UserNotFoundException(BBBException, NoResultFound): ...
+class UserNotFoundException(ItemNotFoundException):
+    @property
+    def item_name(self) -> str:
+        return "User"
+
+
+class EmailAlreadyTakenException(BadDataException):
+    def __init__(self):
+        super().__init__("Email already taken")

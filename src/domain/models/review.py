@@ -1,3 +1,4 @@
+import datetime
 from typing import TYPE_CHECKING, Optional
 
 from sqlalchemy import (
@@ -23,30 +24,30 @@ class Review(BaseModel):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
 
-    date: Mapped[str] = mapped_column(
-        DateTime(timezone=True), nullable=False, server_default=func.now()
-    )
     text: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     grade: Mapped[int] = mapped_column(
         Integer, CheckConstraint('grade > 0 AND grade <= 5'), nullable=False
     )
+    published_at: Mapped[datetime.datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now()
+    )
 
     author_id: Mapped[int] = mapped_column(
-        ForeignKey("users.id"), nullable=False
+        ForeignKey("users.id", ondelete="CASCADE"), nullable=False
     )
     room_id: Mapped[Optional[int]] = mapped_column(
-        ForeignKey("rooms.id"), nullable=True
+        ForeignKey("rooms.id", ondelete="CASCADE"), nullable=True
     )
     studio_id: Mapped[int] = mapped_column(
-        ForeignKey("studios.id"), nullable=False
+        ForeignKey("studios.id", ondelete="CASCADE"), nullable=False
     )
 
     author: Mapped["User"] = relationship(
-        back_populates="reviews", lazy='joined', foreign_keys=[author_id]
+        back_populates="reviews",
+        lazy="joined"
     )
-    room: Mapped[Optional["Room"]] = relationship(
-        back_populates="reviews", lazy='joined', foreign_keys=[room_id]
-    )
-    studio: Mapped["Studio"] = relationship(
-        back_populates="reviews", lazy='joined', foreign_keys=[studio_id]
-    )
+    room: Mapped[Optional["Room"]] = relationship(back_populates="reviews")
+    studio: Mapped["Studio"] = relationship(back_populates="reviews")
+
+    def is_written_by(self, user_id: int) -> bool:
+        return self.author_id == user_id

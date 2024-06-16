@@ -4,14 +4,13 @@ from typing import Self, Annotated
 from pydantic import (
     Field,
     HttpUrl,
-    PositiveInt,
     field_validator,
     model_validator,
     field_serializer,
 )
 from pydantic_core.core_schema import SerializationInfo
 
-from src.domain.schemas.base import BaseSchema
+from src.domain.schemas.base import BaseSchema, IntID
 
 from src.domain.schemas.phone_number import RuPhoneNumber
 
@@ -62,7 +61,7 @@ class BaseStudio(BaseSchema):
 
 
 class StudioRead(BaseStudio):
-    id: PositiveInt
+    id: IntID
     average_grade: float = Field(ge=0, le=5, examples=[4.4])
 
 

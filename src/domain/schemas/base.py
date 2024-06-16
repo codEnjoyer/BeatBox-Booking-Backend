@@ -7,7 +7,14 @@ from pydantic import (
     AwareDatetime,
     PlainSerializer,
     Field,
+    PositiveInt,
 )
+
+
+class BaseSchema(BaseModel):
+    model_config = ConfigDict(
+        from_attributes=True,
+    )
 
 
 def convert_datetime_to_iso_8601_with_tz(dt: datetime) -> str:
@@ -20,9 +27,4 @@ DatetimeTZ = Annotated[
     PlainSerializer(convert_datetime_to_iso_8601_with_tz, return_type=str),
     Field(examples=['2024-06-16T11:36:43+0000']),
 ]
-
-
-class BaseSchema(BaseModel):
-    model_config = ConfigDict(
-        from_attributes=True,
-    )
+IntID = Annotated[PositiveInt, Field(examples=[1])]

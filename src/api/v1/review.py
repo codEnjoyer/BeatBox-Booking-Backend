@@ -46,8 +46,7 @@ async def get_room_reviews(
     return reviews
 
 
-@router.post("/studios/{studio_id}/reviews",
-             response_model=ReviewRead)
+@router.post("/studios/{studio_id}/reviews", response_model=ReviewRead)
 async def post_review_on_studio(
     studio: ValidStudioIdDep,
     schema: ReviewCreate,
@@ -103,9 +102,7 @@ async def update_my_studio_review(
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail=str(e)
             ) from e
-    updated = await review_service.update_by_id(review.id, schema)
-    with_author = await review_service.get_by_id(updated.id)
-    return with_author
+    return await review_service.update_by_id(review.id, schema)
 
 
 @router.delete(

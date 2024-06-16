@@ -1,26 +1,20 @@
-from pydantic import Field, PositiveInt
+from pydantic import Field
 
-from src.domain.schemas.base import BaseSchema
+from src.domain.schemas.base import BaseSchema, IntID
 
 
-class BaseEmployee(BaseSchema): ...
+class BaseEmployee(BaseSchema):
+    name: str = Field(min_length=3)
 
 
 class EmployeeRead(BaseEmployee):
-    id: PositiveInt
-    studio_id: PositiveInt
-    user: "UserRead"
+    id: IntID
+    studio_id: IntID
+    user_id: IntID
 
 
 class EmployeeCreate(BaseEmployee):
-    name: str = Field(min_length=3)
-    user_id: PositiveInt
+    user_id: IntID
 
 
-class EmployeeUpdate(BaseEmployee):
-    name: str = Field(min_length=3)
-
-
-from src.domain.schemas.user import UserRead
-
-EmployeeRead.update_forward_refs()
+class EmployeeUpdate(BaseEmployee): ...

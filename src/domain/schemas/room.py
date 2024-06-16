@@ -1,6 +1,6 @@
-from pydantic import PositiveInt, Field, HttpUrl
+from pydantic import Field, HttpUrl
 
-from src.domain.schemas.base import BaseSchema
+from src.domain.schemas.base import BaseSchema, IntID
 
 from src.domain.schemas.additional_service import (
     AdditionalServiceRead,
@@ -15,7 +15,7 @@ class BaseRoom(BaseSchema):
 
 
 class RoomRead(BaseRoom):
-    id: PositiveInt
+    id: IntID
     banner: HttpUrl | None
 
     images: list[HttpUrl]

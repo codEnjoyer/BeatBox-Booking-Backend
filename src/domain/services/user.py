@@ -44,6 +44,10 @@ class UserService(ModelService[UserRepository, User, UserCreate, UserUpdate]):
             return False
         return True
 
+    async def is_employee(self, user_id: int) -> bool:
+        user = await self.get_by_id(user_id)
+        return user.employee is not None
+
     def is_password_valid(self, plain: str, hashed: str) -> bool:
         return self._pwd_context.verify(plain, hashed)
 

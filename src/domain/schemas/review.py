@@ -1,6 +1,6 @@
 from pydantic import Field, PositiveInt
 
-from src.domain.schemas.base import BaseSchema, DatetimeTZ
+from src.domain.schemas.base import BaseSchema, DatetimeTZ, IntID
 
 
 class BaseReview(BaseSchema):
@@ -8,13 +8,13 @@ class BaseReview(BaseSchema):
     text: str | None = Field(
         min_length=1, max_length=500, examples=["Nice", None]
     )
-    room_id: PositiveInt | None = Field(examples=[1, None])
+    room_id: IntID | None
 
 
 class ReviewRead(BaseReview):
-    id: PositiveInt
+    id: IntID
     author: "UserRead"
-    studio_id: PositiveInt
+    studio_id: IntID
     published_at: DatetimeTZ
 
 

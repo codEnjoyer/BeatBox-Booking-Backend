@@ -17,3 +17,10 @@ class EmployeeService(
         return await self._repository.get_all(
             Employee.studio_id == studio_id, limit=limit, offset=offset
         )
+
+    async def add_in_studio(
+        self, studio_id: int, schema: EmployeeCreate
+    ) -> Employee:
+        schema_dict = schema.model_dump()
+        schema_dict["studio_id"] = studio_id
+        return await self._repository.create(schema_dict)

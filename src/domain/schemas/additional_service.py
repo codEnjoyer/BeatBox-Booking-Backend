@@ -1,6 +1,6 @@
-from pydantic import PositiveInt, Field
+from pydantic import Field
 
-from src.domain.schemas.base import BaseSchema
+from src.domain.schemas.base import BaseSchema, IntID
 
 
 class BaseAdditionalService(BaseSchema):
@@ -10,7 +10,7 @@ class BaseAdditionalService(BaseSchema):
 
 
 class AdditionalServiceRead(BaseAdditionalService):
-    id: PositiveInt
+    id: IntID
 
 
 class AdditionalServiceCreate(BaseAdditionalService): ...

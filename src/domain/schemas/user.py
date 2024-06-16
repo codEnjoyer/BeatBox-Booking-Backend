@@ -1,8 +1,8 @@
 import typing
 
-from pydantic import EmailStr, PositiveInt, Field
+from pydantic import EmailStr, Field
 
-from src.domain.schemas.base import BaseSchema
+from src.domain.schemas.base import BaseSchema, IntID
 
 
 class BaseUser(BaseSchema):
@@ -10,7 +10,7 @@ class BaseUser(BaseSchema):
 
 
 class UserRead(BaseUser):
-    id: PositiveInt
+    id: IntID
     is_superuser: bool
     employee: typing.Optional["EmployeeRead"]
 

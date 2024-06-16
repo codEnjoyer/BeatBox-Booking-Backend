@@ -79,15 +79,6 @@ async def book_slot(
     user: AuthenticatedUser,
 ) -> BookingRead:
     booking = await booking_service.book_room_for_user(room, user.id, schema)
-    # booking = await booking_service.create(
-    #     schema=schema, user_id=user.id, studio_id=room.studio_id
-    # )
-    # # TODO: улучшить
-    # if schema.status == BookingStatus.CLOSED and not user.employee:
-    #     raise HTTPException(
-    #         status_code=status.HTTP_403_FORBIDDEN,
-    #         detail="User does not have permission to close the booking",
-    #     )
     return booking
 
 
@@ -95,16 +86,13 @@ async def book_slot(
     "/studios/{studio_id}/rooms/{room_id}/bookings/{booking_id}",
     response_model=BookingRead,
 )
-async def confirm_payment_for_booking(
-    schema: BookingUpdate,
+async def update_booking_name(
     booking: OwnedBookingDep,
+    schema: BookingUpdate,
     booking_service: BookingServiceDep,
-    user: AuthenticatedUser,
+    _: AuthenticatedUser,
 ) -> BookingRead:
-    # TODO: заменить на соответствующую логику
-    booking = await booking_service.update_booking(
-        booking.id, user_id=user.id, schema=schema
-    )
+    booking = await booking_service.update_by_id(booking.id, schema)
     return booking
 
 

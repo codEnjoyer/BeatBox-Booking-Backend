@@ -8,7 +8,7 @@ from sqlalchemy.orm import mapped_column, relationship, Mapped
 from src.domain.models.base import BaseModel
 
 if TYPE_CHECKING:
-    from src.domain.models.booking import Booking
+    from src.domain.models.booking import Booking, BookingStatus
     from src.domain.models.review import Review
     from src.domain.models.studio import Studio
 
@@ -47,9 +47,10 @@ class Room(BaseModel):
     )
 
     def is_free_at_interval(
-        self, from_: datetime.datetime, to: datetime.datetime
+            self, from_: datetime.datetime, to: datetime.datetime
     ) -> bool:
         for booking in self.bookings:
-            if booking.within_range(from_, to):
+            if (booking.is_within_range(from_, to)
+                    and booking.status != BookingStatus.CANCELED):
                 return False
         return True

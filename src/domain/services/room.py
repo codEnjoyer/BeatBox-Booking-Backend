@@ -23,7 +23,7 @@ class RoomService(ModelService[RoomRepository, Room, RoomCreate, RoomUpdate]):
         return rooms
 
     async def create_room_in_studio(
-            self, studio_id: int, schema: RoomCreate
+        self, studio_id: int, schema: RoomCreate
     ) -> Room:
         schema_dict = schema.model_dump()
         schema_dict["studio_id"] = studio_id
@@ -36,11 +36,12 @@ class RoomService(ModelService[RoomRepository, Room, RoomCreate, RoomUpdate]):
         return await self.get_by_id(updated.id)
 
     async def check_if_room_in_studio(
-            self, room_id: int, studio_id: int
-    ) -> None:
+        self, room_id: int, studio_id: int
+    ) -> Room:
         room = await self.get_by_id(room_id)
         if room.studio_id != studio_id:
             raise RoomDoesNotExistInStudioException()
+        return room
 
     async def get_all_images(self, room_id: int) -> list[uuid.UUID]:
         return await self._repository.get_all_images_by_id(room_id=room_id)

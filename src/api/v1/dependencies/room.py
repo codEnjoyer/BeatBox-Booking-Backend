@@ -6,8 +6,10 @@ from starlette import status
 from src.api.v1.dependencies.services import RoomServiceDep
 from src.api.v1.dependencies.studio import ValidStudioIdDep
 from src.api.v1.dependencies.types import PathIntID
-from src.domain.exceptions.room import RoomNotFoundException, \
-    RoomDoesNotExistInStudioException
+from src.domain.exceptions.room import (
+    RoomNotFoundException,
+    RoomDoesNotExistInStudioException,
+)
 from src.domain.models.room import Room
 from src.domain.schemas.room import RoomRead
 from src.domain.services.file import FileService
@@ -45,10 +47,9 @@ async def get_images_url(
     return banner_url, images_url
 
 
-async def valid_studio_room_id(room_id: PathIntID,
-                               studio: ValidStudioIdDep,
-                               room_service: RoomServiceDep
-                               ) -> Room:
+async def valid_studio_room_id(
+    room_id: PathIntID, studio: ValidStudioIdDep, room_service: RoomServiceDep
+) -> Room:
     try:
         room = await room_service.check_if_room_in_studio(room_id, studio.id)
     except RoomNotFoundException as e:

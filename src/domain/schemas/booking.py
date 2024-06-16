@@ -37,8 +37,9 @@ class BookingRead(BaseBooking):
     @classmethod
     def multiples_of_30(cls, value: DatetimeTZ) -> DatetimeTZ:
         if value.minute % 30 != 0:
-            raise ValueError("starts_at and ends_at"
-                             " must be multiples of 30 minutes")
+            raise ValueError(
+                "starts_at and ends_at" " must be multiples of 30 minutes"
+            )
         return value
 
 
@@ -56,8 +57,9 @@ class BookingCreate(BaseBooking):
     @classmethod
     def multiples_of_30(cls, value: DatetimeTZ) -> DatetimeTZ:
         if value.minute % 30 != 0:
-            raise ValueError("starts_at and ends_at"
-                             " must be multiples of 30 minutes")
+            raise ValueError(
+                "starts_at and ends_at" " must be multiples of 30 minutes"
+            )
         return value
 
 

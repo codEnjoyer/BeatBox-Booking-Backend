@@ -1,13 +1,19 @@
-import datetime as dt
+import datetime
 import uuid
 
 from fastapi import HTTPException
+from sqlalchemy.orm import selectinload
 from starlette import status
-from sqlalchemy.exc import NoResultFound
 
+from src.domain.models import Room
 from src.domain.models.booking import Booking, BookingStatus
 from src.domain.schemas.booking import BookingCreate, BookingUpdate
-from src.domain.exceptions.booking import BookingNotFoundException
+from src.domain.exceptions.booking import (
+    BookingNotFoundException,
+    MustBookWithinOneDayException,
+    SlotAlreadyBookedException,
+    MustBookWithinStudioWorkingTimeException,
+)
 from src.domain.models.repositories.booking import BookingRepository
 from src.domain.models.repositories.room import RoomRepository
 from src.domain.services.base import ModelService
@@ -19,83 +25,73 @@ class BookingService(
     def __init__(self):
         super().__init__(BookingRepository(), BookingNotFoundException)
 
-    async def create(self, schema: BookingCreate, **kwargs) -> Booking:
-        user_id: int = kwargs.get('user_id')
-        studio_id: int = kwargs.get('user_id')
-        if await self.is_booking_already_booked(
-            starts_at=schema.starts_at,
-            ends_at=schema.ends_at,
-            room_id=schema.room_id,
-        ):
-            raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT,
-                detail="Booking already booked",
-            )
+    async def get_room_bookings(
+        self,
+        room_id: int,
+        from_: datetime.date | None = None,
+        to: datetime.date | None = None,
+        offset: int = 0,
+        limit: int = 100,
+    ) -> list[Booking]:
+        date_filter = []
+        if from_:
+            date_filter.append(self.model.starts_at >= from_)
+        if to:
+            date_filter.append(self.model.ends_at <= to)
+        return await self._repository.get_all(
+            self.model.room_id == room_id,
+            *date_filter,
+            offset=offset,
+            limit=limit,
+        )
+
+    async def book_room_for_user(
+        self, room: Room, user_id: int, schema: BookingCreate
+    ) -> Booking:
+        await self.check_if_can_be_booked(room, schema)
+        schema_dict = schema.model_dump()
+        schema_dict.update(
+            user_id=user_id,
+            room_id=room.id,
+            status=BookingStatus.WAITING_FOR_PAYMENT,
+        )
+        return await self._repository.create(schema_dict)
+
+    @staticmethod
+    async def check_if_can_be_booked(room: Room, schema: BookingCreate) -> None:
+        if schema.starts_at.date() != schema.ends_at.date():
+            raise MustBookWithinOneDayException()
 
         if (
-            schema.status == BookingStatus.CLOSED
-            and not await RoomRepository.is_working_in_studio(
-                user_id=user_id, studio_id=studio_id
-            )
+            schema.starts_at < room.studio.opening_at
+            or schema.ends_at > room.studio.closing_at
         ):
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                # TODO: replace to api layer exception
-                detail="User does not have permission to close the booking",
-            )
-        booking_data = schema.dict()
-        booking_data["user_id"] = user_id
-        return await self._repository.create(booking_data)
+            raise MustBookWithinStudioWorkingTimeException()
 
-    async def is_booking_already_booked(
-        self, starts_at: dt.datetime, ends_at: dt.datetime, room_id: int
-    ) -> bool:
-        try:
-            await self._repository.get_one(
-                self._model.starts_at == starts_at,
-                self._model.ends_at == ends_at,
-                self._model.room_id == room_id,
-                self._model.status == BookingStatus.BOOKED,
-            )
-        except NoResultFound:
-            return False
-        return True
+        if not room.is_free_at_interval(
+            from_=schema.starts_at, to=schema.ends_at
+        ):
+            raise SlotAlreadyBookedException()
 
-    async def check_user_permission(
-        self, booking_id: uuid.UUID, user_id: int
-    ) -> bool:
-        try:
-            await self._repository.get_one(
-                self._model.id == booking_id,
-                self._model.user_id == user_id,
-            )
-        except NoResultFound:
-            return False
-        return True
-
-    async def get_bookings_by_user_id(
+    async def get_user_bookings(
         self, user_id: int, offset: int = 0, limit: int = 100
     ) -> list[Booking]:
         return await self._repository.get_all(
-            self._model.user_id == user_id, offset=offset, limit=limit
+            self.model.user_id == user_id, offset=offset, limit=limit
         )
 
-    async def patch_booking(
+    async def update_booking(
         self, booking_id: uuid.UUID, user_id: int, schema: BookingUpdate
     ) -> Booking:
-        if (
-            schema.status == BookingStatus.CANCELED
-            and not await self.check_user_permission(
-                booking_id=booking_id, user_id=user_id
-            )
-        ):
+        # TODO: заменить на confirm_payment_for_booking
+        has_permission = await self.check_user_permission(booking_id, user_id)
+        if schema.status == BookingStatus.CANCELED and not has_permission:
             raise HTTPException(
                 status.HTTP_403_FORBIDDEN,
                 detail="User does not have permission to cancel the booking",
             )
-
-        booking = await self._repository.get_one_with_room_relation(
-            self._model.id == booking_id
+        booking = await self._repository.get_one(
+            self.model.id == booking_id, options=(selectinload(self.model.room))
         )
 
         if (
@@ -119,16 +115,7 @@ class BookingService(
             "user_id": user_id,
         }
 
-        return await self._repository.update_one(
-            booking_data, self._model.id == booking_id
+        result: Booking = await self._repository.update(
+            booking_data, self.model.id == booking_id
         )
-
-    async def remove(self, booking_id: uuid.UUID, user_id: int) -> None:
-        if not await self.check_user_permission(
-            booking_id=booking_id, user_id=user_id
-        ):
-            raise HTTPException(
-                status.HTTP_404_NOT_FOUND,
-                detail="User does not have permission to delete the booking",
-            )
-        await self._repository.delete(self._model.id == booking_id)
+        return result

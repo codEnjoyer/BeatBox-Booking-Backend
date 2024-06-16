@@ -1,30 +1,27 @@
-from pydantic import constr, EmailStr
+import typing
 
-from src.domain.schemas.base import BaseSchema
-from src.domain.schemas.phone_number import PhoneNumber
+from pydantic import EmailStr, Field
+
+from src.domain.schemas.base import BaseSchema, IntID
 
 
 class BaseUser(BaseSchema):
     email: EmailStr
 
 
-class UserCredentials(BaseUser):
-    password: constr(max_length=200)
-
-
-# TODO: кажется, стоит переосмыслить схемы. сейчас решил ничего не трогать
+class UserRead(BaseUser):
+    id: IntID
+    is_superuser: bool
+    employee: typing.Optional["EmployeeRead"]
 
 
 class UserCreate(BaseUser):
-    phone_number: PhoneNumber
-    password: constr(max_length=200)
-    is_superuser: bool = False
+    password: str = Field(..., min_length=8, max_length=24)
 
 
-class UserRead(BaseUser):
-    id: int
-    is_superuser: bool = False
+class UserUpdate(BaseUser): ...
 
 
-class UserUpdate(BaseUser):
-    phone_number: PhoneNumber
+from src.domain.schemas.employee import EmployeeRead
+
+UserRead.update_forward_refs()

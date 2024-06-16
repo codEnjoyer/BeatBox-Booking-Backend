@@ -1,30 +1,15 @@
 from contextlib import asynccontextmanager
 
-from sqlalchemy.exc import NoResultFound, IntegrityError
+from sqlalchemy.exc import NoResultFound
 
-from src.api import *  # noqa: F403
-from fastapi import FastAPI, APIRouter, Request, Response, HTTPException, status
-
-
-def include_routers(app_: FastAPI, *routers: APIRouter) -> None:
-    for routers in routers:
-        app_.include_router(routers)
+from src.api import v1_router
+from fastapi import FastAPI, Request, Response, HTTPException, status
 
 
 @asynccontextmanager
 async def lifespan(app_: FastAPI):
     """Запускаем код до и после запуска приложения"""
-    include_routers(
-        app_,
-        auth_router,  # noqa: F405
-        employee_router,  # noqa: F405
-        file_router,  # noqa: F405
-        review_router,  # noqa: F405
-        studio_router,  # noqa: F405
-        user_router,  # noqa: F405
-        room_router,  # noqa: F405
-        booking_router,  # noqa: F405
-    )
+    app_.include_router(v1_router)
     yield  # Возвращаем работу приложению
     # Тут можно выполнить код после завершения приложения
 
@@ -42,12 +27,4 @@ async def not_found_handler(_: Request, exc: NoResultFound) -> Response:
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
         detail="Requested item was not found",
-    ) from exc
-
-
-@app.exception_handler(IntegrityError)
-async def integrity_error_handler(_: Request, exc: IntegrityError) -> Response:
-    raise HTTPException(
-        status_code=status.HTTP_400_BAD_REQUEST,
-        detail="Data is invalid",
     ) from exc

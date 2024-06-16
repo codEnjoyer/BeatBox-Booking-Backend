@@ -10,6 +10,7 @@ from src.settings import settings
 
 
 class FileBucketRepository:
+    # TODO: наследование от репозитория
     def __init__(self):
         self.max_image_size = 1024 * 1024 * 100  # 100 mb
         self.valid_image_types = (image.Jpeg, image.Png, image.Webp)

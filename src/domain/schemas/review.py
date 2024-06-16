@@ -1,24 +1,29 @@
-from pydantic import Field
+from pydantic import Field, PositiveInt
 
-from src.domain.schemas.base import BaseSchema
+from src.domain.schemas.base import BaseSchema, DatetimeTZ, IntID
 
 
 class BaseReview(BaseSchema):
-    grade: int = Field(..., gt=0, le=5)
-    text: str
+    grade: PositiveInt = Field(..., ge=1, le=5, examples=[4])
+    text: str | None = Field(
+        min_length=1, max_length=500, examples=["Nice", None]
+    )
+    room_id: IntID | None
 
 
 class ReviewRead(BaseReview):
-    id: int
-    author_id: int
-    date: str
-    studio_id: int
-    room_id: int | None
+    id: IntID
+    author: "UserRead"
+    studio_id: IntID
+    published_at: DatetimeTZ
 
 
-class ReviewCreate(BaseReview):
-    room_id: int | None
+class ReviewCreate(BaseReview): ...
 
 
-class ReviewUpdate(BaseReview):
-    ...
+class ReviewUpdate(BaseReview): ...
+
+
+from src.domain.schemas.user import UserRead
+
+ReviewRead.update_forward_refs()

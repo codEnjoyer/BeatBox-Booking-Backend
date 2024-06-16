@@ -1,18 +1,18 @@
-from src.domain.schemas.base import BaseSchema
+from src.domain.schemas.base import BaseSchema, IntID, NonEmptyString
 
 
 class BaseEmployee(BaseSchema):
-    studio_id: int
+    name: NonEmptyString
 
 
 class EmployeeRead(BaseEmployee):
-    id: int
-    user_id: int
+    id: IntID
+    studio_id: IntID
+    user_id: IntID
 
 
 class EmployeeCreate(BaseEmployee):
-    user_id: int
+    user_id: IntID
 
 
-class EmployeeUpdate(BaseEmployee):
-    ...
+class EmployeeUpdate(BaseEmployee): ...

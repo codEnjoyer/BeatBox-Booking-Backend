@@ -1,7 +1,9 @@
-from typing import override
+from abc import abstractmethod
+from typing import Iterable
 
 from sqlalchemy import insert, ColumnElement, select, delete, update
 from sqlalchemy.exc import NoResultFound
+from sqlalchemy.sql.base import ExecutableOption
 
 from src.domain.db import async_session_maker
 from src.domain.models.base import BaseModel
@@ -13,20 +15,16 @@ class SQLAlchemyRepository[
     Model: BaseModel, CreateSchema: BaseSchema, UpdateSchema: BaseSchema
 ](Repository[Model, CreateSchema, UpdateSchema]):
 
-    @override
     @property
-    def model(self) -> type[Model]:
-        return self._model
-
-    def __init__(self, model: type[Model]):
-        super().__init__(model)
+    @abstractmethod
+    def model(self) -> type[Model]: ...
 
     async def create(self, schema: CreateSchema | dict[str, ...]) -> Model:
         schema = (
             schema.model_dump() if isinstance(schema, BaseSchema) else schema
         )
         async with async_session_maker() as session:
-            stmt = insert(self._model).values(**schema).returning(self._model)
+            stmt = insert(self.model).values(**schema).returning(self.model)
             result = await session.execute(stmt)
             instance = result.scalar()
             await session.commit()
@@ -35,20 +33,39 @@ class SQLAlchemyRepository[
     async def get_all(
         self,
         *where: ColumnElement[bool],
+        options: Iterable[ExecutableOption] | None = None,
         offset: int = 0,
         limit: int = 100,
     ) -> list[Model]:
+        """
+        Raises:
+            NoResultFound
+        """
+        options = options or ()
         async with async_session_maker() as session:
-            stmt = select(self._model).where(*where).offset(offset).limit(limit)
+            stmt = (
+                select(self.model)
+                .where(*where)
+                .options(*options)
+                .offset(offset)
+                .limit(limit)
+            )
             result = await session.execute(stmt)
             instances = result.unique().scalars().all()
-            if not instances:
-                raise NoResultFound
             return instances
 
-    async def get_one(self, *where: ColumnElement[bool]) -> Model:
+    async def get_one(
+        self,
+        *where: ColumnElement[bool],
+        options: Iterable[ExecutableOption] | None = None,
+    ) -> Model:
+        """
+        Raises:
+            NoResultFound
+        """
+        options = options or ()
         async with async_session_maker() as session:
-            stmt = select(self._model).where(*where).limit(1)
+            stmt = select(self.model).where(*where).options(*options).limit(1)
             result = await session.execute(stmt)
             instance: Model | None = result.scalar()
             if not instance:
@@ -57,24 +74,24 @@ class SQLAlchemyRepository[
 
     async def update(
         self, schema: UpdateSchema | dict[str, ...], *where: ColumnElement[bool]
-    ) -> Model:
+    ) -> Model | list[Model]:
         schema = (
             schema.model_dump() if isinstance(schema, BaseSchema) else schema
         )
         async with async_session_maker() as session:
             stmt = (
-                update(self._model)
+                update(self.model)
                 .where(*where)
                 .values(**schema)
-                .returning(self._model)
+                .returning(self.model)
             )
             result = await session.execute(stmt)
+            instances = result.unique().scalars().all()
             await session.commit()
-            instances = result.scalars()
-            return instances
+            return instances[0] if len(instances) == 1 else instances
 
     async def delete(self, *where: ColumnElement[bool]) -> None:
         async with async_session_maker() as session:
-            stmt = delete(self._model).where(*where)
+            stmt = delete(self.model).where(*where)
             await session.execute(stmt)
             await session.commit()

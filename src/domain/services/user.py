@@ -1,8 +1,12 @@
-from passlib.context import CryptContext
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
+from typing import override
 
-from src.domain.exceptions.user import UserNotFoundException
+from passlib.context import CryptContext
+from sqlalchemy.exc import NoResultFound
+
+from src.domain.exceptions.user import (
+    UserNotFoundException,
+    EmailAlreadyTakenException,
+)
 from src.domain.models import User
 from src.domain.models.repositories.user import UserRepository
 from src.domain.schemas.user import UserCreate, UserUpdate
@@ -10,45 +14,42 @@ from src.domain.services.base import ModelService
 
 
 class UserService(ModelService[UserRepository, User, UserCreate, UserUpdate]):
-    pwd_context = CryptContext(schemes=["bcrypt"])
+    _pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
     def __init__(self):
         super().__init__(UserRepository(), UserNotFoundException)
 
-    @staticmethod
-    async def get_user_by_id(
-        user_id: int, session: AsyncSession
-    ) -> User | None:
-        stmt = select(User)
-        stmt = stmt.filter_by(id=user_id)
-        result = await session.execute(stmt)
-        return result.unique().scalar_one()
+    async def get_by_email(self, email: str) -> User:
+        try:
+            model = await self._repository.get_one(self.model.email == email)
+        except NoResultFound as e:
+            raise self._not_found_exception from e
+        return model
 
-    @staticmethod
-    async def get_user_by_email(
-        email: str, session: AsyncSession
-    ) -> User | None:
-        stmt = select(User)
-        stmt = stmt.filter_by(email=email)
-        result = await session.execute(stmt)
-        return result.unique().scalar_one()
+    @override
+    async def create(self, schema: UserCreate) -> User:
+        if await self.is_exist_with_email(schema.email):
+            raise EmailAlreadyTakenException()
+        schema_dict = schema.model_dump()
+        plain_password = schema_dict.pop("password")
+        schema_dict["hashed_password"] = self._hash_password(plain_password)
+        created = await self._repository.create(schema_dict)
+        # NOTE: дополнительный запрос в БД из-за relationship'а сотрудника
+        return await self.get_by_id(created.id)
 
-    @staticmethod
-    async def create_user(
-        user_schema: UserCreate, session: AsyncSession
-    ) -> User:
-        new_user = User(
-            email=user_schema.email,
-            hashed_password=UserService.pwd_context.hash(user_schema.password),
-            is_superuser=user_schema.is_superuser,
-            phone_number=user_schema.phone_number,
-        )
-        session.add(new_user)
-        await session.flush()
-        await session.refresh(new_user)
-        await session.commit()
-        return new_user
+    async def is_exist_with_email(self, email: str) -> bool:
+        try:
+            await self.get_by_email(email)
+        except self._not_found_exception:
+            return False
+        return True
 
-    @staticmethod
-    def verify_password(plaintext: str, hashed: str):
-        return UserService.pwd_context.verify(plaintext, hashed)
+    async def is_employee(self, user_id: int) -> bool:
+        user = await self.get_by_id(user_id)
+        return user.employee is not None
+
+    def is_password_valid(self, plain: str, hashed: str) -> bool:
+        return self._pwd_context.verify(plain, hashed)
+
+    def _hash_password(self, password: str) -> str:
+        return self._pwd_context.hash(password)

@@ -1,21 +1,25 @@
-import uuid
+from pydantic import HttpUrl
 
-from src.domain.schemas.base import BaseSchema
+from src.domain.schemas.base import BaseSchema, IntID, NonEmptyString
+
+from src.domain.schemas.booking import BookingRead
 
 
 class BaseRoom(BaseSchema):
-    name: str
-    description: str
+    name: NonEmptyString
+    description: NonEmptyString | None
+    additional_services: NonEmptyString | None
 
 
 class RoomRead(BaseRoom):
-    banner: str | None
-    images: list[str] | None
+    id: IntID
+    banner: HttpUrl | None
+    images: list[HttpUrl]
+
+    bookings: list[BookingRead]
 
 
-class RoomCreate(BaseRoom):
-    banner_id: uuid.UUID | None
+class RoomCreate(BaseRoom): ...
 
 
-class RoomUpdate(BaseRoom):
-    banner_id: uuid.UUID | None
+class RoomUpdate(BaseRoom): ...

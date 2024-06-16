@@ -1,89 +1,63 @@
 import uuid
+from typing import override, Iterable
 
-from sqlalchemy import ColumnElement, select, update
-from sqlalchemy.exc import NoResultFound
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import ColumnElement
 from sqlalchemy.orm import selectinload
+from sqlalchemy.sql.base import ExecutableOption
 
-from src.domain.db import async_session_maker
-from src.domain.models import Room, Studio, RoomImage
+from src.domain.models import Room
 from src.domain.models.repositories.SQLAlchemy import SQLAlchemyRepository
 from src.domain.schemas.room import RoomCreate, RoomUpdate
 
 
 class RoomRepository(SQLAlchemyRepository[Room, RoomCreate, RoomUpdate]):
-    def __init__(self):
-        super().__init__(Room)
+    @override
+    @property
+    def model(self) -> type[Room]:
+        return Room
 
-    @staticmethod
-    async def is_working_in_studio(employee_id: int, studio_id: int) -> bool:
-        async with async_session_maker() as session:
-            stmt = (
-                select(Studio)
-                .where(Studio.id == studio_id)
-                .options(selectinload(Studio.employees))
-            )
-            result = await session.execute(stmt)
-            studio = result.scalar()
-            if not studio:
-                raise NoResultFound
-            studio_employees_ids = (
-                employee.id for employee in studio.employees
-            )
-            return employee_id in studio_employees_ids
-
-    async def is_room_exist(self, *where: ColumnElement[bool]) -> bool:
-        try:
-            await self.get_one(*where)
-        except NoResultFound:
-            return False
-        return True
-
-    async def get(self, *where: ColumnElement[bool]) -> Room:
-        async with async_session_maker() as session:
-            return await self.get_one_with_session(session, *where)
-
-    async def get_one_with_session(
-        self, session: AsyncSession, *where: ColumnElement[bool]
-    ) -> Room:
-        stmt = (
-            select(self._model)
-            .options(
-                selectinload(self._model.studio, self._model.studio.employees)
-            )
-            .where(*where)
-            .limit(1)
+    @override
+    async def get_all(
+        self,
+        *where: ColumnElement[bool],
+        options: Iterable[ExecutableOption] | None = None,
+        offset: int = 0,
+        limit: int = 100,
+    ) -> list[Room]:
+        """
+        Load rooms with bookings
+        """
+        options = options or ()
+        rooms = await super().get_all(
+            *where,
+            options=(*options, selectinload(self.model.bookings)),
+            offset=offset,
+            limit=limit,
         )
-        result = await session.execute(stmt)
-        room: Room | None = result.scalar()
-        if not room:
-            raise NoResultFound
+        return rooms
+
+    @override
+    async def get_one(
+        self,
+        *where: ColumnElement[bool],
+        options: Iterable[ExecutableOption] | None = None,
+    ) -> Room:
+        """
+        Load room with bookings
+        """
+        options = options or ()
+        room = await super().get_one(
+            *where, options=(*options, selectinload(self.model.bookings))
+        )
         return room
-
-    async def update_one(
-        self, schema: RoomUpdate | dict[str, ...], *where: ColumnElement[bool]
-    ) -> Room:
-        schema = (
-            schema.model_dump() if isinstance(schema, RoomUpdate) else schema
-        )
-        async with async_session_maker() as session:
-            stmt = (
-                update(self._model)
-                .where(*where)
-                .values(**schema)
-                .returning(self._model)
-            )
-            result = await session.execute(stmt)
-            instances = result.scalar()
-            await session.commit()
-            return instances
 
     @staticmethod
     async def get_all_images_by_id(room_id: int) -> list[uuid.UUID]:
-        async with async_session_maker() as session:
-            stmt = select(RoomImage).where(RoomImage.room_id == room_id)
-            result = await session.execute(stmt)
-            instances = result.unique().scalars().all()
-            if not instances:
-                raise NoResultFound
-            return instances
+        # async with async_session_maker() as session:
+        #     stmt = select(RoomImage).where(RoomImage.room_id == room_id)
+        #     result = await session.execute(stmt)
+        #     instances = result.unique().scalars().all()
+        #     if not instances:
+        #         raise NoResultFound
+        #     return instances
+        raise NotImplementedError

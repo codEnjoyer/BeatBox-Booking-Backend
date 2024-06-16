@@ -1,15 +1,14 @@
-import uuid
+import datetime
 from typing import TYPE_CHECKING, Optional
 
 from sqlalchemy import Integer, String, ForeignKey
+from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import mapped_column, relationship, Mapped
 
-from src.domain.models.additional_service import AdditionalService
 from src.domain.models.base import BaseModel
 
 if TYPE_CHECKING:
     from src.domain.models.booking import Booking
-    from src.domain.models.file import File
     from src.domain.models.review import Review
     from src.domain.models.studio import Studio
 
@@ -18,42 +17,39 @@ class Room(BaseModel):
     __tablename__ = "rooms"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    name: Mapped[str] = mapped_column(String(100))
-    description: Mapped[str] = mapped_column(String(500))
+    name: Mapped[str] = mapped_column(String(100), nullable=False)
+    description: Mapped[str] = mapped_column(String(500), nullable=True)
+    additional_services: Mapped[str] = mapped_column(String(500), nullable=True)
 
-    banner_id: Mapped[Optional[uuid.UUID]] = mapped_column(
-        ForeignKey("files.name"), nullable=True
+    banner: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    images: Mapped[list[str]] = mapped_column(
+        ARRAY(String), nullable=False, server_default="{}"
     )
+
     studio_id: Mapped[int] = mapped_column(
-        ForeignKey("studios.id"), nullable=False
+        ForeignKey("studios.id", ondelete="CASCADE"), nullable=False
     )
 
-    additional_services: Mapped[list["AdditionalService"]] = relationship(
-        back_populates="room", cascade="all, delete-orphan"
-    )
-    banner: Mapped[Optional["File"]] = relationship(
-        lazy="joined", foreign_keys=[banner_id]
-    )
     bookings: Mapped[list["Booking"]] = relationship(
-        back_populates="room", cascade="all, delete-orphan", lazy="selectin"
-    )
-    images: Mapped[list["File"]] = relationship(
-        secondary="room_images", cascade="all"
+        back_populates="room",
+        cascade="all, delete-orphan",
+        lazy="selectin",
+        passive_deletes=True,
     )
     reviews: Mapped[list["Review"]] = relationship(
-        back_populates="room", lazy="joined", cascade="all, delete-orphan"
+        back_populates="room",
+        lazy="selectin",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
     )
     studio: Mapped["Studio"] = relationship(
-        back_populates="rooms", lazy="joined", foreign_keys=[studio_id]
+        back_populates="rooms", lazy="joined"
     )
 
-
-class RoomImage(BaseModel):
-    __tablename__ = "room_images"
-
-    room_id: Mapped[int] = mapped_column(
-        ForeignKey("rooms.id"), primary_key=True
-    )
-    image_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("files.name"), primary_key=True
-    )
+    def is_free_at_interval(
+        self, from_: datetime.datetime, to: datetime.datetime
+    ) -> bool:
+        for booking in self.bookings:
+            if booking.within_range(from_, to):
+                return False
+        return True

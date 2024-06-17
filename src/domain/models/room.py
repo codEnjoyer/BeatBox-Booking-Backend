@@ -6,9 +6,10 @@ from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import mapped_column, relationship, Mapped
 
 from src.domain.models.base import BaseModel
+from src.domain.models.booking import BookingStatus
 
 if TYPE_CHECKING:
-    from src.domain.models.booking import Booking, BookingStatus
+    from src.domain.models.booking import Booking
     from src.domain.models.review import Review
     from src.domain.models.studio import Studio
 

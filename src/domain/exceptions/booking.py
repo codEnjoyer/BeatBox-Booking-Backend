@@ -20,3 +20,13 @@ class MustBookWithinStudioWorkingTimeException(BadDataException):
 class SlotAlreadyBookedException(BadDataException):
     def __init__(self):
         super().__init__("Slot already booked")
+
+
+class BookingAlreadyCancelledException(BadDataException):
+    def __init__(self):
+        super().__init__("Booking already cancelled")
+
+
+class BookingMustBeActiveException(BadDataException):
+    def __init__(self):
+        super().__init__("Booking must be active")

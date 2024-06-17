@@ -1,9 +1,9 @@
 from contextlib import asynccontextmanager
 
-from sqlalchemy.exc import NoResultFound
-
 from src.api import v1_router
 from fastapi import FastAPI, Request, Response, HTTPException, status
+
+from src.domain.exceptions.base import BBBException
 
 
 @asynccontextmanager
@@ -22,9 +22,9 @@ app = FastAPI(
 )
 
 
-@app.exception_handler(NoResultFound)
-async def not_found_handler(_: Request, exc: NoResultFound) -> Response:
+@app.exception_handler(BBBException)
+async def service_exception_handler(_: Request, exc: BBBException) -> Response:
     raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
-        detail="Requested item was not found",
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        detail=exc.message
     ) from exc

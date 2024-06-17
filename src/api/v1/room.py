@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 from starlette import status
 
 from src.api.v1.dependencies.employee import StudioManagerDep
@@ -9,9 +9,8 @@ from src.api.v1.dependencies.studio import ValidStudioIdDep
 from src.api.v1.dependencies.room import (
     # convert_model_to_scheme,
     # get_images_url,
-    ValidStudioRoomNameDep,
+    ValidStudioRoomIdDep,
 )
-from src.domain.exceptions.room import RoomWithSameNameAlreadyExistsException
 from src.domain.models import Room
 from src.domain.schemas.room import RoomRead, RoomCreate, RoomUpdate
 
@@ -26,9 +25,9 @@ async def get_all_studio_rooms(
     return rooms
 
 
-@router.get("/studios/{studio_id}/rooms/{room_name}", response_model=RoomRead)
+@router.get("/studios/{studio_id}/rooms/{room_id}", response_model=RoomRead)
 async def get_studio_room(
-    room: ValidStudioRoomNameDep,
+    room: ValidStudioRoomIdDep,
 ) -> RoomRead:
     return room
 
@@ -41,13 +40,7 @@ async def create_room(
     # file_service: FileServiceDep,
     _: StudioManagerDep,
 ) -> Room:
-    try:
-        room = await room_service.create_room_in_studio(studio.id, schema)
-    except RoomWithSameNameAlreadyExistsException as e:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail=str(e),
-        ) from e
+    room = await room_service.create_room_in_studio(studio.id, schema)
     return room
     # banner_url, images_url = await get_images_url(
     #     room=room, file_service=file_service, room_service=room_service
@@ -57,9 +50,9 @@ async def create_room(
     # )
 
 
-@router.put("/studios/{studio_id}/rooms/{room_name}", response_model=RoomRead)
+@router.put("/studios/{studio_id}/rooms/{room_id}", response_model=RoomRead)
 async def update_room(
-    room: ValidStudioRoomNameDep,
+    room: ValidStudioRoomIdDep,
     schema: RoomUpdate,
     room_service: RoomServiceDep,
     # file_service: FileServiceDep,
@@ -77,11 +70,11 @@ async def update_room(
 
 
 @router.delete(
-    "/studios/{studio_id}/rooms/{room_name}",
+    "/studios/{studio_id}/rooms/{room_id}",
     status_code=status.HTTP_204_NO_CONTENT,
 )
 async def delete_room(
-    room: ValidStudioRoomNameDep,
+    room: ValidStudioRoomIdDep,
     room_service: RoomServiceDep,
     _: StudioManagerDep,
 ) -> None:

@@ -15,8 +15,8 @@ if typing.TYPE_CHECKING:
 
 class BookingStatus(enum.Enum):
     CLOSED = "closed"
-    WAITING_FOR_PAYMENT = "waiting_for_payment"
-    EXPIRED = "expired"
+    # WAITING_FOR_PAYMENT = "waiting_for_payment"
+    # EXPIRED = "expired"
     CANCELED = "canceled"
     BOOKED = "booked"
 

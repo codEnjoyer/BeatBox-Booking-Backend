@@ -1,9 +1,5 @@
 import datetime
-import uuid
-
-from fastapi import HTTPException
-from sqlalchemy.orm import selectinload
-from starlette import status
+from typing import override
 
 from src.domain.models import Room
 from src.domain.models.booking import Booking, BookingStatus
@@ -12,10 +8,10 @@ from src.domain.exceptions.booking import (
     BookingNotFoundException,
     MustBookWithinOneDayException,
     SlotAlreadyBookedException,
-    MustBookWithinStudioWorkingTimeException,
+    MustBookWithinStudioWorkingTimeException, BookingAlreadyCancelledException,
+    BookingMustBeActiveException,
 )
 from src.domain.models.repositories.booking import BookingRepository
-from src.domain.models.repositories.room import RoomRepository
 from src.domain.services.base import ModelService
 
 
@@ -26,18 +22,18 @@ class BookingService(
         super().__init__(BookingRepository(), BookingNotFoundException)
 
     async def get_room_bookings(
-        self,
-        room_id: int,
-        from_: datetime.date | None = None,
-        to: datetime.date | None = None,
-        offset: int = 0,
-        limit: int = 100,
+            self,
+            room_id: int,
+            from_: datetime.date | None = None,
+            to: datetime.date | None = None,
+            offset: int = 0,
+            limit: int = 100,
     ) -> list[Booking]:
         date_filter = []
         if from_:
             date_filter.append(self.model.starts_at >= from_)
         if to:
-            date_filter.append(self.model.ends_at <= to)
+            date_filter.append(self.model.ends_at < to)
         return await self._repository.get_all(
             self.model.room_id == room_id,
             *date_filter,
@@ -46,76 +42,64 @@ class BookingService(
         )
 
     async def book_room_for_user(
-        self, room: Room, user_id: int, schema: BookingCreate
+            self, room: Room, user_id: int, schema: BookingCreate
     ) -> Booking:
         await self.check_if_can_be_booked(room, schema)
         schema_dict = schema.model_dump()
         schema_dict.update(
             user_id=user_id,
             room_id=room.id,
-            status=BookingStatus.WAITING_FOR_PAYMENT,
+            status=BookingStatus.BOOKED,
         )
-        return await self._repository.create(schema_dict)
+        created = await self._repository.create(schema_dict)
+        with_user = await self.get_by_id(created.id)
+        return with_user
+
+    @override
+    async def update_by_id(
+            self, booking_id: int, schema: BookingUpdate) -> Booking:
+        updated = await super().update_by_id(booking_id, schema)
+        return await self.get_by_id(updated.id)
+
+    async def update_booking_name(
+            self, booking: Booking, schema: BookingUpdate) -> Booking:
+        if booking.status != BookingStatus.BOOKED:
+            raise BookingMustBeActiveException()
+
+        return await self.update_by_id(booking.id, schema)
+
+    async def cancel_booking(self, booking: Booking) -> Booking:
+        return await self.update_by_id(booking.id,
+                                       {"status": BookingStatus.CANCELED})
 
     @staticmethod
     async def check_if_can_be_booked(room: Room, schema: BookingCreate) -> None:
         if schema.starts_at.date() != schema.ends_at.date():
             raise MustBookWithinOneDayException()
 
+        starts_at_time = (schema.starts_at.time()
+                          .replace(tzinfo=schema.starts_at.tzinfo))
+        ends_at_time = (schema.ends_at.time()
+                        .replace(tzinfo=schema.ends_at.tzinfo))
         if (
-            schema.starts_at < room.studio.opening_at
-            or schema.ends_at > room.studio.closing_at
+                starts_at_time < room.studio.opening_at
+                or ends_at_time > room.studio.closing_at
         ):
             raise MustBookWithinStudioWorkingTimeException()
 
         if not room.is_free_at_interval(
-            from_=schema.starts_at, to=schema.ends_at
+                from_=schema.starts_at, to=schema.ends_at
         ):
             raise SlotAlreadyBookedException()
 
+    @staticmethod
+    async def check_if_can_be_cancelled(booking: Booking) -> None:
+        if booking.status == BookingStatus.CANCELED:
+            raise BookingAlreadyCancelledException()
+
     async def get_user_bookings(
-        self, user_id: int, offset: int = 0, limit: int = 100
+            self, user_id: int, offset: int = 0, limit: int = 100
     ) -> list[Booking]:
         return await self._repository.get_all(
             self.model.user_id == user_id, offset=offset, limit=limit
         )
-
-    async def update_booking(
-        self, booking_id: uuid.UUID, user_id: int, schema: BookingUpdate
-    ) -> Booking:
-        # TODO: заменить на confirm_payment_for_booking
-        has_permission = await self.check_user_permission(booking_id, user_id)
-        if schema.status == BookingStatus.CANCELED and not has_permission:
-            raise HTTPException(
-                status.HTTP_403_FORBIDDEN,
-                detail="User does not have permission to cancel the booking",
-            )
-        booking = await self._repository.get_one(
-            self.model.id == booking_id, options=(selectinload(self.model.room))
-        )
-
-        if (
-            schema.status == BookingStatus.CLOSED
-            and not await RoomRepository.is_working_in_studio(
-                user_id=user_id, studio_id=booking.room.studio_id
-            )
-        ):
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="User does not have permission to close the booking",
-            )
-
-        booking_data = {
-            "status": schema.status,
-            "name": schema.name,
-            "surname": schema.surname,
-            "starts_at": schema.starts_at,
-            "ends_at": schema.ends_at,
-            "room_id": schema.room_id,
-            "user_id": user_id,
-        }
-
-        result: Booking = await self._repository.update(
-            booking_data, self.model.id == booking_id
-        )
-        return result

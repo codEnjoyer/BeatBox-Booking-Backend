@@ -18,14 +18,13 @@ class BaseSchema(BaseModel):
 
 
 def convert_datetime_to_iso_8601_with_tz(dt: datetime) -> str:
-    print(dt.tzinfo)
     return dt.strftime('%Y-%m-%dT%H:%M:%S%z')
 
 
 DatetimeTZ = Annotated[
     AwareDatetime,
     PlainSerializer(convert_datetime_to_iso_8601_with_tz, return_type=str),
-    Field(examples=['2024-06-16T11:36:43+0000']),
+    Field(examples=['2024-06-16T11:00:00+0500']),
 ]
 IntID = Annotated[PositiveInt, Field(examples=[1])]
 NonEmptyString = Annotated[str, Field(min_length=1)]

@@ -120,7 +120,7 @@ async def cancel_booking(
         booking_service: BookingServiceDep,
 ) -> None:
     try:
-        canceled = await booking_service.cancel_booking(booking)
+        cancelled = await booking_service.cancel_booking(booking)
     except BookingAlreadyCancelledException as e:
         raise HTTPException(status.HTTP_409_CONFLICT, detail=str(e))
-    return canceled
+    return cancelled

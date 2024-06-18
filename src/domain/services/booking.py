@@ -70,7 +70,7 @@ class BookingService(
 
     async def cancel_booking(self, booking: Booking) -> Booking:
         return await self.update_by_id(booking.id,
-                                       {"status": BookingStatus.CANCELED})
+                                       {"status": BookingStatus.CANCELLED})
 
     @staticmethod
     async def check_if_can_be_booked(room: Room, schema: BookingCreate) -> None:
@@ -94,7 +94,7 @@ class BookingService(
 
     @staticmethod
     async def check_if_can_be_cancelled(booking: Booking) -> None:
-        if booking.status == BookingStatus.CANCELED:
+        if booking.status == BookingStatus.CANCELLED:
             raise BookingAlreadyCancelledException()
 
     async def get_user_bookings(

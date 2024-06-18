@@ -52,6 +52,6 @@ class Room(BaseModel):
     ) -> bool:
         for booking in self.bookings:
             if (booking.is_within_range(from_, to)
-                    and booking.status != BookingStatus.CANCELED):
+                    and booking.status != BookingStatus.CANCELLED):
                 return False
         return True

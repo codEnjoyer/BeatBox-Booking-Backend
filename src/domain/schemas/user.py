@@ -1,6 +1,6 @@
 import typing
 
-from pydantic import EmailStr, Field
+from pydantic import EmailStr, Field, model_validator
 
 from src.domain.schemas.base import BaseSchema, IntID
 
@@ -17,6 +17,12 @@ class UserRead(BaseUser):
 
 class UserCreate(BaseUser):
     password: str = Field(..., min_length=8, max_length=24)
+
+    @model_validator(mode="after")
+    def password_is_not_email(self) -> typing.Self:
+        if self.password == self.email:
+            raise ValueError("Password cannot be the same as email")
+        return self
 
 
 class UserUpdate(BaseUser): ...

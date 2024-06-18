@@ -2,7 +2,7 @@ import typing
 
 from pydantic import EmailStr, Field, model_validator
 
-from src.domain.schemas.base import BaseSchema, IntID
+from src.domain.schemas.base import BaseSchema, IntID, NonEmptyString
 
 
 class BaseUser(BaseSchema):
@@ -11,11 +11,13 @@ class BaseUser(BaseSchema):
 
 class UserRead(BaseUser):
     id: IntID
+    nickname: NonEmptyString
     is_superuser: bool
     employee: typing.Optional["EmployeeRead"]
 
 
 class UserCreate(BaseUser):
+    nickname: NonEmptyString | None
     password: str = Field(..., min_length=8, max_length=24)
 
     @model_validator(mode="after")

@@ -14,7 +14,6 @@ from src.api.v1.dependencies.types import QueryLimit, QueryOffset, \
 from src.domain.exceptions.booking import MustBookWithinOneDayException, \
     MustBookWithinStudioWorkingTimeException, SlotAlreadyBookedException, \
     BookingAlreadyCancelledException, BookingMustBeActiveException
-from src.domain.models.booking import BookingStatus
 from src.domain.schemas.booking import BookingCreate, BookingRead, BookingUpdate
 
 router = APIRouter(tags=["Booking"])

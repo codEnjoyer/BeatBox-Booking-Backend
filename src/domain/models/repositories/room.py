@@ -17,11 +17,11 @@ class RoomRepository(SQLAlchemyRepository[Room, RoomCreate, RoomUpdate]):
 
     @override
     async def get_all(
-            self,
-            *where: ColumnElement[bool],
-            options: Iterable[ExecutableOption] | None = None,
-            offset: int = 0,
-            limit: int = 100,
+        self,
+        *where: ColumnElement[bool],
+        options: Iterable[ExecutableOption] | None = None,
+        offset: int = 0,
+        limit: int = 100,
     ) -> list[Room]:
         """
         Load rooms with bookings
@@ -37,9 +37,9 @@ class RoomRepository(SQLAlchemyRepository[Room, RoomCreate, RoomUpdate]):
 
     @override
     async def get_one(
-            self,
-            *where: ColumnElement[bool],
-            options: Iterable[ExecutableOption] | None = None,
+        self,
+        *where: ColumnElement[bool],
+        options: Iterable[ExecutableOption] | None = None,
     ) -> Room:
         """
         Load room with bookings

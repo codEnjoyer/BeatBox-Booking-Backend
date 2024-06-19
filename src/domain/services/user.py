@@ -7,7 +7,8 @@ from sqlalchemy.exc import NoResultFound
 
 from src.domain.exceptions.user import (
     UserNotFoundException,
-    EmailAlreadyTakenException, NicknameAlreadyTakenException,
+    EmailAlreadyTakenException,
+    NicknameAlreadyTakenException,
 )
 from src.domain.models import User
 from src.domain.models.repositories.user import UserRepository
@@ -55,11 +56,14 @@ class UserService(ModelService[UserRepository, User, UserCreate, UserUpdate]):
         return await self.get_by_id(created.id)
 
     async def update(self, user: User, schema: UserUpdate) -> User:
-        if (user.email != schema.email
-                and await self.is_exist_with_email(schema.email)):
+        if user.email != schema.email and await self.is_exist_with_email(
+            schema.email
+        ):
             raise EmailAlreadyTakenException()
-        if (user.nickname != schema.nickname
-                and await self.is_exist_with_nickname(schema.nickname)):
+        if (
+            user.nickname != schema.nickname
+            and await self.is_exist_with_nickname(schema.nickname)
+        ):
             raise NicknameAlreadyTakenException()
         updated = await self.update_by_id(user.id, schema)
         # NOTE: дополнительный запрос в БД из-за relationship'а сотрудника
@@ -68,7 +72,8 @@ class UserService(ModelService[UserRepository, User, UserCreate, UserUpdate]):
     async def update_password(self, user: User, plain_password: str) -> User:
         new_hashed_password = self._hash_password(plain_password)
         updated = await self.update_by_id(
-            user.id, {"hashed_password": new_hashed_password})
+            user.id, {"hashed_password": new_hashed_password}
+        )
         # NOTE: дополнительный запрос в БД из-за relationship'а сотрудника
         return await self.get_by_id(updated.id)
 

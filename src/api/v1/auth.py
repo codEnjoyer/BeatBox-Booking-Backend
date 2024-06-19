@@ -5,7 +5,8 @@ from src.api.v1.dependencies.auth import OAuth2Dep
 from src.api.v1.dependencies.services import UserServiceDep, AuthServiceDep
 from src.domain.exceptions.user import (
     UserNotFoundException,
-    EmailAlreadyTakenException, NicknameAlreadyTakenException,
+    EmailAlreadyTakenException,
+    NicknameAlreadyTakenException,
 )
 from src.domain.models import User
 from src.domain.schemas.auth import Token

@@ -16,9 +16,9 @@ class UserRead(BaseUser):
     employee: typing.Optional["EmployeeRead"]
 
 
-Password = typing.Annotated[str, Field(min_length=8,
-                                       max_length=24,
-                                       examples=["password"])]
+Password = typing.Annotated[
+    str, Field(min_length=8, max_length=24, examples=["password"])
+]
 
 
 class UserCreate(BaseUser):

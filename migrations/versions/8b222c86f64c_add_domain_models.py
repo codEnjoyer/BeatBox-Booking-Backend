@@ -81,7 +81,7 @@ def upgrade() -> None:
             sa.Enum(
                 'WAITING_FOR_PAYMENT',
                 'EXPIRED',
-                'CANCELED',
+                'CANCELLED',
                 'BOOKED',
                 name='bookingstatus',
             ),

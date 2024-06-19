@@ -1,11 +1,9 @@
 from typing import TYPE_CHECKING, Optional
 import datetime as dt
 
-from furl import furl
-from sqlalchemy import String, Integer, Float, DateTime
+from sqlalchemy import String, Integer, Float, Time
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import mapped_column, relationship, Mapped
-from sqlalchemy_utils import URLType, PhoneNumberType
 
 from src.domain.models.base import BaseModel
 
@@ -23,38 +21,49 @@ class Studio(BaseModel):
     description: Mapped[Optional[str]] = mapped_column(
         String(500), nullable=True
     )
+    opening_at: Mapped[dt.time] = mapped_column(
+        Time(timezone=True), nullable=False
+    )
+    closing_at: Mapped[dt.time] = mapped_column(
+        Time(timezone=True), nullable=False
+    )
 
-    address: Mapped[str] = mapped_column(String(200), nullable=False)
+    banner_filename: Mapped[Optional[str]] = mapped_column(
+        String, nullable=True
+    )
+
     latitude: Mapped[float] = mapped_column(Float(precision=8), nullable=False)
     longitude: Mapped[float] = mapped_column(Float(precision=8), nullable=False)
 
-    opening_at: Mapped[dt.datetime] = mapped_column(
-        DateTime(timezone=True), nullable=False
-    )
-    closing_at: Mapped[dt.datetime] = mapped_column(
-        DateTime(timezone=True), nullable=False
-    )
-
-    site_url: Mapped[Optional[furl]] = mapped_column(URLType, nullable=True)
+    site: Mapped[Optional[str]] = mapped_column(String(200), nullable=True)
     contact_phone_number: Mapped[Optional[str]] = mapped_column(
-        PhoneNumberType(region="RU"), nullable=True
+        String(100), nullable=True
     )
     tg: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
     vk: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
     whats_app: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
 
     employees: Mapped[list["Employee"]] = relationship(
-        back_populates="studio", cascade="all, delete-orphan"
+        back_populates="studio",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
     )
     reviews: Mapped[list["Review"]] = relationship(
-        back_populates="studio", lazy="joined", cascade="all, delete-orphan"
+        back_populates="studio",
+        lazy="joined",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
     )
     rooms: Mapped[list["Room"]] = relationship(
-        back_populates="studio", cascade="all, delete-orphan"
+        back_populates="studio",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
     )
 
     @hybrid_property
-    def average_grade(self):
-        return sum([review.grade for review in self.reviews]) / len(
-            self.reviews
-        )
+    def average_grade(self) -> float:
+        if not self.reviews:
+            return 0
+        total = sum(review.grade for review in self.reviews)
+        count = len(self.reviews)  # noqa
+        return total / count

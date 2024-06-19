@@ -15,9 +15,9 @@ if typing.TYPE_CHECKING:
 
 class BookingStatus(enum.Enum):
     CLOSED = "closed"
-    WAITING_FOR_PAYMENT = "waiting_for_payment"
-    EXPIRED = "expired"
-    CANCELED = "canceled"
+    # WAITING_FOR_PAYMENT = "waiting_for_payment"
+    # EXPIRED = "expired"
+    CANCELLED = "cancelled"
     BOOKED = "booked"
 
 
@@ -40,12 +40,24 @@ class Booking(BaseModel):
         DateTime(timezone=True), nullable=False
     )
 
-    room_id: Mapped[int] = mapped_column(ForeignKey("rooms.id"), nullable=False)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    room_id: Mapped[int] = mapped_column(
+        ForeignKey("rooms.id", ondelete="CASCADE"), nullable=False
+    )
+    user_id: Mapped[int] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
 
     room: Mapped["Room"] = relationship(
-        back_populates="bookings", lazy="joined"
+        back_populates="bookings",
+        lazy="joined",
     )
     user: Mapped["User"] = relationship(
-        back_populates="bookings", lazy="joined"
+        back_populates="bookings",
+        lazy="joined",
     )
+
+    def is_within_range(self, from_: dt.datetime, to: dt.datetime) -> bool:
+        return self.starts_at <= to and self.ends_at >= from_
+
+    def is_owned_by(self, user_id: int) -> bool:
+        return self.user_id == user_id

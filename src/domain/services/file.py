@@ -1,83 +1,46 @@
 import uuid
-from sqlalchemy import ColumnElement
-from typing import Tuple
-from fastapi import UploadFile, HTTPException
+
+from fastapi import UploadFile
 from filetype import guess
-from starlette import status
+from filetype.types import image
 
-from src.domain.models import File
-from src.domain.exceptions.studio import StudioNotFoundException
-from src.domain.models.file import SupportedFileExtensions
-from src.domain.schemas.file import FileUpdate, FileCreate
-from src.domain.services.base import ModelService
-from src.domain.models.repositories.file import FileRepository
-from src.domain.models.repositories.file_bucket import FileBucketRepository
+from src.domain.exceptions.file import (
+    FileIsNotAnImageOrUnsupportedException,
+    FileIsTooLargeException,
+)
+from src.domain.models.repositories.s3 import S3Repository
+
+MAX_IMAGE_SIZE = 1024 * 1024 * 10  # 10 Mb
+VALID_IMAGE_EXTENSIONS = (
+    image.Jpeg().extension,
+    image.Png().extension,
+    image.Webp().extension,
+)
 
 
-class FileService(ModelService[FileRepository, File, FileCreate, FileUpdate]):
+class FileService:
     def __init__(self):
-        super().__init__(FileRepository(), StudioNotFoundException)
-        self.file_bucket_repository = FileBucketRepository()
+        self._repository = S3Repository()
 
-    async def create(
-        self, upload_file: UploadFile, **kwargs
-    ) -> Tuple[File, str]:
-        filename = str(uuid.uuid4())
+    async def upload_image(self, upload_file: UploadFile) -> str:
+        image_extension = guess(upload_file.file).extension
+        filename = f"{uuid.uuid4()}.{image_extension}"
+        await self._repository.upload(upload_file, filename)
+        return filename
 
-        image_type = guess(upload_file.file)
-        image_type_str = str(image_type.extension)
-        full_name = f"{filename}.{image_type_str}"
+    async def get_url_by_name(self, filename: str) -> str:
+        return await self._repository.get_url(filename)
 
-        file_url = await self.file_bucket_repository.upload(
-            upload_file=upload_file, key=full_name
-        )
-        file: File = await self._repository.create(
-            FileCreate(
-                name=filename, extension=SupportedFileExtensions(image_type_str)
-            )
-        )
-        return file, file_url
+    async def delete_by_name(self, filename: str) -> None:
+        await self._repository.delete(filename)
 
-    async def delete_by_name(self, name: str) -> None:
-        try:
-            file: File = await self._repository.get_one(
-                self._model.name == name
-            )
-            full_name = f"{file.name}.{file.extension.value}"
-            await self.file_bucket_repository.delete(file_key=full_name)
-            await self._repository.delete(self._model.name == name)
-        except Exception:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="File not found"
-            )
-
-    async def get_url(self, name: str) -> str:
-        try:
-            file: File = await self._repository.get_one(
-                self._model.name == name
-            )
-            full_name = f"{file.name}.{file.extension.value}"
-            return await self.file_bucket_repository.get_presigned_url(
-                full_name
-            )
-        except Exception:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="File not found"
-            )
-
-    async def try_get_url(self, name: str) -> str | None:
-        try:
-            file: File = await self._repository.get_one(
-                self._model.name == name
-            )
-            full_name = f"{file.name}.{file.extension.value}"
-            return await self.file_bucket_repository.get_presigned_url(
-                full_name
-            )
-        except Exception:
-            return None
-
-    async def update(
-        self, schema: FileUpdate | dict[str, ...], *where: ColumnElement[bool]
-    ) -> File:
-        raise NotImplementedError('Method must not be called')
+    @staticmethod
+    def check_if_file_valid_image(upload_file: UploadFile) -> None:
+        if upload_file.size > MAX_IMAGE_SIZE:
+            raise FileIsTooLargeException()
+        file_type = guess(upload_file.file)
+        if (
+            file_type is None
+            or file_type.extension not in VALID_IMAGE_EXTENSIONS
+        ):
+            raise FileIsNotAnImageOrUnsupportedException()

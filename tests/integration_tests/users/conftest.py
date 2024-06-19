@@ -2,7 +2,7 @@ import pytest
 from sqlalchemy import delete
 
 from src.models import User
-from src.domain.schemas.user import UserCreateSchema
+from src.domain.schemas.user import UserCreate
 
 from tests.conftest import async_session_maker
 
@@ -10,9 +10,9 @@ from tests.conftest import async_session_maker
 @pytest.fixture
 def users_create_schema():
     users = [
-        UserCreateSchema(username="test_1", email="test1@testmail.com", hashed_password="my_secret_password"),
-        UserCreateSchema(username="test-2", email="test2@testmail.com", hashed_password="my_secret_password2"),
-        UserCreateSchema(username="test=3", email="test3@testmail.com", hashed_password="my_secret_password3"),
+        UserCreate(username="test_1", email="test1@testmail.com", hashed_password="my_secret_password"),
+        UserCreate(username="test-2", email="test2@testmail.com", hashed_password="my_secret_password2"),
+        UserCreate(username="test=3", email="test3@testmail.com", hashed_password="my_secret_password3"),
     ]
     return users
 

@@ -1,29 +1,52 @@
-from pydantic import constr
+import typing
 
-from src.domain.schemas.base import BaseSchema
+from pydantic import EmailStr, Field, model_validator
 
-
-class UserBaseSchema(BaseSchema):
-    email: str
+from src.domain.schemas.base import BaseSchema, IntID, NonEmptyString
 
 
-class UserAuthSchema(UserBaseSchema):
-    password: constr(max_length=200)
+class BaseUser(BaseSchema):
+    email: EmailStr
 
 
-# TODO: кажется, стоит переосмыслить схемы. сейчас решил ничего не трогать
+class UserRead(BaseUser):
+    id: IntID
+    nickname: NonEmptyString
+    is_superuser: bool
+    employee: typing.Optional["EmployeeRead"]
 
 
-class UserCreateSchema(UserBaseSchema):
-    phone_number: str
-    password: constr(max_length=200)
-    is_superuser: bool = False
+Password = typing.Annotated[str, Field(min_length=8,
+                                       max_length=24,
+                                       examples=["password"])]
 
 
-class UserReadSchema(UserBaseSchema):
-    id: int
-    is_superuser: bool = False
+class UserCreate(BaseUser):
+    nickname: NonEmptyString | None
+    password: Password
+
+    @model_validator(mode="after")
+    def password_is_not_email(self) -> typing.Self:
+        if self.password == self.email:
+            raise ValueError("Password cannot be the same as email")
+        return self
 
 
-class UserUpdateSchema(UserBaseSchema):
-    phone_number: str
+class UserUpdate(BaseUser):
+    nickname: NonEmptyString
+
+
+class UserPasswordUpdate(BaseSchema):
+    old_password: Password
+    new_password: Password
+
+    @model_validator(mode="after")
+    def different_passwords(self) -> typing.Self:
+        if self.old_password == self.new_password:
+            raise ValueError("Old and new passwords must be different")
+        return self
+
+
+from src.domain.schemas.employee import EmployeeRead
+
+UserRead.update_forward_refs()

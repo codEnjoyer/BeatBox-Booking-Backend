@@ -1,9 +1,11 @@
 import uuid
+from typing import override
 
-from fastapi import HTTPException
-from starlette import status
 
-from src.domain.exceptions.room import RoomNotFoundException
+from src.domain.exceptions.room import (
+    RoomNotFoundException,
+    RoomDoesNotExistInStudioException,
+)
 from src.domain.models import Room
 from src.domain.models.repositories.room import RoomRepository
 from src.domain.schemas.room import RoomCreate, RoomUpdate
@@ -14,76 +16,32 @@ class RoomService(ModelService[RoomRepository, Room, RoomCreate, RoomUpdate]):
     def __init__(self):
         super().__init__(RoomRepository(), RoomNotFoundException)
 
-    async def get(self, room_id: int) -> Room:
-        room = await self._repository.get_one(self._model.id == room_id)
-        if not room:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Room with that id not found",
-            )
-        return room
-
-    async def create(self, schema: RoomCreate, **kwargs) -> Room:
-        studio_id = kwargs.get("studio_id")
-        if await self._repository.is_room_exist(
-            self._model.name == schema.name, self._model.studio_id == studio_id
-        ):
-            raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT,
-                detail="Room with same name already exists",
-            )
-
-        await self._repository.check_employee_permissions(
-            user_id=kwargs.get("user_id"), studio_id=studio_id
+    async def get_all_in_studio(self, studio_id: int) -> list[Room]:
+        rooms = await self._repository.get_all(
+            self.model.studio_id == studio_id,
         )
+        return rooms
 
-        studio_dict = {
-            "name": schema.name,
-            "description": schema.description,
-            "banner_id": schema.banner_id,
-            "studio_id": studio_id,
-        }
-        try:
-            return await self._repository.create(studio_dict)
-        except Exception:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="File with that id not found",
-            )
-
-    async def delete(self, room_id: int, studio_id: int, user_id: int) -> None:
-        if not await self._repository.is_room_exist(
-            self._model.id == room_id, self._model.studio_id == studio_id
-        ):
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Room with that id not found",
-            )
-
-        await self._repository.check_employee_permissions(
-            user_id=user_id, studio_id=studio_id
-        )
-
-        return await self._repository.delete(self._model.id == room_id)
-
-    async def update(
-        self, room_id: int, studio_id: int, user_id: int, schema: RoomUpdate
+    async def create_room_in_studio(
+        self, studio_id: int, schema: RoomCreate
     ) -> Room:
-        if not await self._repository.is_room_exist(
-            self._model.id == room_id, self._model.studio_id == studio_id
-        ):
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Room with that id not found",
-            )
+        schema_dict = schema.model_dump()
+        schema_dict["studio_id"] = studio_id
+        created = await self._repository.create(schema_dict)
+        return await self.get_by_id(created.id)
 
-        await self._repository.check_employee_permissions(
-            user_id=user_id, studio_id=studio_id
-        )
+    @override
+    async def update_by_id(self, room_id: int, schema: RoomUpdate) -> Room:
+        updated = await super().update_by_id(room_id, schema)
+        return await self.get_by_id(updated.id)
 
-        return await self._repository.update_one(
-            schema, self._model.id == room_id
-        )
+    async def check_if_room_in_studio(
+        self, room_id: int, studio_id: int
+    ) -> Room:
+        room = await self.get_by_id(room_id)
+        if room.studio_id != studio_id:
+            raise RoomDoesNotExistInStudioException()
+        return room
 
     async def get_all_images(self, room_id: int) -> list[uuid.UUID]:
         return await self._repository.get_all_images_by_id(room_id=room_id)

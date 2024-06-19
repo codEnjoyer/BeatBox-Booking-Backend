@@ -20,25 +20,28 @@ class S3Repository:
         )
 
     async def get_url(self, filename: str) -> str:
-        async with (self.session.client(self.service_name,
-                                        endpoint_url=self.endpoint) as client):
+        async with self.session.client(
+            self.service_name, endpoint_url=self.endpoint
+        ) as client:
             try:
                 url = await client.generate_presigned_url(
                     'get_object',
                     Params={'Bucket': self.bucket_name, 'Key': filename},
-                    ExpiresIn=URL_EXPIRES_IN_SECONDS
+                    ExpiresIn=URL_EXPIRES_IN_SECONDS,
                 )
             except ClientError as e:
                 raise FileNotFoundException from e
         return url
 
     async def upload(self, file: UploadFile, filename: str) -> str:
-        async with self.session.client(self.service_name,
-                                       endpoint_url=self.endpoint) as client:
+        async with self.session.client(
+            self.service_name, endpoint_url=self.endpoint
+        ) as client:
             await client.upload_fileobj(file, self.bucket_name, filename)
         return filename
 
     async def delete(self, filename: str) -> None:
-        async with self.session.client(self.service_name,
-                                       endpoint_url=self.endpoint) as client:
+        async with self.session.client(
+            self.service_name, endpoint_url=self.endpoint
+        ) as client:
             await client.delete_object(Bucket=self.bucket_name, Key=filename)

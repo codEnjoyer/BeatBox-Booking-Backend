@@ -6,6 +6,7 @@ from src.domain.schemas.booking import BookingRead
 class BaseRoom(BaseSchema):
     name: NonEmptyString
     description: NonEmptyString | None
+    equipment: NonEmptyString | None
     additional_services: NonEmptyString | None
 
 

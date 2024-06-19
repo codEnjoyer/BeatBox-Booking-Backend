@@ -5,14 +5,18 @@ from fastapi import UploadFile
 from filetype import guess
 from filetype.types import image
 
-from src.domain.exceptions.file import FileIsNotAnImageOrUnsupportedException, \
-    FileIsTooLargeException
+from src.domain.exceptions.file import (
+    FileIsNotAnImageOrUnsupportedException,
+    FileIsTooLargeException,
+)
 from src.domain.models.repositories.s3 import S3Repository
 
 MAX_IMAGE_SIZE = 1024 * 1024 * 10  # 10 Mb
-VALID_IMAGE_EXTENSIONS = (image.Jpeg().extension,
-                          image.Png().extension,
-                          image.Webp().extension)
+VALID_IMAGE_EXTENSIONS = (
+    image.Jpeg().extension,
+    image.Png().extension,
+    image.Webp().extension,
+)
 
 
 @dataclass
@@ -54,6 +58,8 @@ class FileService:
         if upload_file.size > MAX_IMAGE_SIZE:
             raise FileIsTooLargeException()
         file_type = guess(upload_file.file)
-        if (file_type is None
-                or file_type.extension not in VALID_IMAGE_EXTENSIONS):
+        if (
+            file_type is None
+            or file_type.extension not in VALID_IMAGE_EXTENSIONS
+        ):
             raise FileIsNotAnImageOrUnsupportedException()

@@ -20,10 +20,12 @@ class Room(BaseModel):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     description: Mapped[str] = mapped_column(String(500), nullable=True)
+    equipment: Mapped[str] = mapped_column(String(500), nullable=True)
     additional_services: Mapped[str] = mapped_column(String(500), nullable=True)
 
-    banner_filename: Mapped[Optional[str]] = mapped_column(String,
-                                                           nullable=True)
+    banner_filename: Mapped[Optional[str]] = mapped_column(
+        String, nullable=True
+    )
     images_filenames: Mapped[list[str]] = mapped_column(
         ARRAY(String), nullable=False, server_default="{}"
     )
@@ -49,12 +51,12 @@ class Room(BaseModel):
     )
 
     def is_free_at_interval(
-            self, from_: datetime.datetime, to: datetime.datetime
+        self, from_: datetime.datetime, to: datetime.datetime
     ) -> bool:
         for booking in self.bookings:
             if (
-                    booking.is_within_range(from_, to)
-                    and booking.status != BookingStatus.CANCELLED
+                booking.is_within_range(from_, to)
+                and booking.status != BookingStatus.CANCELLED
             ):
                 return False
         return True

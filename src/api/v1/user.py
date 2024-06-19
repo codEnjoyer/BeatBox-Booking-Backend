@@ -8,8 +8,10 @@ from src.api.v1.dependencies.auth import (
 from src.api.v1.dependencies.services import UserServiceDep
 from src.api.v1.dependencies.types import QueryLimit, QueryOffset
 from src.api.v1.dependencies.user import ValidUserIdDep
-from src.domain.exceptions.user import EmailAlreadyTakenException, \
-    NicknameAlreadyTakenException
+from src.domain.exceptions.user import (
+    EmailAlreadyTakenException,
+    NicknameAlreadyTakenException,
+)
 from src.domain.schemas.user import UserRead, UserUpdate, UserPasswordUpdate
 from src.domain.models.user import User
 
@@ -35,17 +37,18 @@ async def get_my_info(user: AuthenticatedUser) -> User:
     return user
 
 
-@router.post("/me",
-             response_model=UserRead)
+@router.post("/me", response_model=UserRead)
 async def change_my_password(
     schema: UserPasswordUpdate,
     user: AuthenticatedUser,
     user_service: UserServiceDep,
 ) -> User:
-    if not user_service.is_password_valid(schema.old_password,
-                                          user.hashed_password):
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
-                            detail="Wrong old password")
+    if not user_service.is_password_valid(
+        schema.old_password, user.hashed_password
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Wrong old password"
+        )
     return await user_service.update_password(user, schema.new_password)
 
 
@@ -58,10 +61,7 @@ async def update_my_info(
     try:
         user = await user_service.update(user, schema)
     except (EmailAlreadyTakenException, NicknameAlreadyTakenException) as e:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail=str(e)
-        )
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
     return user
 
 

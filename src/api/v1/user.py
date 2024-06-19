@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from starlette import status
 
 from src.api.v1.dependencies.auth import (
@@ -8,7 +8,9 @@ from src.api.v1.dependencies.auth import (
 from src.api.v1.dependencies.services import UserServiceDep
 from src.api.v1.dependencies.types import QueryLimit, QueryOffset
 from src.api.v1.dependencies.user import ValidUserIdDep
-from src.domain.schemas.user import UserRead
+from src.domain.exceptions.user import EmailAlreadyTakenException, \
+    NicknameAlreadyTakenException
+from src.domain.schemas.user import UserRead, UserUpdate, UserPasswordUpdate
 from src.domain.models.user import User
 
 router = APIRouter(prefix="/users", tags=["User"])
@@ -29,18 +31,38 @@ async def get_all_users(
 
 # NOTE: Важно, чтобы me-эндпоинты были зарегистрированы раньше, чем /{user_id}
 @router.get("/me", response_model=UserRead)
-async def get_authenticated_user(user: AuthenticatedUser) -> User:
+async def get_my_info(user: AuthenticatedUser) -> User:
     return user
 
 
-# @router.put("/me", response_model=UserRead)
-# async def update_authenticated_user(
-#     schema: UserUpdate,
-#     user: AuthenticatedUser,
-#     user_service: UserServiceDep,
-# ) -> User:
-#     user = await user_service.update_by_id(user.id, schema)
-#     return user
+@router.post("/me",
+             response_model=UserRead)
+async def change_my_password(
+    schema: UserPasswordUpdate,
+    user: AuthenticatedUser,
+    user_service: UserServiceDep,
+) -> User:
+    if not user_service.is_password_valid(schema.old_password,
+                                          user.hashed_password):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                            detail="Wrong old password")
+    return await user_service.update_password(user, schema.new_password)
+
+
+@router.put("/me", response_model=UserRead)
+async def update_my_info(
+    schema: UserUpdate,
+    user: AuthenticatedUser,
+    user_service: UserServiceDep,
+) -> User:
+    try:
+        user = await user_service.update(user, schema)
+    except (EmailAlreadyTakenException, NicknameAlreadyTakenException) as e:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=str(e)
+        )
+    return user
 
 
 @router.get(

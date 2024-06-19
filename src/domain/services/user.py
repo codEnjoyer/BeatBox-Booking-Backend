@@ -7,7 +7,7 @@ from sqlalchemy.exc import NoResultFound
 
 from src.domain.exceptions.user import (
     UserNotFoundException,
-    EmailAlreadyTakenException,
+    EmailAlreadyTakenException, NicknameAlreadyTakenException,
 )
 from src.domain.models import User
 from src.domain.models.repositories.user import UserRepository
@@ -41,19 +41,36 @@ class UserService(ModelService[UserRepository, User, UserCreate, UserUpdate]):
     async def create(self, schema: UserCreate) -> User:
         if await self.is_exist_with_email(schema.email):
             raise EmailAlreadyTakenException()
+
         if schema.nickname is None:
-            schema.nickname = schema.email.split("@")[0]
-        if await self.is_exist_with_nickname(schema.nickname):
-            # надеемся на рандом
-            schema.nickname = (
-                f"{schema.nickname}" f"-{self.__generate_unique_string()}"
-            )
+            schema.nickname = self.generate_nickname_from_email(schema.email)
+        elif await self.is_exist_with_nickname(schema.nickname):
+            raise NicknameAlreadyTakenException()
+
         schema_dict = schema.model_dump()
         plain_password = schema_dict.pop("password")
         schema_dict["hashed_password"] = self._hash_password(plain_password)
         created = await self._repository.create(schema_dict)
         # NOTE: дополнительный запрос в БД из-за relationship'а сотрудника
         return await self.get_by_id(created.id)
+
+    async def update(self, user: User, schema: UserUpdate) -> User:
+        if (user.email != schema.email
+                and await self.is_exist_with_email(schema.email)):
+            raise EmailAlreadyTakenException()
+        if (user.nickname != schema.nickname
+                and await self.is_exist_with_nickname(schema.nickname)):
+            raise NicknameAlreadyTakenException()
+        updated = await self.update_by_id(user.id, schema)
+        # NOTE: дополнительный запрос в БД из-за relationship'а сотрудника
+        return await self.get_by_id(updated.id)
+
+    async def update_password(self, user: User, plain_password: str) -> User:
+        new_hashed_password = self._hash_password(plain_password)
+        updated = await self.update_by_id(
+            user.id, {"hashed_password": new_hashed_password})
+        # NOTE: дополнительный запрос в БД из-за relationship'а сотрудника
+        return await self.get_by_id(updated.id)
 
     async def is_exist_with_email(self, email: str) -> bool:
         try:
@@ -78,6 +95,12 @@ class UserService(ModelService[UserRepository, User, UserCreate, UserUpdate]):
 
     def _hash_password(self, password: str) -> str:
         return self._pwd_context.hash(password)
+
+    async def generate_nickname_from_email(self, email: str) -> str:
+        nickname = email.split("@")[0]
+        if await self.is_exist_with_nickname(nickname):
+            return f"{nickname}-{self.__generate_unique_string()}"
+        return nickname
 
     @staticmethod
     def __generate_unique_string(length: int = 8) -> str:

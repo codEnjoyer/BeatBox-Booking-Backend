@@ -28,7 +28,8 @@ class Studio(BaseModel):
         Time(timezone=True), nullable=False
     )
 
-    banner: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    banner_filename: Mapped[Optional[str]] = mapped_column(String,
+                                                           nullable=True)
 
     latitude: Mapped[float] = mapped_column(Float(precision=8), nullable=False)
     longitude: Mapped[float] = mapped_column(Float(precision=8), nullable=False)

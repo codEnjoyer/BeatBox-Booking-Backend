@@ -1,5 +1,3 @@
-from pydantic import HttpUrl
-
 from src.domain.schemas.base import BaseSchema, IntID, NonEmptyString
 
 from src.domain.schemas.booking import BookingRead
@@ -13,8 +11,6 @@ class BaseRoom(BaseSchema):
 
 class RoomRead(BaseRoom):
     id: IntID
-    banner: HttpUrl | None
-    images: list[HttpUrl]
 
     bookings: list[BookingRead]
 

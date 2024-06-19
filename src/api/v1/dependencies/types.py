@@ -11,5 +11,5 @@ QueryDateFrom = Annotated[datetime.date, Query(
     description="Включительно",
     example="2024-06-16")]
 QueryDateTo = Annotated[datetime.date, Query(
-    description="Невключительно",
+    description="Не включительно",
     examples=["2024-06-18"])]

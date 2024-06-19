@@ -22,8 +22,9 @@ class Room(BaseModel):
     description: Mapped[str] = mapped_column(String(500), nullable=True)
     additional_services: Mapped[str] = mapped_column(String(500), nullable=True)
 
-    banner: Mapped[Optional[str]] = mapped_column(String, nullable=True)
-    images: Mapped[list[str]] = mapped_column(
+    banner_filename: Mapped[Optional[str]] = mapped_column(String,
+                                                           nullable=True)
+    images_filenames: Mapped[list[str]] = mapped_column(
         ARRAY(String), nullable=False, server_default="{}"
     )
 

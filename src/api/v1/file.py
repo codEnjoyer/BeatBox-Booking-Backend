@@ -1,38 +1,111 @@
-# from fastapi import APIRouter, Depends
-#
-# from src.api.dependencies.auth import get_current_user
-# from src.api.dependencies.services import FileServiceDep
-# from src.domain.schemas.file import FileRead
-# from fastapi import UploadFile
-#
-# router = APIRouter(prefix="/files", tags=["File"])
-#
-#
-# @router.post(
-#     "",
-#     dependencies=[Depends(get_current_user)],
-#     response_model=FileRead,
-# )
-# async def upload_file(
-#     file: UploadFile, file_service: FileServiceDep
-# ) -> FileRead:
-#     orm_file, file_url = await file_service.create(file)
-#
-#     return FileRead(
-#         name=str(orm_file.name),
-#         extension=str(orm_file.extension), url=file_url
-#     )
-#     # TODO: перенести в создание студии и комнаты
-#
-#
-# @router.get(
-#     "/{name}",
-#     dependencies=[Depends(get_current_user)], response_model=FileRead
-# )
-# async def get_file_url(name: str, file_service: FileServiceDep) -> str:
-#     return await file_service.get_url(name=name)
-#
-#
-# @router.delete("/{name}", dependencies=[Depends(get_current_user)])
-# async def delete(name: str, file_service: FileServiceDep) -> None:
-#     await file_service.delete_by_name(name=name)
+from fastapi import APIRouter
+from starlette import status
+
+from src.api.v1.dependencies.employee import StudioManagerDep
+from src.api.v1.dependencies.file import ValidRoomImageFilenameDep, \
+    UploadImageFileDep, UploadImageFilesDep, StudioBannerDep, RoomBannerDep
+from src.api.v1.dependencies.room import ValidStudioRoomIdDep
+from src.api.v1.dependencies.services import FileServiceDep
+from src.api.v1.dependencies.studio import ValidStudioIdDep
+from src.domain.schemas.file import FileRead
+
+router = APIRouter(tags=["File"])
+
+
+@router.get("/studios/{studio_id}/banner",
+            tags=["Studio"],
+            response_model=FileRead)
+async def get_studio_banner_url(
+        banner: StudioBannerDep,
+):
+    ...
+
+
+@router.get("/studios/{studio_id}/rooms/{room_id}/banner",
+            tags=["Room"],
+            response_model=FileRead)
+async def get_room_banner_url(
+        banner: RoomBannerDep,
+):
+    ...
+
+
+@router.get("/studios/{studio_id}/rooms/{room_id}/images",
+            tags=["Room"],
+            response_model=list[FileRead])
+async def get_room_images_urls(
+        room: ValidStudioRoomIdDep,
+):
+    ...
+
+
+@router.post("/studios/{studio_id}/rooms/{room_id}/images",
+             tags=["Room"],
+             response_model=list[FileRead])
+async def upload_room_images(
+        room: ValidStudioRoomIdDep,
+        image_files: UploadImageFilesDep,
+        file_service: FileServiceDep,
+        _: StudioManagerDep
+):
+    ...
+
+
+@router.put("/studios/{studio_id}/banner",
+            tags=["Studio"],
+            response_model=FileRead)
+async def update_studio_banner(
+        studio: ValidStudioIdDep,
+        file: UploadImageFileDep,
+        file_service: FileServiceDep,
+        _: StudioManagerDep
+):
+    ...
+
+
+@router.put("/studios/{studio_id}/rooms/{room_id}/banner",
+            tags=["Room"],
+            response_model=FileRead)
+async def update_room_banner(
+        room: ValidStudioRoomIdDep,
+        file: UploadImageFileDep,
+        file_service: FileServiceDep,
+        _: StudioManagerDep
+):
+    ...
+
+
+@router.delete("/studios/{studio_id}/banner",
+               tags=["Studio"],
+               status_code=status.HTTP_204_NO_CONTENT)
+async def delete_studio_banner(
+        studio: ValidStudioIdDep,
+        banner: StudioBannerDep,
+        file_service: FileServiceDep,
+        _: StudioManagerDep
+):
+    ...
+
+
+@router.delete("/studios/{studio_id}/rooms/{room_id}/banner",
+               tags=["Room"],
+               status_code=status.HTTP_204_NO_CONTENT)
+async def delete_room_banner(
+        room: ValidStudioRoomIdDep,
+        banner: RoomBannerDep,
+        file_service: FileServiceDep,
+        _: StudioManagerDep
+):
+    ...
+
+
+@router.delete("/studios/{studio_id}/rooms/{room_id}/images/{filename}",
+               tags=["Room"],
+               status_code=status.HTTP_204_NO_CONTENT)
+async def delete_room_image(
+        room: ValidStudioRoomIdDep,
+        image_filename: ValidRoomImageFilenameDep,
+        file_service: FileServiceDep,
+        _: StudioManagerDep
+):
+    ...

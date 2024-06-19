@@ -5,7 +5,7 @@ from src.api.v1.dependencies.auth import OAuth2Dep
 from src.api.v1.dependencies.services import UserServiceDep, AuthServiceDep
 from src.domain.exceptions.user import (
     UserNotFoundException,
-    EmailAlreadyTakenException,
+    EmailAlreadyTakenException, NicknameAlreadyTakenException,
 )
 from src.domain.models import User
 from src.domain.schemas.auth import Token
@@ -25,7 +25,7 @@ async def register(
 ) -> User:
     try:
         user = await user_service.create(schema)
-    except EmailAlreadyTakenException as e:
+    except (EmailAlreadyTakenException, NicknameAlreadyTakenException) as e:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT, detail=str(e)
         ) from e

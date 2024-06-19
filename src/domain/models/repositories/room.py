@@ -1,4 +1,3 @@
-import uuid
 from typing import override, Iterable
 
 from sqlalchemy import ColumnElement
@@ -18,11 +17,11 @@ class RoomRepository(SQLAlchemyRepository[Room, RoomCreate, RoomUpdate]):
 
     @override
     async def get_all(
-        self,
-        *where: ColumnElement[bool],
-        options: Iterable[ExecutableOption] | None = None,
-        offset: int = 0,
-        limit: int = 100,
+            self,
+            *where: ColumnElement[bool],
+            options: Iterable[ExecutableOption] | None = None,
+            offset: int = 0,
+            limit: int = 100,
     ) -> list[Room]:
         """
         Load rooms with bookings
@@ -38,9 +37,9 @@ class RoomRepository(SQLAlchemyRepository[Room, RoomCreate, RoomUpdate]):
 
     @override
     async def get_one(
-        self,
-        *where: ColumnElement[bool],
-        options: Iterable[ExecutableOption] | None = None,
+            self,
+            *where: ColumnElement[bool],
+            options: Iterable[ExecutableOption] | None = None,
     ) -> Room:
         """
         Load room with bookings
@@ -50,14 +49,3 @@ class RoomRepository(SQLAlchemyRepository[Room, RoomCreate, RoomUpdate]):
             *where, options=(*options, selectinload(self.model.bookings))
         )
         return room
-
-    @staticmethod
-    async def get_all_images_by_id(room_id: int) -> list[uuid.UUID]:
-        # async with async_session_maker() as session:
-        #     stmt = select(RoomImage).where(RoomImage.room_id == room_id)
-        #     result = await session.execute(stmt)
-        #     instances = result.unique().scalars().all()
-        #     if not instances:
-        #         raise NoResultFound
-        #     return instances
-        raise NotImplementedError

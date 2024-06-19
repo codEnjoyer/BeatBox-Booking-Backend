@@ -10,3 +10,8 @@ class UserNotFoundException(ItemNotFoundException):
 class EmailAlreadyTakenException(BadDataException):
     def __init__(self):
         super().__init__("Email already taken")
+
+
+class NicknameAlreadyTakenException(BadDataException):
+    def __init__(self):
+        super().__init__("Nickname already taken")

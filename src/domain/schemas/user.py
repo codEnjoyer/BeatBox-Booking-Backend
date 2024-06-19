@@ -16,9 +16,14 @@ class UserRead(BaseUser):
     employee: typing.Optional["EmployeeRead"]
 
 
+Password = typing.Annotated[str, Field(min_length=8,
+                                       max_length=24,
+                                       examples=["password"])]
+
+
 class UserCreate(BaseUser):
     nickname: NonEmptyString | None
-    password: str = Field(..., min_length=8, max_length=24)
+    password: Password
 
     @model_validator(mode="after")
     def password_is_not_email(self) -> typing.Self:
@@ -27,7 +32,19 @@ class UserCreate(BaseUser):
         return self
 
 
-class UserUpdate(BaseUser): ...
+class UserUpdate(BaseUser):
+    nickname: NonEmptyString
+
+
+class UserPasswordUpdate(BaseSchema):
+    old_password: Password
+    new_password: Password
+
+    @model_validator(mode="after")
+    def different_passwords(self) -> typing.Self:
+        if self.old_password == self.new_password:
+            raise ValueError("Old and new passwords must be different")
+        return self
 
 
 from src.domain.schemas.employee import EmployeeRead

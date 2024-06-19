@@ -1,3 +1,5 @@
+from random import SystemRandom
+from string import ascii_uppercase, digits, ascii_lowercase
 from typing import override
 
 from passlib.context import CryptContext
@@ -26,10 +28,26 @@ class UserService(ModelService[UserRepository, User, UserCreate, UserUpdate]):
             raise self._not_found_exception from e
         return model
 
+    async def get_by_nickname(self, nickname: str) -> User:
+        try:
+            model = await self._repository.get_one(
+                self.model.nickname == nickname
+            )
+        except NoResultFound as e:
+            raise self._not_found_exception from e
+        return model
+
     @override
     async def create(self, schema: UserCreate) -> User:
         if await self.is_exist_with_email(schema.email):
             raise EmailAlreadyTakenException()
+        if schema.nickname is None:
+            schema.nickname = schema.email.split("@")[0]
+        if await self.is_exist_with_nickname(schema.nickname):
+            # надеемся на рандом
+            schema.nickname = (
+                f"{schema.nickname}" f"-{self.__generate_unique_string()}"
+            )
         schema_dict = schema.model_dump()
         plain_password = schema_dict.pop("password")
         schema_dict["hashed_password"] = self._hash_password(plain_password)
@@ -44,6 +62,13 @@ class UserService(ModelService[UserRepository, User, UserCreate, UserUpdate]):
             return False
         return True
 
+    async def is_exist_with_nickname(self, nickname: str) -> bool:
+        try:
+            await self.get_by_nickname(nickname)
+        except self._not_found_exception:
+            return False
+        return True
+
     async def is_employee(self, user_id: int) -> bool:
         user = await self.get_by_id(user_id)
         return user.employee is not None
@@ -53,3 +78,11 @@ class UserService(ModelService[UserRepository, User, UserCreate, UserUpdate]):
 
     def _hash_password(self, password: str) -> str:
         return self._pwd_context.hash(password)
+
+    @staticmethod
+    def __generate_unique_string(length: int = 8) -> str:
+        random = SystemRandom()
+        return "".join(
+            random.choice(ascii_uppercase + ascii_lowercase + digits)
+            for _ in range(length)
+        )

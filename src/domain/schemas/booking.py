@@ -1,8 +1,13 @@
 import uuid
 from typing import Self, Annotated
 
-from pydantic import model_validator, field_validator, AwareDatetime, Field, \
-    FutureDatetime
+from pydantic import (
+    model_validator,
+    field_validator,
+    AwareDatetime,
+    Field,
+    FutureDatetime,
+)
 
 from src.domain.schemas.base import (
     BaseSchema,
@@ -39,7 +44,8 @@ class BookingRead(BaseBooking):
     def multiples_of_30(cls, value: DatetimeTZ) -> DatetimeTZ:
         if value.minute % 30 != 0 or value.second != 0:
             raise ValueError(
-                "starts_at and ends_at must be multiples of 30 minutes")
+                "starts_at and ends_at must be multiples of 30 minutes"
+            )
         return value
 
 
@@ -66,7 +72,8 @@ class BookingCreate(BaseBooking):
     def multiples_of_30(cls, value: DatetimeTZ) -> DatetimeTZ:
         if value.minute % 30 != 0 or value.second != 0:
             raise ValueError(
-                "starts_at and ends_at must be multiples of 30 minutes")
+                "starts_at and ends_at must be multiples of 30 minutes"
+            )
         return value
 
 

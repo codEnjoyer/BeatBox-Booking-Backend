@@ -17,7 +17,7 @@ class BookingStatus(enum.Enum):
     CLOSED = "closed"
     # WAITING_FOR_PAYMENT = "waiting_for_payment"
     # EXPIRED = "expired"
-    CANCELED = "canceled"
+    CANCELLED = "cancelled"
     BOOKED = "booked"
 
 

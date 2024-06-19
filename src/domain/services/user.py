@@ -45,8 +45,9 @@ class UserService(ModelService[UserRepository, User, UserCreate, UserUpdate]):
             schema.nickname = schema.email.split("@")[0]
         if await self.is_exist_with_nickname(schema.nickname):
             # надеемся на рандом
-            schema.nickname = (f"{schema.nickname}"
-                               f"-{self.__generate_unique_string()}")
+            schema.nickname = (
+                f"{schema.nickname}" f"-{self.__generate_unique_string()}"
+            )
         schema_dict = schema.model_dump()
         plain_password = schema_dict.pop("password")
         schema_dict["hashed_password"] = self._hash_password(plain_password)

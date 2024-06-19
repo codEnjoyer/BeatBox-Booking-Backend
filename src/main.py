@@ -25,6 +25,5 @@ app = FastAPI(
 @app.exception_handler(BBBException)
 async def service_exception_handler(_: Request, exc: BBBException) -> Response:
     raise HTTPException(
-        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        detail=exc.message
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=exc.message
     ) from exc

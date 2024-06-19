@@ -20,6 +20,7 @@ class Settings(BaseSettings):
 
     app_port: int
 
+    s3_endpoint: str
     aws_access_key_id: str
     aws_secret_access_key: str
     bucket_name: str

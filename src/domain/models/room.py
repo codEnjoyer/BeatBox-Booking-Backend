@@ -52,7 +52,12 @@ class Room(BaseModel):
             self, from_: datetime.datetime, to: datetime.datetime
     ) -> bool:
         for booking in self.bookings:
-            if (booking.is_within_range(from_, to)
-                    and booking.status != BookingStatus.CANCELLED):
+            if (
+                    booking.is_within_range(from_, to)
+                    and booking.status != BookingStatus.CANCELLED
+            ):
                 return False
         return True
+
+    def has_image_with_filename(self, filename: str) -> bool:
+        return filename in self.images_filenames

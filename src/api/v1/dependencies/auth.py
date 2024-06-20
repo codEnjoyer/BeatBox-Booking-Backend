@@ -8,7 +8,7 @@ from src.api.v1.dependencies.services import UserServiceDep, AuthServiceDep
 from src.domain.exceptions.user import UserNotFoundException
 from src.domain.models import User, Employee
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/v1/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/login")
 BearerTokenDep = Annotated[str, Depends(oauth2_scheme)]
 OAuth2Dep = Annotated[OAuth2PasswordRequestForm, Depends()]
 

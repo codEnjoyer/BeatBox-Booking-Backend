@@ -39,7 +39,9 @@ class UserService(ModelService[UserRepository, User, UserCreate, UserUpdate]):
         return model
 
     @override
-    async def create(self, schema: UserCreate) -> User:
+    async def create(
+        self, schema: UserCreate, is_superuser: bool = False
+    ) -> User:
         if await self.is_exist_with_email(schema.email):
             raise EmailAlreadyTakenException()
 
@@ -51,6 +53,7 @@ class UserService(ModelService[UserRepository, User, UserCreate, UserUpdate]):
         schema_dict = schema.model_dump()
         plain_password = schema_dict.pop("password")
         schema_dict["hashed_password"] = self._hash_password(plain_password)
+        schema_dict["is_superuser"] = is_superuser
         created = await self._repository.create(schema_dict)
         # NOTE: дополнительный запрос в БД из-за relationship'а сотрудника
         return await self.get_by_id(created.id)

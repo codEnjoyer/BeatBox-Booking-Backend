@@ -1,5 +1,6 @@
 from typing import override
 
+from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import selectinload
 
 from src.domain.exceptions.studio import StudioNotFoundException
@@ -16,12 +17,20 @@ class StudioService(
         super().__init__(StudioRepository(), StudioNotFoundException)
 
     @override
-    async def create(self, schema: StudioCreate, **kwargs) -> Studio:
+    async def create(self, schema: StudioCreate) -> Studio:
         created = await self._repository.create(schema)
         with_reviews = await self.get_by_id(
             created.id, options=(selectinload(self.model.reviews),)
         )
         return with_reviews
+
+    async def create_if_not_exists(self, schema: StudioCreate) -> Studio:
+        try:
+            return await self._repository.get_one(
+                self.model.name == schema.name
+            )
+        except NoResultFound:
+            return await self.create(schema)
 
     @override
     async def update_by_id(self, model_id: int, schema: StudioUpdate) -> Studio:

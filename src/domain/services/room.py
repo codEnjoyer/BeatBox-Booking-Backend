@@ -1,6 +1,7 @@
 import uuid
 from typing import override
 
+from sqlalchemy.exc import NoResultFound
 
 from src.domain.exceptions.room import (
     RoomNotFoundException,
@@ -29,6 +30,17 @@ class RoomService(ModelService[RoomRepository, Room, RoomCreate, RoomUpdate]):
         schema_dict["studio_id"] = studio_id
         created = await self._repository.create(schema_dict)
         return await self.get_by_id(created.id)
+
+    async def create_if_not_exists(
+        self, studio_id: int, schema: RoomCreate
+    ) -> Room:
+        try:
+            return await self._repository.get_one(
+                self.model.name == schema.name,
+                self.model.studio_id == studio_id,
+            )
+        except NoResultFound:
+            return await self.create_room_in_studio(studio_id, schema)
 
     @override
     async def update_by_id(self, room_id: int, schema: RoomUpdate) -> Room:

@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=".env", env_file_encoding="utf-8", extra="allow"
     )
-    ENVIRONMENT: Literal[
+    environment: Literal[
         "PROD", "TEST"
     ]  # PROD / TEST. ENVIRONMENT=TEST используется для проверки в тестах.
 
@@ -19,6 +19,7 @@ class Settings(BaseSettings):
     db_user: str
 
     app_port: int
+    root_password: str
 
     s3_endpoint: str
     aws_access_key_id: str

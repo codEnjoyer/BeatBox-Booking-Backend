@@ -9,7 +9,7 @@ class Settings(BaseSettings):
         env_file=".env", env_file_encoding="utf-8", extra="allow"
     )
     environment: Literal[
-        "PROD", "TEST"
+        "PROD", "DEV", "TEST"
     ]  # PROD / TEST. ENVIRONMENT=TEST используется для проверки в тестах.
 
     db_host: str

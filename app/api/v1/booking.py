@@ -82,7 +82,7 @@ async def get_room_bookings(
     "/studios/{studio_id}/rooms/{room_id}/bookings",
     response_model=BookingRead,
 )
-async def book_slot(
+async def book_room(
     room: ValidStudioRoomIdDep,
     schema: BookingCreate,
     booking_service: BookingServiceDep,

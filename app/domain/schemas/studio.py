@@ -32,7 +32,7 @@ TgLink = Annotated[
         examples=["https://t.me/Moz-Art_school"],
         # https://regex101.com/r/XkxTty/1
         pattern=r"^(?:|(https?:\/\/)?(|www)[.]?((t|telegram)\.me)\/)"
-                r"[a-zA-Z0-9_]{5,32}$",
+        r"[a-zA-Z0-9_]{5,32}$",
     ),
 ]
 

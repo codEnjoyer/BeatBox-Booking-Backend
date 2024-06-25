@@ -1,3 +1,4 @@
+import datetime
 import uuid
 from typing import Self, Annotated
 
@@ -74,6 +75,13 @@ class BookingCreate(BaseBooking):
             raise ValueError(
                 "starts_at and ends_at must be multiples of 30 minutes"
             )
+        return value
+
+    @field_validator("starts_at", "ends_at")
+    @classmethod
+    def within_one_year(cls, value: DatetimeTZ) -> DatetimeTZ:
+        if value > datetime.datetime.now() + datetime.timedelta(days=365):
+            raise ValueError("starts_at and ends_at must be within one year")
         return value
 
 

@@ -3,6 +3,7 @@ services:
     build:
       context: ./
       dockerfile: Dockerfile
+      target: development
     ports:
       - ${APP_PORT}:${APP_PORT}
     depends_on:

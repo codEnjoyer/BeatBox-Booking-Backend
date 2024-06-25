@@ -1,7 +1,7 @@
 import pytest
 from sqlalchemy import select
 
-from src.models import User
+from app.models import User
 from tests.conftest import async_session_maker
 
 

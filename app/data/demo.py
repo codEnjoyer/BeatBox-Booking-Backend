@@ -33,7 +33,7 @@ async def load_studios() -> list[Studio]:
             longitude=60.609368,
             site="https://moz-art-school.ru",
             contact_phone_number="+7 (966) 669-20-16",
-            tg="https://t.me/Moz-Art_school",
+            tg=None,
             vk="https://vk.com/mozartekb",
             whats_app="https://wa.me/79025026723",
         ),

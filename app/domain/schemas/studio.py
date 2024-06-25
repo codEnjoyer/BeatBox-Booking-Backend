@@ -10,7 +10,7 @@ from pydantic import (
 )
 from pydantic_core.core_schema import SerializationInfo
 
-from app.domain.schemas.base import BaseSchema, IntID
+from app.domain.schemas.base import BaseSchema, IntID, NonEmptyString
 
 from app.domain.schemas.phone_number import RuPhoneNumber
 
@@ -26,10 +26,36 @@ StudioWorkingTime = Annotated[
     ),
 ]
 
+TgLink = Annotated[
+    NonEmptyString,
+    Field(
+        examples=["https://t.me/Moz-Art_school"],
+        # https://regex101.com/r/XkxTty/1
+        pattern=r"^(?:|(https?:\/\/)?(|www)[.]?((t|telegram)\.me)\/)"
+                r"[a-zA-Z0-9_]{5,32}$",
+    ),
+]
+
+VkLink = Annotated[
+    NonEmptyString,
+    Field(
+        examples=["https://vk.com/mozartekb"],
+        pattern=r"^(?:https?:\/\/)?(?:www\.)?vk\.com\/(.*)\/?$",
+    ),
+]
+
+WhatsAppLink = Annotated[
+    NonEmptyString,
+    Field(
+        examples=["https://wa.me/79025026723"],
+        pattern=r"^(?:https?:\/\/)?(?:www\.)?wa\.me\/(79\d{9})\/?$",
+    ),
+]
+
 
 class BaseStudio(BaseSchema):
-    name: str = Field(min_length=1, max_length=100)
-    description: str | None = Field(min_length=1, max_length=500)
+    name: Annotated[NonEmptyString, Field(max_length=100)]
+    description: Annotated[NonEmptyString, Field(max_length=500)] | None
     opening_at: StudioWorkingTime
     closing_at: StudioWorkingTime
     latitude: float = Field(gt=-90, le=90, examples=[0.0])
@@ -37,10 +63,9 @@ class BaseStudio(BaseSchema):
 
     site: HttpUrl | None
     contact_phone_number: RuPhoneNumber | None = Field(examples=["79123456789"])
-    # TODO: добавить валидацию соц. сетей
-    tg: str | None
-    vk: str | None
-    whats_app: str | None
+    tg: TgLink | None
+    vk: VkLink | None
+    whats_app: WhatsAppLink | None
 
     @field_validator("opening_at", "closing_at")
     @classmethod

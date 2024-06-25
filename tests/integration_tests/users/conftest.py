@@ -1,8 +1,8 @@
 import pytest
 from sqlalchemy import delete
 
-from src.models import User
-from src.domain.schemas.user import UserCreate
+from app.models import User
+from app.domain.schemas.user import UserCreate
 
 from tests.conftest import async_session_maker
 

@@ -2,14 +2,20 @@ from typing import Annotated
 
 from pydantic import Field, PositiveInt
 
-from app.domain.schemas.base import BaseSchema, DatetimeTZ, IntID, \
-    NonEmptyString
+from app.domain.schemas.base import (
+    BaseSchema,
+    DatetimeTZ,
+    IntID,
+    NonEmptyString,
+)
 
 
 class BaseReview(BaseSchema):
     grade: Annotated[PositiveInt, Field(..., ge=1, le=5, examples=[4])]
-    text: (Annotated[NonEmptyString, Field(max_length=1024, examples=["Nice"])]
-           | None)
+    text: (
+        Annotated[NonEmptyString, Field(max_length=1024, examples=["Nice"])]
+        | None
+    )
     room_id: IntID | None
 
 

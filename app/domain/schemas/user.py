@@ -5,8 +5,8 @@ from pydantic import EmailStr, Field, model_validator
 from app.domain.schemas.base import BaseSchema, IntID, NonEmptyString
 
 Nickname = typing.Annotated[
-    NonEmptyString,
-    Field(max_length=16, examples=["johndoe"])]
+    NonEmptyString, Field(max_length=16, examples=["johndoe"])
+]
 
 Password = typing.Annotated[
     str, Field(min_length=8, max_length=24, examples=["password"])

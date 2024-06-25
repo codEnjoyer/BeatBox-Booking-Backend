@@ -13,8 +13,10 @@ from app.settings import settings
 metadata = MetaData()
 Base = declarative_base(metadata=metadata)
 engine = create_async_engine(
-    str(settings.database_url),
-    pool_recycle=3600,
+    settings.database_url,
+    pool_recycle=60 * 60,  # 1 hour
+    pool_size=10,
+    max_overflow=20,
 )
 async_session_maker = async_sessionmaker(engine, expire_on_commit=False)
 

@@ -33,7 +33,7 @@ TgLink = Annotated[
         # https://regex101.com/r/XkxTty/1
         pattern=r"^(?:|(https?:\/\/)?(|www)[.]?((t|telegram)\.me)\/)"
         r"[a-zA-Z0-9_]{5,32}$",
-        max_length=100
+        max_length=100,
     ),
 ]
 
@@ -42,7 +42,7 @@ VkLink = Annotated[
     Field(
         examples=["https://vk.com/mozartekb"],
         pattern=r"^(?:https?:\/\/)?(?:www\.)?vk\.com\/(.*)\/?$",
-        max_length=100
+        max_length=100,
     ),
 ]
 
@@ -51,7 +51,7 @@ WhatsAppLink = Annotated[
     Field(
         examples=["https://wa.me/79025026723"],
         pattern=r"^(?:https?:\/\/)?(?:www\.)?wa\.me\/(79\d{9})\/?$",
-        max_length=100
+        max_length=100,
     ),
 ]
 

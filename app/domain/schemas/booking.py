@@ -20,8 +20,9 @@ from app.domain.models.booking import BookingStatus
 
 
 class BaseBooking(BaseSchema):
-    name: NonEmptyString
-    surname: NonEmptyString | None
+    name: Annotated[NonEmptyString, Field(max_length=32, examples=["John"])]
+    surname: (Annotated[NonEmptyString, Field(max_length=64, examples=["Doe"])]
+              | None)
 
 
 class BookingRead(BaseBooking):

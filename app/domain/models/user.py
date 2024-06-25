@@ -17,8 +17,9 @@ class User(BaseModel):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
 
     email: Mapped[str] = mapped_column(String(320), unique=True, nullable=False)
-    hashed_password: Mapped[str] = mapped_column(String, nullable=False)
-    nickname: Mapped[str] = mapped_column(String, unique=True, nullable=False)
+    hashed_password: Mapped[str] = mapped_column(String(100), nullable=False)
+    nickname: Mapped[str] = mapped_column(String(16), unique=True,
+                                          nullable=False)
     is_superuser: Mapped[bool] = mapped_column(
         Boolean, nullable=False, default=False, server_default=false()
     )

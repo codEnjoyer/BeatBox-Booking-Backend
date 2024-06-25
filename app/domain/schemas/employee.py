@@ -1,8 +1,12 @@
+from typing import Annotated
+
+from pydantic import Field
+
 from app.domain.schemas.base import BaseSchema, IntID, NonEmptyString
 
 
 class BaseEmployee(BaseSchema):
-    name: NonEmptyString
+    name: Annotated[NonEmptyString, Field(max_length=64, examples=["John Doe"])]
 
 
 class EmployeeRead(BaseEmployee):

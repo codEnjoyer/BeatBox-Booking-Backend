@@ -19,9 +19,9 @@ class Room(BaseModel):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String(100), nullable=False)
-    description: Mapped[str] = mapped_column(String(500), nullable=True)
-    equipment: Mapped[str] = mapped_column(String(500), nullable=True)
-    additional_services: Mapped[str] = mapped_column(String(500), nullable=True)
+    description: Mapped[str] = mapped_column(String(1024), nullable=True)
+    equipment: Mapped[str] = mapped_column(String(512), nullable=True)
+    additional_services: Mapped[str] = mapped_column(String(512), nullable=True)
 
     banner_filename: Mapped[Optional[str]] = mapped_column(
         String, nullable=True

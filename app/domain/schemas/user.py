@@ -4,6 +4,14 @@ from pydantic import EmailStr, Field, model_validator
 
 from app.domain.schemas.base import BaseSchema, IntID, NonEmptyString
 
+Nickname = typing.Annotated[
+    NonEmptyString,
+    Field(max_length=16, examples=["johndoe"])]
+
+Password = typing.Annotated[
+    str, Field(min_length=8, max_length=24, examples=["password"])
+]
+
 
 class BaseUser(BaseSchema):
     email: EmailStr
@@ -11,18 +19,13 @@ class BaseUser(BaseSchema):
 
 class UserRead(BaseUser):
     id: IntID
-    nickname: NonEmptyString
+    nickname: Nickname
     is_superuser: bool
     employee: typing.Optional["EmployeeRead"]
 
 
-Password = typing.Annotated[
-    str, Field(min_length=8, max_length=24, examples=["password"])
-]
-
-
 class UserCreate(BaseUser):
-    nickname: NonEmptyString | None
+    nickname: Nickname | None
     password: Password
 
     @model_validator(mode="after")
@@ -33,7 +36,7 @@ class UserCreate(BaseUser):
 
 
 class UserUpdate(BaseUser):
-    nickname: NonEmptyString
+    nickname: Nickname
 
 
 class UserPasswordUpdate(BaseSchema):

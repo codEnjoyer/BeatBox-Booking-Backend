@@ -19,7 +19,7 @@ class Studio(BaseModel):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String(100), nullable=False, index=True)
     description: Mapped[Optional[str]] = mapped_column(
-        String(500), nullable=True
+        String(1024), nullable=True
     )
     opening_at: Mapped[dt.time] = mapped_column(
         Time(timezone=True), nullable=False
@@ -35,9 +35,9 @@ class Studio(BaseModel):
     latitude: Mapped[float] = mapped_column(Float(precision=8), nullable=False)
     longitude: Mapped[float] = mapped_column(Float(precision=8), nullable=False)
 
-    site: Mapped[Optional[str]] = mapped_column(String(200), nullable=True)
+    site: Mapped[Optional[str]] = mapped_column(String(2083), nullable=True)
     contact_phone_number: Mapped[Optional[str]] = mapped_column(
-        String(100), nullable=True
+        String(16), nullable=True
     )
     tg: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
     vk: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)

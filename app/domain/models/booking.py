@@ -31,8 +31,8 @@ class Booking(BaseModel):
     status: Mapped[BookingStatus] = mapped_column(
         Enum(BookingStatus), nullable=False
     )
-    name: Mapped[str] = mapped_column(String, nullable=False)
-    surname: Mapped[str] = mapped_column(String, nullable=True)
+    name: Mapped[str] = mapped_column(String(32), nullable=False)
+    surname: Mapped[str] = mapped_column(String(64), nullable=True)
     starts_at: Mapped[dt.datetime] = mapped_column(
         DateTime(timezone=True), nullable=False
     )

@@ -24,7 +24,7 @@ class Review(BaseModel):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
 
-    text: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    text: Mapped[Optional[str]] = mapped_column(Text(1024), nullable=True)
     grade: Mapped[int] = mapped_column(
         Integer, CheckConstraint('grade > 0 AND grade <= 5'), nullable=False
     )

@@ -14,7 +14,7 @@ class Employee(BaseModel):
     __tablename__ = "employees"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-    name: Mapped[str] = mapped_column(String, nullable=False)
+    name: Mapped[str] = mapped_column(String(64), nullable=False)
 
     user_id: Mapped[int] = mapped_column(
         ForeignKey("users.id", ondelete="CASCADE"), nullable=False

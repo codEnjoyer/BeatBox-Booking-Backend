@@ -82,8 +82,9 @@ class BookingCreate(BaseBooking):
     @field_validator("starts_at", "ends_at")
     @classmethod
     def within_one_year(cls, value: DatetimeTZ) -> DatetimeTZ:
-        next_year_now = (datetime.datetime.now(tz=value.tzinfo)
-                         + datetime.timedelta(days=365))
+        next_year_now = datetime.datetime.now(
+            tz=value.tzinfo
+        ) + datetime.timedelta(days=365)
         if value > next_year_now:
             raise ValueError("starts_at and ends_at must be within one year")
         return value

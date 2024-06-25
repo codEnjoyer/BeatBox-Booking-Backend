@@ -103,12 +103,13 @@ class BookingService(
         if booking.status == BookingStatus.CANCELLED:
             raise BookingAlreadyCancelledException()
 
-    async def has_user_booked_studio(self,
-                                     user_id: int,
-                                     studio_id: int,
-                                     room_id: int | None = None) -> bool:
-        where = [self.model.user_id == user_id,
-                 self.model.room.has(studio_id=studio_id)]
+    async def has_user_booked_studio(
+        self, user_id: int, studio_id: int, room_id: int | None = None
+    ) -> bool:
+        where = [
+            self.model.user_id == user_id,
+            self.model.room.has(studio_id=studio_id),
+        ]
         if room_id:
             where.append(self.model.room_id == room_id)
 

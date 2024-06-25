@@ -201,7 +201,7 @@ async def load_rooms(studios: list[Studio]) -> list[Room]:
                 "9×12″ Tom\n"
                 "14×16″ Floor Tom",
                 additional_services="Мониторы для барабанщика: "
-                                    "Kempton, AxelVox",
+                "Kempton, AxelVox",
             ),
         ),
         await room_service.create_if_not_exists(
@@ -226,7 +226,7 @@ async def load_rooms(studios: list[Studio]) -> list[Room]:
                 "9×12″ Tom\n"
                 "14×16″ Floor Tom",
                 additional_services="Мониторы для барабанщика: "
-                                    "Kempton, AxelVox",
+                "Kempton, AxelVox",
             ),
         ),
     ]

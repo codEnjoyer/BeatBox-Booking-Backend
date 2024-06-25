@@ -86,8 +86,8 @@ RUN --mount=type=cache,target=/root/.cache \
 WORKDIR /app
 COPY ./ ./
 
-CMD alembic upgrade head && python3 startup.py
-
+RUN chmod a+x ./*.sh
+CMD ["./dev-launch.sh"]
 
 ################################
 # PRODUCTION
@@ -95,6 +95,10 @@ CMD alembic upgrade head && python3 startup.py
 ################################
 FROM python-base AS production
 COPY --from=builder-base $PYSETUP_PATH $PYSETUP_PATH
+
+# will become mountpoint of our code
 WORKDIR /app
 COPY ./ ./
-CMD ["gunicorn", "-k", "uvicorn.workers.UvicornWorker", "app.main:app"]
+
+RUN chmod a+x ./*.sh
+CMD ["./prod-launch.sh"]

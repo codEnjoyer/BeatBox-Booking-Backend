@@ -1,22 +1,22 @@
 from fastapi import APIRouter, HTTPException
 from starlette import status
 
-from app.api.v1.dependencies.review import OwnedReviewDep
-from app.api.v1.dependencies.room import ValidStudioRoomIdDep
-from app.api.v1.dependencies.services import (
+from api.v1.dependencies.auth import AuthenticatedUser
+from api.v1.dependencies.review import OwnedReviewDep
+from api.v1.dependencies.room import ValidStudioRoomIdDep
+from api.v1.dependencies.services import (
     ReviewServiceDep,
     RoomServiceDep,
     BookingServiceDep,
 )
-from app.api.v1.dependencies.auth import AuthenticatedUser
-from app.api.v1.dependencies.studio import ValidStudioIdDep
-from app.api.v1.dependencies.types import QueryOffset, QueryLimit
-from app.domain.exceptions.review import ReviewAlreadyExistException
-from app.domain.exceptions.room import (
+from api.v1.dependencies.studio import ValidStudioIdDep
+from api.v1.dependencies.types import QueryOffset, QueryLimit
+from exceptions.review import ReviewAlreadyExistException
+from exceptions.room import (
     RoomNotFoundException,
     RoomDoesNotExistInStudioException,
 )
-from app.domain.schemas.review import ReviewCreate, ReviewRead, ReviewUpdate
+from schemas.review import ReviewCreate, ReviewRead, ReviewUpdate
 
 router = APIRouter(tags=["Review"])
 

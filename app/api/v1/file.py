@@ -1,21 +1,21 @@
 from fastapi import APIRouter
 from starlette import status
 
-from app.api.v1.dependencies.employee import StudioManagerDep
-from app.api.v1.dependencies.file import (
+from api.v1.dependencies.employee import StudioManagerDep
+from api.v1.dependencies.file import (
     # ValidRoomImageFilenameDep,
     UploadImageFileDep,
     UploadImageFilesDep,
     StudioBannerFilenameDep,
     RoomBannerFilenameDep,
 )
-from app.api.v1.dependencies.room import ValidStudioRoomIdDep
-from app.api.v1.dependencies.services import (
+from api.v1.dependencies.room import ValidStudioRoomIdDep
+from api.v1.dependencies.services import (
     FileServiceDep,
     StudioServiceDep,
     RoomServiceDep,
 )
-from app.api.v1.dependencies.studio import ValidStudioIdDep
+from api.v1.dependencies.studio import ValidStudioIdDep
 
 router = APIRouter(tags=["File"])
 

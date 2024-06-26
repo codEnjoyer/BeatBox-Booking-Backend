@@ -1,19 +1,19 @@
 from contextlib import asynccontextmanager
 
-from app.api import v1_router
 from fastapi import FastAPI, Request, Response, HTTPException, status
 
-from app.data.demo import load_demo_data
-from app.data.initial import load_initial_data
-from app.domain.exceptions.base import BBBException
-from app.settings import settings
+from api import v1_router
+from data.demo import load_demo_data
+from data.initial import load_initial_data
+from exceptions.base import BBBException
+from settings import app_settings
 
 
 @asynccontextmanager
 async def lifespan(app_: FastAPI):
     """Запускаем код до и после запуска приложения"""
     await load_initial_data()
-    if settings.environment == "PROD":
+    if app_settings.environment == "PROD":
         await load_demo_data()
     app_.include_router(v1_router)
     yield  # Возвращаем работу приложению

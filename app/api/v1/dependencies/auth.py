@@ -1,12 +1,12 @@
 from typing import Annotated
 
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi import Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jwt import InvalidTokenError
 
-from app.api.v1.dependencies.services import UserServiceDep, AuthServiceDep
-from app.domain.exceptions.user import UserNotFoundException
-from app.domain.models import User, Employee
+from api.v1.dependencies.services import UserServiceDep, AuthServiceDep
+from exceptions.user import UserNotFoundException
+from models import User, Employee
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/login")
 BearerTokenDep = Annotated[str, Depends(oauth2_scheme)]

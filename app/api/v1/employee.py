@@ -1,16 +1,16 @@
 from fastapi import APIRouter, HTTPException
 from starlette import status
 
-from app.api.v1.dependencies.employee import (
+from api.v1.dependencies.employee import (
     ValidEmployeeIdDep,
     StudioManagerDep,
 )
-from app.api.v1.dependencies.services import EmployeeServiceDep, UserServiceDep
-from app.api.v1.dependencies.studio import ValidStudioIdDep
-from app.api.v1.dependencies.types import QueryOffset, QueryLimit
-from app.domain.exceptions.user import UserNotFoundException
-from app.domain.models import Employee
-from app.domain.schemas.employee import EmployeeRead, EmployeeCreate
+from api.v1.dependencies.services import EmployeeServiceDep, UserServiceDep
+from api.v1.dependencies.studio import ValidStudioIdDep
+from api.v1.dependencies.types import QueryOffset, QueryLimit
+from exceptions.user import UserNotFoundException
+from models import Employee
+from schemas.employee import EmployeeRead, EmployeeCreate
 
 router = APIRouter(tags=["Employee"])
 

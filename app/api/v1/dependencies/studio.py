@@ -3,11 +3,11 @@ from typing import Annotated
 from fastapi import HTTPException, Depends
 from starlette import status
 
-from app.api.v1.dependencies.auth import AuthenticatedEmployee
-from app.api.v1.dependencies.services import StudioServiceDep
-from app.api.v1.dependencies.types import PathIntID
-from app.domain.exceptions.studio import StudioNotFoundException
-from app.domain.models import Studio, Employee
+from api.v1.dependencies.auth import AuthenticatedEmployee
+from api.v1.dependencies.services import StudioServiceDep
+from api.v1.dependencies.types import PathIntID
+from exceptions.studio import StudioNotFoundException
+from models import Studio, Employee
 
 
 async def valid_studio_id(

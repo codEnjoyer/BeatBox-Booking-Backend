@@ -1,16 +1,16 @@
 from fastapi import APIRouter, HTTPException
 from starlette import status
 
-from app.api.v1.dependencies.auth import OAuth2Dep
-from app.api.v1.dependencies.services import UserServiceDep, AuthServiceDep
-from app.domain.exceptions.user import (
+from api.v1.dependencies.auth import OAuth2Dep
+from api.v1.dependencies.services import UserServiceDep, AuthServiceDep
+from exceptions.user import (
     UserNotFoundException,
     EmailAlreadyTakenException,
     NicknameAlreadyTakenException,
 )
-from app.domain.models import User
-from app.domain.schemas.auth import Token
-from app.domain.schemas.user import UserRead, UserCreate
+from models import User
+from schemas.auth import Token
+from schemas.user import UserRead, UserCreate
 
 router = APIRouter(tags=["Auth"])
 

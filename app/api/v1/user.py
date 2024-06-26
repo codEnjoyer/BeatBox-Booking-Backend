@@ -1,19 +1,19 @@
 from fastapi import APIRouter, HTTPException
 from starlette import status
 
-from app.api.v1.dependencies.auth import (
+from api.v1.dependencies.auth import (
     AuthenticatedUser,
     AuthenticatedSuperuser,
 )
-from app.api.v1.dependencies.services import UserServiceDep
-from app.api.v1.dependencies.types import QueryLimit, QueryOffset
-from app.api.v1.dependencies.user import ValidUserIdDep
-from app.domain.exceptions.user import (
+from api.v1.dependencies.services import UserServiceDep
+from api.v1.dependencies.types import QueryLimit, QueryOffset
+from api.v1.dependencies.user import ValidUserIdDep
+from exceptions.user import (
     EmailAlreadyTakenException,
     NicknameAlreadyTakenException,
 )
-from app.domain.schemas.user import UserRead, UserUpdate, UserPasswordUpdate
-from app.domain.models.user import User
+from models.user import User
+from schemas.user import UserRead, UserUpdate, UserPasswordUpdate
 
 router = APIRouter(prefix="/users", tags=["User"])
 

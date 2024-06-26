@@ -1,10 +1,10 @@
-from app.domain.exceptions.user import (
+from exceptions.user import (
     EmailAlreadyTakenException,
     NicknameAlreadyTakenException,
 )
-from app.domain.schemas.user import UserCreate
-from app.domain.services.user import UserService
-from app.settings import settings
+from schemas.user import UserCreate
+from services.user import UserService
+from settings import app_settings
 
 
 async def load_users():
@@ -12,7 +12,7 @@ async def load_users():
     root_user = UserCreate(
         email="root@mail.ru",
         nickname="root",
-        password=settings.root_password,
+        password=app_settings.root_password,
     )
     try:
         await user_service.create(root_user, is_superuser=True)

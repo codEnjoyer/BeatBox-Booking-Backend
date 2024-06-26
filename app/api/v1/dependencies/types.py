@@ -1,5 +1,5 @@
-from typing import Annotated
 import datetime
+from typing import Annotated
 
 from fastapi import Query, Path
 from pydantic import PositiveInt, NonNegativeInt

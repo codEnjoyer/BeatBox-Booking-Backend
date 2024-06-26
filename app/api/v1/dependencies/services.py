@@ -2,15 +2,15 @@ from typing import Annotated
 
 from fastapi import Depends
 
-from app.domain.services.auth import AuthService
-from app.domain.services.booking import BookingService
-from app.domain.services.employee import EmployeeService
-from app.domain.services.file import FileService
-from app.domain.services.review import ReviewService
-from app.domain.services.room import RoomService
-from app.domain.services.studio import StudioService
-from app.domain.services.user import UserService
-from app.settings import auth_settings
+from services.auth import AuthService
+from services.booking import BookingService
+from services.employee import EmployeeService
+from services.file import FileService
+from services.review import ReviewService
+from services.room import RoomService
+from services.studio import StudioService
+from services.user import UserService
+from settings import auth_settings
 
 
 def get_auth_service() -> AuthService:

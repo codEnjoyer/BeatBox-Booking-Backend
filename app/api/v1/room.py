@@ -1,15 +1,14 @@
 from fastapi import APIRouter
 from starlette import status
 
-from app.api.v1.dependencies.employee import StudioManagerDep
-
-from app.api.v1.dependencies.services import RoomServiceDep
-from app.api.v1.dependencies.studio import ValidStudioIdDep
-from app.api.v1.dependencies.room import (
+from api.v1.dependencies.employee import StudioManagerDep
+from api.v1.dependencies.room import (
     ValidStudioRoomIdDep,
 )
-from app.domain.models import Room
-from app.domain.schemas.room import RoomRead, RoomCreate, RoomUpdate
+from api.v1.dependencies.services import RoomServiceDep
+from api.v1.dependencies.studio import ValidStudioIdDep
+from models import Room
+from schemas.room import RoomRead, RoomCreate, RoomUpdate
 
 router = APIRouter(tags=["Room"])
 

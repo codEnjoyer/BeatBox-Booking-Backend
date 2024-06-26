@@ -3,10 +3,10 @@ from typing import Annotated
 from fastapi import HTTPException, Depends
 from starlette import status
 
-from app.api.v1.dependencies.services import UserServiceDep
-from app.api.v1.dependencies.types import PathIntID
-from app.domain.exceptions.user import UserNotFoundException
-from app.domain.models import User
+from api.v1.dependencies.services import UserServiceDep
+from api.v1.dependencies.types import PathIntID
+from exceptions.user import UserNotFoundException
+from models import User
 
 
 async def valid_user_id(

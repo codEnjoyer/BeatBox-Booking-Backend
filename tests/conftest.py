@@ -3,13 +3,14 @@ from typing import AsyncGenerator
 
 import pytest
 from sqlalchemy import NullPool
-from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession, create_async_engine
+from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession, \
+    create_async_engine
 
+from db import Base, get_async_session
 from app.main import app
-from app.domain.db import Base, get_async_session
-from app.settings import settings
+from app.settings import app_settings
 
-engine_test = create_async_engine(str(settings.database_url), poolclass=NullPool)
+engine_test = create_async_engine(str(app_settings.database_url), poolclass=NullPool)
 async_session_maker = async_sessionmaker(engine_test, expire_on_commit=False)
 
 
@@ -25,7 +26,7 @@ app.dependency_overrides[get_async_session] = override_get_async_session
 @pytest.fixture(autouse=True, scope="session")
 async def test_env_file():
     # Проверка, что .env, используемый в тестах содержит ENVIRONMENT=TEST
-    assert settings.environment == "TEST"
+    assert app_settings.environment == "TEST"
 
 
 @pytest.fixture(scope="function")

@@ -4,11 +4,11 @@ from typing import Annotated
 from fastapi import HTTPException, Depends
 from starlette import status
 
-from app.api.v1.dependencies.auth import AuthenticatedUser
-from app.api.v1.dependencies.room import ValidStudioRoomIdDep
-from app.api.v1.dependencies.services import BookingServiceDep
-from app.domain.exceptions.booking import BookingNotFoundException
-from app.domain.models import Booking, User
+from api.v1.dependencies.auth import AuthenticatedUser
+from api.v1.dependencies.room import ValidStudioRoomIdDep
+from api.v1.dependencies.services import BookingServiceDep
+from exceptions.booking import BookingNotFoundException
+from models import Booking, User
 
 
 async def valid_booking_id(

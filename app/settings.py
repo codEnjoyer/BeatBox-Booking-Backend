@@ -6,7 +6,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file=".env", env_file_encoding="utf-8", extra="allow"
+        env_file="../.env", env_file_encoding="utf-8", extra="allow"
     )
     environment: Literal[
         "PROD", "DEV", "TEST"
@@ -41,12 +41,12 @@ class Settings(BaseSettings):
         return str(host)
 
 
-settings = Settings()
+app_settings = Settings()
 
 
 class AuthSettings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file=".env", env_file_encoding="utf-8", extra="allow"
+        env_file="../.env", env_file_encoding="utf-8", extra="allow"
     )
 
     secret_auth_token: str

@@ -1,20 +1,20 @@
 from typing import Tuple, Annotated
 
 from fastapi import HTTPException, Depends
+from sqlalchemy.exc import NoResultFound
 from starlette import status
 
-from app.api.v1.dependencies.services import RoomServiceDep
-from app.api.v1.dependencies.studio import ValidStudioIdDep
-from app.api.v1.dependencies.types import PathIntID
-from app.domain.exceptions.room import (
+from api.v1.dependencies.services import RoomServiceDep
+from api.v1.dependencies.studio import ValidStudioIdDep
+from api.v1.dependencies.types import PathIntID
+from exceptions.room import (
     RoomNotFoundException,
     RoomDoesNotExistInStudioException,
 )
-from app.domain.models.room import Room
-from app.domain.schemas.room import RoomRead
-from app.domain.services.file import FileService
-from app.domain.services.room import RoomService
-from sqlalchemy.exc import NoResultFound
+from models.room import Room
+from schemas.room import RoomRead
+from services.file import FileService
+from services.room import RoomService
 
 
 def convert_model_to_scheme(

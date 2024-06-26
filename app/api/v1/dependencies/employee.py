@@ -2,12 +2,12 @@ from typing import Annotated
 
 from fastapi import HTTPException, status, Depends
 
-from app.api.v1.dependencies.auth import AuthenticatedUser
-from app.api.v1.dependencies.services import EmployeeServiceDep
-from app.api.v1.dependencies.studio import ValidStudioIdDep
-from app.api.v1.dependencies.types import PathIntID
-from app.domain.exceptions.employee import EmployeeNotFoundException
-from app.domain.models import User, Employee
+from api.v1.dependencies.auth import AuthenticatedUser
+from api.v1.dependencies.services import EmployeeServiceDep
+from api.v1.dependencies.studio import ValidStudioIdDep
+from api.v1.dependencies.types import PathIntID
+from exceptions.employee import EmployeeNotFoundException
+from models import User, Employee
 
 
 def can_manage_studio(

@@ -1,12 +1,12 @@
 from fastapi import APIRouter
 from starlette import status
 
-from app.api.v1.dependencies.employee import StudioManagerDep
-from app.api.v1.dependencies.services import StudioServiceDep
-from app.api.v1.dependencies.studio import ValidStudioIdDep
-from app.api.v1.dependencies.types import QueryOffset, QueryLimit
-from app.api.v1.dependencies.auth import AuthenticatedSuperuser
-from app.domain.schemas.studio import StudioRead, StudioCreate, StudioUpdate
+from api.v1.dependencies.auth import AuthenticatedSuperuser
+from api.v1.dependencies.employee import StudioManagerDep
+from api.v1.dependencies.services import StudioServiceDep
+from api.v1.dependencies.studio import ValidStudioIdDep
+from api.v1.dependencies.types import QueryOffset, QueryLimit
+from schemas.studio import StudioRead, StudioCreate, StudioUpdate
 
 router = APIRouter(prefix="/studios", tags=["Studio"])
 

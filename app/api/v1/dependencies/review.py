@@ -3,12 +3,12 @@ from typing import Annotated
 from fastapi import HTTPException, Depends
 from starlette import status
 
-from app.api.v1.dependencies.auth import AuthenticatedUser
-from app.api.v1.dependencies.services import ReviewServiceDep
-from app.api.v1.dependencies.studio import ValidStudioIdDep
-from app.api.v1.dependencies.types import PathIntID
-from app.domain.exceptions.review import ReviewNotFoundException
-from app.domain.models import Review
+from api.v1.dependencies.auth import AuthenticatedUser
+from api.v1.dependencies.services import ReviewServiceDep
+from api.v1.dependencies.studio import ValidStudioIdDep
+from api.v1.dependencies.types import PathIntID
+from exceptions.review import ReviewNotFoundException
+from models import Review
 
 
 async def valid_review_id(

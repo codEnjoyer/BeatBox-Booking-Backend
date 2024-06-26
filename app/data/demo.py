@@ -1,10 +1,10 @@
 from datetime import time, timezone
 
-from app.domain.models import Studio, Room
-from app.domain.schemas.room import RoomCreate
-from app.domain.schemas.studio import StudioCreate
-from app.domain.services.room import RoomService
-from app.domain.services.studio import StudioService
+from models import Studio, Room
+from schemas.room import RoomCreate
+from schemas.studio import StudioCreate
+from services.room import RoomService
+from services.studio import StudioService
 
 
 async def load_studios() -> list[Studio]:

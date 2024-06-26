@@ -3,10 +3,10 @@ from typing import Annotated
 from fastapi import UploadFile, HTTPException, Depends
 from starlette import status
 
-from app.api.v1.dependencies.room import ValidStudioRoomIdDep
-from app.api.v1.dependencies.services import FileServiceDep
-from app.api.v1.dependencies.studio import ValidStudioIdDep
-from app.domain.exceptions.file import (
+from api.v1.dependencies.room import ValidStudioRoomIdDep
+from api.v1.dependencies.services import FileServiceDep
+from api.v1.dependencies.studio import ValidStudioIdDep
+from exceptions.file import (
     FileNotFoundException,
     FileIsTooLargeException,
     FileIsNotAnImageOrUnsupportedException,

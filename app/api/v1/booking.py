@@ -1,33 +1,33 @@
 from fastapi import APIRouter, HTTPException
 from starlette import status
 
-from app.api.v1.dependencies.booking import (
+from api.v1.dependencies.auth import AuthenticatedUser
+from api.v1.dependencies.booking import (
     OwnedBookingDep,
     BookingCancelerDep,
     ValidBookingIdDep,
 )
-from app.api.v1.dependencies.room import ValidStudioRoomIdDep
-from app.api.v1.dependencies.services import BookingServiceDep
-from app.api.v1.dependencies.auth import AuthenticatedUser
-from app.api.v1.dependencies.types import (
+from api.v1.dependencies.room import ValidStudioRoomIdDep
+from api.v1.dependencies.services import BookingServiceDep
+from api.v1.dependencies.types import (
     QueryLimit,
     QueryOffset,
     QueryDateFrom,
     QueryDateTo,
 )
-from app.domain.exceptions.booking import (
+from exceptions.booking import (
     MustBookWithinOneDayException,
     MustBookWithinStudioWorkingTimeException,
     SlotAlreadyBookedException,
     BookingAlreadyCancelledException,
     BookingMustBeActiveException,
 )
-from app.domain.schemas.booking import BookingCreate, BookingRead, BookingUpdate
+from schemas.booking import BookingCreate, BookingRead, BookingUpdate
 
 router = APIRouter(tags=["Booking"])
 
 
-@router.get("/me/bookings", response_model=list[BookingRead])
+@router.get("/users/me/bookings", response_model=list[BookingRead])
 async def get_my_bookings(
     booking_service: BookingServiceDep,
     user: AuthenticatedUser,

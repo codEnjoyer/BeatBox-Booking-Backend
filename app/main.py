@@ -31,12 +31,16 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost",
-                   "https://localhost"],
+    allow_origins=[
+        "http://localhost",
+        "http://158.160.58.186/",
+        "https://158.160.58.186/",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 @app.exception_handler(BBBException)
 async def service_exception_handler(_: Request, exc: BBBException) -> Response:

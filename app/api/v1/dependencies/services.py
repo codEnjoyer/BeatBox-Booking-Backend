@@ -10,11 +10,11 @@ from services.review import ReviewService
 from services.room import RoomService
 from services.studio import StudioService
 from services.user import UserService
-from settings import auth_settings
+from settings.auth import auth_settings
 
 
 def get_auth_service() -> AuthService:
-    return AuthService(auth_settings.secret_auth_token)
+    return AuthService(auth_settings.secret_token)
 
 
 AuthServiceDep = Annotated[AuthService, Depends(get_auth_service)]

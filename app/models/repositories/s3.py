@@ -3,7 +3,7 @@ from aiohttp import ClientError
 from fastapi import UploadFile
 
 from exceptions.file import FileNotFoundException
-from settings import app_settings
+from settings.s3 import s3_settings
 
 CHUNK_SIZE = 1024 * 1024  # 1 Mb
 URL_EXPIRES_IN_SECONDS = 60 * 60  # 1 hour
@@ -12,11 +12,11 @@ URL_EXPIRES_IN_SECONDS = 60 * 60  # 1 hour
 class S3Repository:
     def __init__(self):
         self.service_name = 's3'
-        self.endpoint = app_settings.s3_endpoint
-        self.bucket_name = app_settings.bucket_name
+        self.endpoint = s3_settings.endpoint
+        self.bucket_name = s3_settings.bucket_name
         self.session = aioboto3.Session(
-            aws_access_key_id=app_settings.aws_access_key_id,
-            aws_secret_access_key=app_settings.aws_secret_access_key,
+            aws_access_key_id=s3_settings.aws_access_key_id,
+            aws_secret_access_key=s3_settings.aws_secret_access_key,
         )
 
     async def get_url(self, filename: str) -> str:

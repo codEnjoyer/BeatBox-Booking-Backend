@@ -2,7 +2,7 @@ from datetime import timedelta, datetime, timezone
 
 import jwt
 
-from settings import auth_settings
+from settings.auth import auth_settings
 
 
 class AuthService:
@@ -19,7 +19,7 @@ class AuthService:
             expire = datetime.now(timezone.utc) + expires_delta
         else:
             expire = datetime.now(timezone.utc) + timedelta(
-                hours=auth_settings.auth_token_expiration_hours
+                hours=auth_settings.token_expiration_hours
             )
         to_encode.update({"exp": expire})
 

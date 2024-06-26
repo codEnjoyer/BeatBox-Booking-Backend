@@ -4,7 +4,7 @@ from exceptions.user import (
 )
 from schemas.user import UserCreate
 from services.user import UserService
-from settings import app_settings
+from settings.app import app_settings
 
 
 async def load_users():

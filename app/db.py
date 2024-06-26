@@ -8,12 +8,12 @@ from sqlalchemy.ext.asyncio import (
 )
 from sqlalchemy.orm import declarative_base
 
-from settings import app_settings
+from settings.db import db_settings
 
 metadata = MetaData()
 Base = declarative_base(metadata=metadata)
 engine = create_async_engine(
-    app_settings.database_url,
+    db_settings.url,
     pool_recycle=60 * 60,  # 1 hour
     pool_size=10,
     max_overflow=20,

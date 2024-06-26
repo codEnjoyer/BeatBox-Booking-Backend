@@ -6,7 +6,7 @@ from api import v1_router
 from data.demo import load_demo_data
 from data.initial import load_initial_data
 from exceptions.base import BBBException
-from settings import app_settings
+from settings.app import app_settings
 
 
 @asynccontextmanager

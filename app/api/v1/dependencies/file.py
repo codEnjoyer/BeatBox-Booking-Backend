@@ -19,7 +19,7 @@ async def valid_filename(filename: str, file_service: FileServiceDep) -> str:
     except FileNotFoundException as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail=str(e)
-        )
+        ) from e
     return filename
 
 
@@ -69,11 +69,11 @@ async def valid_upload_image_file(
     except FileIsNotAnImageOrUnsupportedException as e:
         raise HTTPException(
             status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE, detail=str(e)
-        )
+        ) from e
     except FileIsTooLargeException as e:
         raise HTTPException(
             status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE, detail=str(e)
-        )
+        ) from e
     return file
 
 
@@ -89,11 +89,11 @@ async def valid_upload_image_files(
     except FileIsNotAnImageOrUnsupportedException as e:
         raise HTTPException(
             status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE, detail=str(e)
-        )
+        ) from e
     except FileIsTooLargeException as e:
         raise HTTPException(
             status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE, detail=str(e)
-        )
+        ) from e
     return files
 
 

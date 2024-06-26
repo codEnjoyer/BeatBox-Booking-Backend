@@ -45,7 +45,7 @@ async def create_employee_in_studio(
     except UserNotFoundException as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail=str(e)
-        )
+        ) from e
     if user.employee is not None:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

@@ -96,9 +96,9 @@ async def book_room(
         MustBookWithinOneDayException,
         MustBookWithinStudioWorkingTimeException,
     ) as e:
-        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(e))
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
     except SlotAlreadyBookedException as e:
-        raise HTTPException(status.HTTP_409_CONFLICT, detail=str(e))
+        raise HTTPException(status.HTTP_409_CONFLICT, detail=str(e)) from e
     return booking
 
 
@@ -115,7 +115,7 @@ async def update_booking_name(
     try:
         booking = await booking_service.update_by_id(booking.id, schema)
     except BookingMustBeActiveException as e:
-        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(e))
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
     return booking
 
 
@@ -131,5 +131,5 @@ async def cancel_booking(
     try:
         cancelled = await booking_service.cancel_booking(booking)
     except BookingAlreadyCancelledException as e:
-        raise HTTPException(status.HTTP_409_CONFLICT, detail=str(e))
+        raise HTTPException(status.HTTP_409_CONFLICT, detail=str(e)) from e
     return cancelled

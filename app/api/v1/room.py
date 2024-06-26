@@ -46,7 +46,6 @@ async def update_room(
     room_service: RoomServiceDep,
     _: StudioManagerDep,
 ) -> RoomRead:
-    # TODO: Check
     room = await room_service.update_by_id(room.id, schema)
     return room
 

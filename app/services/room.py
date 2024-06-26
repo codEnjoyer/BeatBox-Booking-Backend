@@ -43,8 +43,8 @@ class RoomService(ModelService[RoomRepository, Room, RoomCreate, RoomUpdate]):
             return await self.create_room_in_studio(studio_id, schema)
 
     @override
-    async def update_by_id(self, room_id: int, schema: RoomUpdate) -> Room:
-        updated = await super().update_by_id(room_id, schema)
+    async def update_by_id(self, model_id: int, schema: RoomUpdate) -> Room:
+        updated = await super().update_by_id(model_id, schema)
         return await self.get_by_id(updated.id)
 
     async def check_if_room_in_studio(

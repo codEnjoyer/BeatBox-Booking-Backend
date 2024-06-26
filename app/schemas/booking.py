@@ -1,5 +1,4 @@
 import datetime
-import typing
 import uuid
 from typing import Self, Annotated
 
@@ -18,9 +17,6 @@ from schemas.base import (
     DatetimeTZ,
     NonEmptyString,
 )
-
-if typing.TYPE_CHECKING:
-    from schemas.user import UserRead
 
 
 class BaseBooking(BaseSchema):
@@ -96,5 +92,7 @@ class BookingCreate(BaseBooking):
 
 class BookingUpdate(BaseBooking): ...
 
+
+from schemas.user import UserRead
 
 BookingRead.update_forward_refs()

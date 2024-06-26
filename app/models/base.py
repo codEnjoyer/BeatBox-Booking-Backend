@@ -13,7 +13,10 @@ class BaseModel(Base):
                 setattr(self, attr, value)
 
     def __repr__(self):
-        """Relationships не используются в repr(), т.к. могут вести к неожиданным подгрузкам"""  # noqa: E501
+        """
+        Relationships не используются в repr(),
+        т.к. могут вести к неожиданным подгрузкам
+        """
         columns = []
         for index, column in enumerate(self.__table__.columns.keys()):
             if column in self._repr_cols or index < self._repr_cols_num:

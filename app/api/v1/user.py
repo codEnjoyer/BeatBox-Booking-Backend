@@ -61,7 +61,8 @@ async def update_my_info(
     try:
         user = await user_service.update(user, schema)
     except (EmailAlreadyTakenException, NicknameAlreadyTakenException) as e:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT,
+                            detail=str(e)) from e
     return user
 
 

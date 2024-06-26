@@ -58,9 +58,9 @@ class BookingService(
 
     @override
     async def update_by_id(
-        self, booking_id: int, schema: BookingUpdate
+        self, model_id: int, schema: BookingUpdate
     ) -> Booking:
-        updated = await super().update_by_id(booking_id, schema)
+        updated = await super().update_by_id(model_id, schema)
         return await self.get_by_id(updated.id)
 
     async def update_booking_name(

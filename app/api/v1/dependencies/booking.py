@@ -22,7 +22,7 @@ async def valid_booking_id(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=str(e),
-        )
+        ) from e
     return booking
 
 

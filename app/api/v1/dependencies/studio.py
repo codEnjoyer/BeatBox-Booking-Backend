@@ -19,7 +19,7 @@ async def valid_studio_id(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=str(e),
-        )
+        ) from e
     return studio
 
 

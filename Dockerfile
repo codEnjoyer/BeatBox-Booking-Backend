@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-# Keep this syntax directive! It's used to enable Docker BuildKit
+# Keep this syntax directive! It'settings used to enable Docker BuildKit
 
 # Based on https://github.com/python-poetry/poetry/discussions/1879?sort=top#discussioncomment-216865
 # but I try to keep it updated (see history)
@@ -24,7 +24,7 @@ ENV PYTHONUNBUFFERED=1 \
     POETRY_VERSION=1.8.2 \
     # make poetry install to this location
     POETRY_HOME="/opt/poetry" \
-    # make poetry create the virtual environment in the project's root
+    # make poetry create the virtual environment in the project'settings root
     # it gets named `.venv`
     POETRY_VIRTUALENVS_IN_PROJECT=true \
     # do not ask any interactive question

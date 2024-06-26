@@ -3,7 +3,7 @@ services:
     build:
       context: ./
       dockerfile: Dockerfile
-      target: production
+      target: development
     ports:
       - ${APP_PORT}:${APP_PORT}
     env_file:

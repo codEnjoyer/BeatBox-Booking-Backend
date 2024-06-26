@@ -65,6 +65,7 @@ exclude = '''
   venv
   | tests
   | pytest_cache
+  | migrations
 )
 '''
 

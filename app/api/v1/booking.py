@@ -40,32 +40,12 @@ async def get_my_bookings(
     return bookings
 
 
-# @router.get("/studios/{studio_id}/bookings", response_model=list[BookingRead])
-# async def get_studio_bookings(
-#     studio: ValidStudioIdDep,
-#     booking_service: BookingServiceDep,
-#     _: AuthenticatedUser,
-#     from_: datetime.date | None = None,
-#     to: datetime.date | None = None,
-#     offset: QueryOffset = 0,
-#     limit: QueryLimit = 100,
-# ) -> list[Booking]:
-#     studio_bookings = []
-#     for room in studio.rooms:
-#         room_bookings = await booking_service.get_room_bookings(
-#             room.id, from_, to, offset=offset, limit=limit
-#         )
-#         studio_bookings.extend(room_bookings)
-#     return studio_bookings
-
-
 @router.get(
     "/studios/{studio_id}/rooms/{room_id}/bookings",
     response_model=list[BookingRead],
 )
 async def get_room_bookings(
     room: ValidStudioRoomIdDep,
-    _: AuthenticatedUser,
     booking_service: BookingServiceDep,
     from_: QueryDateFrom | None = None,
     to: QueryDateTo | None = None,
